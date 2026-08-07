@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getBonusLesson, listVideos, markVideoWatched } from "@/lib/db";
 import { useAuth } from "@/lib/auth";
+import { cn } from "@/lib/utils";
+
 
 
 export const Route = createFileRoute("/dashboard")({
