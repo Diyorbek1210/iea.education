@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, PlayCircle } from "lucide-react";
+import { CheckCircle2, Gift, Lock, PlayCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { listVideos, markVideoWatched } from "@/lib/db";
+import { getBonusLesson, listVideos, markVideoWatched } from "@/lib/db";
 import { useAuth } from "@/lib/auth";
+
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
