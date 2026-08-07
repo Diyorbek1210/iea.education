@@ -29,9 +29,12 @@ function DashboardPage() {
   const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
   const { data: videos = [] } = useQuery({ queryKey: ["videos"], queryFn: listVideos });
+  const { data: bonus } = useQuery({ queryKey: ["bonus"], queryFn: getBonusLesson });
 
   const watched = user?.videosWatched ?? [];
   const progress = videos.length ? (watched.length / videos.length) * 100 : 0;
+  const bonusUnlocked = watched.length >= 5;
+
 
   async function watch(id: string, url: string) {
     window.open(url, "_blank", "noopener,noreferrer");
