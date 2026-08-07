@@ -1,0 +1,32 @@
+import { GraduationCap } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+export function Logo({
+  className,
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
+  return (
+    <div className={cn("flex items-center gap-3", className)}>
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-primary shadow-card">
+        <GraduationCap className="h-6 w-6 text-primary-foreground" />
+      </span>
+      <span className="leading-none">
+        <span className="block text-xl font-extrabold tracking-tight text-foreground">IEA</span>
+        {!compact && (
+          <>
+            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              IELTS &amp; English Access
+            </span>
+            <span className="mt-0.5 block text-[10px] italic text-primary">
+              Learning Today, Leading Tomorrow
+            </span>
+          </>
+        )}
+      </span>
+    </div>
+  );
+}
