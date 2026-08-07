@@ -68,6 +68,59 @@ function DashboardPage() {
         <Progress value={progress} className="mt-4 h-2" />
       </section>
 
+      {bonus && (
+        <section
+          className={cn(
+            "mt-6 flex flex-wrap items-center gap-4 rounded-3xl p-6 shadow-card",
+            bonusUnlocked ? "bg-gradient-primary" : "bg-card",
+          )}
+        >
+          <span
+            className={cn(
+              "flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
+              bonusUnlocked ? "bg-primary-foreground/20" : "bg-secondary",
+            )}
+          >
+            {bonusUnlocked ? (
+              <Gift className="h-5 w-5 text-primary-foreground" />
+            ) : (
+              <Lock className="h-5 w-5 text-muted-foreground" />
+            )}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p
+              className={cn(
+                "text-sm font-extrabold",
+                bonusUnlocked ? "text-primary-foreground" : "text-foreground",
+              )}
+            >
+              {bonus.title}
+            </p>
+            <p
+              className={cn(
+                "mt-1 text-xs",
+                bonusUnlocked ? "text-primary-foreground/80" : "text-muted-foreground",
+              )}
+            >
+              {bonusUnlocked
+                ? bonus.description
+                : `Locked — watch ${5 - watched.length} more lesson(s) to unlock this free bonus.`}
+            </p>
+          </div>
+          {bonusUnlocked && (
+            <Button
+              variant="soft"
+              size="pill"
+              onClick={() => window.open(bonus.url, "_blank", "noopener,noreferrer")}
+            >
+              <PlayCircle className="h-4 w-4" /> Watch bonus
+            </Button>
+          )}
+        </section>
+      )}
+
+
+
       <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {videos.map((video) => {
           const done = watched.includes(video.id);
