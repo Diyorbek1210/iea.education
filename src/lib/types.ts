@@ -41,3 +41,11 @@ export interface BonusLesson {
   description: string;
   url: string;
 }
+
+export interface PlacementQuestion {
+  id: string;
+  q: string;
+  options: string[];
+  answer: number;
+  createdAt: string;
+}

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { getBonusLesson, listVideos, markVideoWatched } from "@/lib/db";
+import { getBonusLesson, listBonusLessons, listVideos, markVideoWatched } from "@/lib/db";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +32,10 @@ function DashboardPage() {
   const queryClient = useQueryClient();
   const { data: videos = [] } = useQuery({ queryKey: ["videos"], queryFn: listVideos });
   const { data: bonus } = useQuery({ queryKey: ["bonus"], queryFn: getBonusLesson });
+  const { data: bonusLessons = [] } = useQuery({
+    queryKey: ["bonus-lessons"],
+    queryFn: listBonusLessons,
+  });
 
   const watched = user?.videosWatched ?? [];
   const progress = videos.length ? (watched.length / videos.length) * 100 : 0;
@@ -69,6 +73,66 @@ function DashboardPage() {
         </div>
         <Progress value={progress} className="mt-4 h-2" />
       </section>
+
+      {bonusLessons.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-sm font-bold text-foreground">Bonus lessons</h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {bonusLessons.map((item) => (
+              <div
+                key={item.id}
+                className={cn(
+                  "flex flex-wrap items-center gap-4 rounded-3xl p-6 shadow-card",
+                  bonusUnlocked ? "bg-gradient-primary" : "bg-card",
+                )}
+              >
+                <span
+                  className={cn(
+                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
+                    bonusUnlocked ? "bg-primary-foreground/20" : "bg-secondary",
+                  )}
+                >
+                  {bonusUnlocked ? (
+                    <Gift className="h-5 w-5 text-primary-foreground" />
+                  ) : (
+                    <Lock className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={cn(
+                      "text-sm font-extrabold",
+                      bonusUnlocked ? "text-primary-foreground" : "text-foreground",
+                    )}
+                  >
+                    {item.title}
+                  </p>
+                  <p
+                    className={cn(
+                      "mt-1 text-xs line-clamp-2",
+                      bonusUnlocked ? "text-primary-foreground/80" : "text-muted-foreground",
+                    )}
+                  >
+                    {bonusUnlocked
+                      ? item.description
+                      : `Locked — watch ${5 - watched.length} more lesson(s) to unlock.`}
+                  </p>
+                </div>
+                {bonusUnlocked && (
+                  <Button
+                    variant="soft"
+                    size="pill"
+                    className="shrink-0"
+                    onClick={() => window.open(item.url, "_blank", "noopener,noreferrer")}
+                  >
+                    <PlayCircle className="h-4 w-4" /> Watch
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {bonus && (
         <section

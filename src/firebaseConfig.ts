@@ -1,23 +1,25 @@
-/**
- * Firebase configuration.
- *
- * Replace the values below with your own Firebase project credentials
- * (Firebase Console → Project settings → Your apps → SDK setup and configuration).
- *
- * Until real values are provided, the app automatically runs in "local demo mode"
- * and stores data in the browser (localStorage) so every page stays usable.
- */
+
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
 export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+ apiKey: "AIzaSyCC5TBm4rC7AleakQl92W_yRPaiNoGoV9s",
+
+  authDomain: "salom-4f3bd.firebaseapp.com",
+
+  databaseURL: "https://salom-4f3bd-default-rtdb.firebaseio.com",
+
+  projectId: "salom-4f3bd",
+
+  storageBucket: "salom-4f3bd.firebasestorage.app",
+
+  messagingSenderId: "223747081418",
+
+  appId: "1:223747081418:web:5d1d89c7e00cc1a0b82033",
+
+  measurementId: "G-JYXYC0S8DX"
+
 };
 
 export const isFirebaseConfigured = !Object.values(firebaseConfig).some((value) =>

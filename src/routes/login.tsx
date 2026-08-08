@@ -49,19 +49,19 @@ function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-soft px-5 py-12">
-      <div className="w-full max-w-md">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-soft px-5 py-6">
+      <div className="w-full max-w-xs">
         <Link to="/" className="mx-auto flex w-fit">
           <Logo />
         </Link>
 
-        <div className="mt-8 rounded-4xl bg-card p-8 shadow-soft">
-          <h1 className="text-2xl font-extrabold text-foreground">Welcome back</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+        <div className="mt-3 rounded-3xl bg-card p-4 shadow-soft">
+          <h1 className="text-lg font-extrabold text-foreground">Welcome back</h1>
+          <p className="mt-1 text-xs text-muted-foreground">
             Log in to continue where you left off.
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-3 space-y-2">
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
@@ -71,7 +71,7 @@ function LoginPage() {
                 maxLength={255}
                 onChange={(e) => setValues({ ...values, email: e.target.value })}
                 placeholder="you@example.com"
-                className="mt-1.5"
+                className="mt-1"
               />
             </div>
             <div>
@@ -83,13 +83,13 @@ function LoginPage() {
                 maxLength={72}
                 onChange={(e) => setValues({ ...values, password: e.target.value })}
                 placeholder="Your password"
-                className="mt-1.5"
+                className="mt-1"
               />
             </div>
             <Button
               type="submit"
               variant="hero"
-              size="pill-lg"
+              size="pill"
               className="w-full"
               disabled={busy}
             >
@@ -97,12 +97,12 @@ function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 flex items-start gap-2 rounded-2xl bg-secondary px-4 py-3 text-xs text-secondary-foreground">
+          <div className="mt-3 flex items-start gap-2 rounded-xl bg-secondary px-3 py-2 text-xs text-secondary-foreground">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <p>Administrators are redirected to the Admin Panel automatically after login.</p>
           </div>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-3 text-center text-xs text-muted-foreground">
             No account yet?{" "}
             <Link to="/test" className="font-semibold text-primary hover:underline">
               Take the placement test

@@ -13,7 +13,8 @@ import {
 } from "firebase/firestore";
 
 import { db, isFirebaseConfigured } from "@/firebaseConfig";
-import type { BonusLesson, MockResult, UserProfile, VideoDoc } from "./types";
+import { placementQuestions as staticPlacementQuestions } from "@/data/placement";
+import type { BonusLesson, MockResult, PlacementQuestion, UserProfile, VideoDoc } from "./types";
 
 /* ------------------------------------------------------------------ *
  * Local demo store — used automatically until firebaseConfig.ts holds
@@ -25,6 +26,7 @@ const KEYS = {
   videos: "iea_videos",
   mocks: "iea_mock_results",
   bonus: "iea_bonus_lesson",
+  placement: "iea_placement_questions",
 };
 
 function read<T>(key: string, fallback: T): T {
@@ -100,11 +102,31 @@ const defaultBonus: BonusLesson = {
   url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
 };
 
+interface BonusItem extends BonusLesson {
+  id: string;
+  createdAt: string;
+}
+
 function localVideos(): VideoDoc[] {
   const existing = read<VideoDoc[] | null>(KEYS.videos, null);
   if (existing && existing.length) return existing;
   write(KEYS.videos, seedVideos);
   return seedVideos;
+}
+
+const seedPlacementQuestions: PlacementQuestion[] = staticPlacementQuestions.map(
+  (question, index) => ({
+    id: `p${index + 1}`,
+    ...question,
+    createdAt: new Date().toISOString(),
+  }),
+);
+
+function localPlacementQuestions(): PlacementQuestion[] {
+  const existing = read<PlacementQuestion[] | null>(KEYS.placement, null);
+  if (existing && existing.length) return existing;
+  write(KEYS.placement, seedPlacementQuestions);
+  return seedPlacementQuestions;
 }
 
 /* ------------------------------------------------------------------ *
@@ -261,4 +283,117 @@ export async function saveBonusLesson(lesson: BonusLesson): Promise<void> {
     return;
   }
   await setDoc(doc(db, "content", "bonusLesson"), lesson);
+}
+
+/* ------------------------------------------------------------------ *
+ * Bonus lessons (multiple items)
+ * ------------------------------------------------------------------ */
+
+const KEYS_BONUS_LESSONS = "iea_bonus_lessons";
+
+function localBonusLessons(): BonusItem[] {
+  const existing = read<BonusItem[] | null>(KEYS_BONUS_LESSONS, null);
+  if (existing && existing.length) return existing;
+  return [];
+}
+
+export async function listBonusLessons(): Promise<BonusItem[]> {
+  if (!isFirebaseConfigured || !db) return localBonusLessons();
+  const snap = await getDocs(
+    query(collection(db, "bonusLessons"), orderBy("createdAt", "desc")),
+  );
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<BonusItem, "id">) }));
+}
+
+export async function addBonusLesson(
+  lesson: Omit<BonusItem, "id" | "createdAt">,
+): Promise<void> {
+  const payload = { ...lesson, createdAt: new Date().toISOString() };
+  if (!isFirebaseConfigured || !db) {
+    write(KEYS_BONUS_LESSONS, [{ id: crypto.randomUUID(), ...payload }, ...localBonusLessons()]);
+    return;
+  }
+  await addDoc(collection(db, "bonusLessons"), payload);
+}
+
+export async function updateBonusLesson(
+  id: string,
+  data: Partial<Omit<BonusItem, "id" | "createdAt">>,
+): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(
+      KEYS_BONUS_LESSONS,
+      localBonusLessons().map((b) => (b.id === id ? { ...b, ...data } : b)),
+    );
+    return;
+  }
+  await updateDoc(doc(db, "bonusLessons", id), data);
+}
+
+export async function deleteBonusLesson(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(
+      KEYS_BONUS_LESSONS,
+      localBonusLessons().filter((b) => b.id !== id),
+    );
+    return;
+  }
+  await deleteDoc(doc(db, "bonusLessons", id));
+}
+
+/* ------------------------------------------------------------------ *
+ * Placement test questions
+ * ------------------------------------------------------------------ */
+
+export async function listPlacementQuestions(): Promise<PlacementQuestion[]> {
+  if (!isFirebaseConfigured || !db) return localPlacementQuestions();
+
+  const snap = await getDocs(
+    query(collection(db, "placementQuestions"), orderBy("createdAt", "asc")),
+  );
+  if (snap.empty) {
+    await Promise.all(
+      seedPlacementQuestions.map(({ id, ...question }) =>
+        setDoc(doc(db!, "placementQuestions", id), question),
+      ),
+    );
+    return seedPlacementQuestions;
+  }
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PlacementQuestion, "id">) }));
+}
+
+export async function addPlacementQuestion(
+  question: Omit<PlacementQuestion, "id" | "createdAt">,
+): Promise<void> {
+  const payload = { ...question, createdAt: new Date().toISOString() };
+  if (!isFirebaseConfigured || !db) {
+    write(KEYS.placement, [...localPlacementQuestions(), { id: crypto.randomUUID(), ...payload }]);
+    return;
+  }
+  await addDoc(collection(db, "placementQuestions"), payload);
+}
+
+export async function updatePlacementQuestion(
+  id: string,
+  data: Partial<Omit<PlacementQuestion, "id" | "createdAt">>,
+): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(
+      KEYS.placement,
+      localPlacementQuestions().map((q) => (q.id === id ? { ...q, ...data } : q)),
+    );
+    return;
+  }
+  await updateDoc(doc(db, "placementQuestions", id), data);
+}
+
+export async function deletePlacementQuestion(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(
+      KEYS.placement,
+      localPlacementQuestions().filter((q) => q.id !== id),
+    );
+    return;
+  }
+  await deleteDoc(doc(db, "placementQuestions", id));
 }

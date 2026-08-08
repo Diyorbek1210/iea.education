@@ -1,6 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Gamepad2,
+  Gift,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/dashboard", label: "Videos", icon: LayoutDashboard },
+  { to: "/bonuses", label: "Bonuses", icon: Gift },
   { to: "/games", label: "Games", icon: Gamepad2 },
   { to: "/mock-test", label: "Mock Test", icon: ClipboardCheck },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
@@ -52,7 +54,7 @@ export function DashboardShell({
     <div className="flex min-h-screen bg-background">
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 shrink-0 border-r border-sidebar-border bg-sidebar p-5 transition-transform lg:static lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-64 shrink-0 border-r border-sidebar-border bg-sidebar p-5 shadow-card transition-transform lg:static lg:translate-x-0 lg:shadow-none",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
