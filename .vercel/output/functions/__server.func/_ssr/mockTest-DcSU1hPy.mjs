@@ -1,0 +1,7364 @@
+//#region node_modules/.nitro/vite/services/ssr/assets/mockTest-DcSU1hPy.js
+function speakingPart1(prompts) {
+	return prompts.map((prompt) => ({
+		part: 1,
+		prompt,
+		prepSeconds: 0,
+		answerSeconds: 30
+	}));
+}
+function speakingPart2(prompt) {
+	return {
+		part: 2,
+		prompt,
+		prepSeconds: 60,
+		answerSeconds: 120
+	};
+}
+function speakingPart3(prompts) {
+	return prompts.map((prompt) => ({
+		part: 3,
+		prompt,
+		prepSeconds: 0,
+		answerSeconds: 40
+	}));
+}
+var mockTests = [
+	{
+		id: "mock-1",
+		order: 1,
+		title: "IELTS Mock Test 1",
+		reading: { passages: [
+			{
+				title: "The Rise of Urban Beekeeping",
+				passage: "Urban beekeeping has become increasingly popular over the past decade, as city dwellers seek ways to support declining bee populations and produce their own honey. Rooftop hives can now be found in many major cities, from London to New York, often installed on the roofs of hotels, offices and even schools. Enthusiasts argue that cities can actually be surprisingly good habitats for bees, since parks, gardens and street trees provide a longer flowering season than the single-crop fields common in intensive rural farming, where a field may bloom for only a few weeks before being harvested. However, research suggests that hives in cities often produce less honey overall than their rural counterparts, largely because urban environments still offer fewer flowering plants across the full year compared with well-managed countryside apiaries, and because urban forage is scattered across many small gardens rather than concentrated in large meadows. Some scientists have also raised concerns about overcrowding: when too many hives are placed close together in a small area, local honeybees may end up competing with wild bees and other pollinators for the same limited food sources, potentially harming those other pollinator populations rather than helping them. A well-known example occurred in one European capital, where the number of registered hives more than tripled within five years without any corresponding increase in flowering plants, prompting local beekeeping associations to call for a temporary limit on new hive registrations in the city centre. Despite these challenges, most beekeeping associations agree that, if managed responsibly and paired with efforts to plant more flowers in public spaces, urban apiaries can still play a valuable role in raising public awareness about pollinator conservation and the broader threat posed by colony collapse disorder, a phenomenon in which worker bees abruptly disappear from a hive, leaving the queen and immature bees behind. Councils in several cities have begun offering small grants to residents who wish to plant bee-friendly gardens alongside their hives, recognising that a hive alone is not enough to guarantee a thriving colony; the surrounding landscape matters just as much as the hive itself. A handful of businesses have also started to see an economic opportunity in the trend, offering rooftop 'bee tourism' experiences and educational workshops for schoolchildren, which supporters say do more for long-term conservation awareness than the honey production itself. Critics, however, caution that such novelty experiences risk trivialising a serious ecological issue, turning a conservation effort into little more than a fashionable pastime for city residents who may never engage with the harder, less visible work of protecting wild bee habitats outside the city.",
+				questions: [
+					{
+						q: "According to the passage, why do some enthusiasts believe cities can be good habitats for bees?",
+						options: [
+							"Cities have fewer predators",
+							"Urban bees are naturally more productive",
+							"Parks and gardens offer a longer flowering season than single-crop fields",
+							"Cities have better weather for bees"
+						],
+						answer: 2
+					},
+					{
+						q: "Why do city hives often produce less honey than rural ones overall?",
+						options: [
+							"Fewer flowering plants year-round and forage scattered across small gardens",
+							"Urban bees are less active",
+							"City hives are smaller in size",
+							"Urban honey is harvested too early"
+						],
+						answer: 0
+					},
+					{
+						q: "What concern do some scientists raise about too many hives in one area?",
+						options: [
+							"They attract predators",
+							"They can crowd out wild pollinators competing for food",
+							"They lower property values",
+							"They reduce local rainfall"
+						],
+						answer: 1
+					},
+					{
+						q: "What happened in the European capital mentioned in the passage?",
+						options: [
+							"All hives were banned",
+							"Honey production doubled",
+							"Hive numbers tripled without more flowering plants",
+							"Wild bees disappeared entirely"
+						],
+						answer: 2
+					},
+					{
+						q: "What did local beekeeping associations call for in response?",
+						options: [
+							"More hives to be registered",
+							"A ban on beekeeping",
+							"A temporary limit on new hive registrations",
+							"Free honey for residents"
+						],
+						answer: 2
+					},
+					{
+						q: "What do beekeeping associations generally agree on?",
+						options: [
+							"Urban beekeeping should be banned",
+							"It can be valuable if managed responsibly",
+							"Only rural beekeeping works",
+							"Hives should be moved indoors"
+						],
+						answer: 1
+					},
+					{
+						q: "What is colony collapse disorder, as described in the passage?",
+						options: [
+							"A disease that kills flowers",
+							"Worker bees abruptly disappearing from a hive",
+							"Overproduction of honey",
+							"A type of urban hive design"
+						],
+						answer: 1
+					},
+					{
+						q: "Why are some councils offering grants to residents?",
+						options: [
+							"To reduce the number of hives",
+							"To fund honey factories",
+							"To help plant bee-friendly gardens",
+							"To pay for pest control"
+						],
+						answer: 2
+					},
+					{
+						q: "What point does the passage make about a hive alone?",
+						options: [
+							"It guarantees a thriving colony",
+							"It is not enough without the surrounding landscape",
+							"It is more important than gardens",
+							"It requires no maintenance"
+						],
+						answer: 1
+					},
+					{
+						q: "What economic opportunity have some businesses identified?",
+						options: [
+							"Selling hive equipment only",
+							"Exporting urban honey abroad",
+							"Rooftop bee tourism and educational workshops",
+							"Renting rooftop space to farmers"
+						],
+						answer: 2
+					},
+					{
+						q: "What do supporters say about these educational workshops?",
+						options: [
+							"They do more for conservation awareness than honey production",
+							"They are purely for profit",
+							"They are less effective than honey sales",
+							"They discourage children from learning about bees"
+						],
+						answer: 0
+					},
+					{
+						q: "What do critics of 'bee tourism' caution?",
+						options: [
+							"It may trivialise a serious ecological issue",
+							"It is too expensive for schools",
+							"It harms bee populations directly",
+							"It is illegal in most cities"
+						],
+						answer: 0
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The decline of rural farming",
+							"How to start a garden",
+							"Bees in the city: benefits, limits and debate",
+							"The history of honey production"
+						],
+						answer: 2
+					}
+				]
+			},
+			{
+				title: "The Printing Press and the Spread of Knowledge",
+				passage: "When Johannes Gutenberg introduced movable-type printing to Europe in the 1440s, few could have predicted how thoroughly it would reshape the continent's intellectual life. Before this innovation, books were copied by hand, a process so slow and expensive that a single volume could take a scribe months to complete, placing books firmly out of reach for all but the wealthiest institutions and individuals. Gutenberg's press, which combined oil-based ink, a wooden press adapted from wine-making equipment, and reusable metal type, allowed multiple identical copies of a text to be produced in a fraction of the time previously required. Within fifty years of Gutenberg's first printed Bible, printing presses had been established in more than 250 European cities, and it is estimated that around twenty million books had been printed, a figure that would rise dramatically over the following century. This rapid expansion did not simply make existing books more available; it changed what kinds of texts were written in the first place. Because printing made it economically viable to produce works in vernacular languages rather than only in Latin, the language of the educated elite, authors increasingly wrote for a broader readership, including merchants, craftsmen and, eventually, women, who had historically been excluded from formal Latin education. Some historians argue that this shift in readership was at least as significant as the increase in the sheer number of books, since it meant that ideas could circulate among people who had previously had no access to written knowledge at all. The press also transformed the way scientific knowledge developed. Where earlier scholars might unknowingly duplicate errors from a single hand-copied manuscript, printed texts could be compared, corrected and reprinted with amendments far more efficiently, allowing errors to be identified and fixed across many more circulating copies. Historians of science often point to this capacity for correction, rather than simple mass production, as the press's most underappreciated contribution to the rise of modern science. Yet the technology's effects were not universally welcomed. Religious and political authorities across Europe quickly recognised that a technology capable of spreading ideas so rapidly could just as easily spread ideas they wished to suppress, and many governments introduced licensing systems requiring printers to obtain official approval before publishing. Despite these restrictions, unlicensed and underground printing persisted throughout the following centuries, often smuggled across borders precisely because it had become so difficult, once a text existed in dozens or hundreds of printed copies, to prevent it from reaching an audience.",
+				questions: [
+					{
+						q: "Before the printing press, how were books typically produced?",
+						options: [
+							"Printed in small workshops",
+							"Carved into stone tablets",
+							"Dictated and memorised",
+							"Copied by hand by scribes"
+						],
+						answer: 3
+					},
+					{
+						q: "What materials did Gutenberg's press combine?",
+						options: [
+							"Stone, water and paper",
+							"Oil-based ink, a wooden press and reusable metal type",
+							"Clay tablets and dye",
+							"Silk paper and bronze plates"
+						],
+						answer: 1
+					},
+					{
+						q: "How many European cities had printing presses within fifty years of Gutenberg's Bible?",
+						options: [
+							"Around 50",
+							"Around 100",
+							"Over 1,000",
+							"More than 250"
+						],
+						answer: 3
+					},
+					{
+						q: "According to the passage, what changed besides the number of available books?",
+						options: [
+							"The kinds of texts being written",
+							"The price of paper",
+							"The size of books",
+							"The location of universities"
+						],
+						answer: 0
+					},
+					{
+						q: "Why did authors increasingly write in vernacular languages?",
+						options: [
+							"Latin was banned",
+							"Vernacular languages were required by law",
+							"Latin books were too short",
+							"Printing made vernacular texts economically viable for a broader readership"
+						],
+						answer: 3
+					},
+					{
+						q: "Who is mentioned as having historically been excluded from Latin education?",
+						options: [
+							"Women",
+							"Merchants only",
+							"Craftsmen only",
+							"Religious leaders"
+						],
+						answer: 0
+					},
+					{
+						q: "What do some historians argue was as significant as the increase in book numbers?",
+						options: [
+							"The cost of ink",
+							"The size of the press",
+							"The speed of shipping",
+							"The shift in readership"
+						],
+						answer: 3
+					},
+					{
+						q: "What problem could occur with hand-copied manuscripts?",
+						options: [
+							"They were too colourful",
+							"Errors could be unknowingly duplicated",
+							"They were too short",
+							"They were printed too quickly"
+						],
+						answer: 1
+					},
+					{
+						q: "What do historians of science often see as the press's most underappreciated contribution?",
+						options: [
+							"Mass production of books",
+							"The capacity for correction across copies",
+							"Cheaper paper",
+							"Faster shipping of texts"
+						],
+						answer: 1
+					},
+					{
+						q: "How did authorities react to the printing press?",
+						options: [
+							"They ignored it completely",
+							"They introduced licensing systems to control publishing",
+							"They banned all printed material",
+							"They funded it fully without restriction"
+						],
+						answer: 1
+					},
+					{
+						q: "What persisted despite official restrictions?",
+						options: [
+							"Hand-copying of manuscripts",
+							"The use of Latin only",
+							"Unlicensed and underground printing",
+							"A total ban on books"
+						],
+						answer: 2
+					},
+					{
+						q: "Why was it difficult to stop a printed text from reaching an audience?",
+						options: [
+							"Printers refused to cooperate with smugglers",
+							"Governments had no printing laws",
+							"Texts were printed in secret languages",
+							"Once many copies existed, suppression became very difficult"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"A biography of Gutenberg",
+							"The history of the Latin language",
+							"How modern books are made",
+							"The printing press and the spread of knowledge"
+						],
+						answer: 3
+					}
+				]
+			},
+			{
+				title: "Coral Reefs Under Threat",
+				passage: "Coral reefs cover less than one percent of the ocean floor, yet they support an estimated quarter of all marine species, making them among the most biologically rich ecosystems on the planet. This remarkable productivity depends on a delicate partnership between coral polyps, the small animals that build reef structures, and microscopic algae called zooxanthellae that live within the coral's tissue. The algae photosynthesise, providing the coral with the majority of its energy, while the coral in turn offers the algae a protected home and access to sunlight near the water's surface. When ocean temperatures rise even slightly above their normal range for a sustained period, this partnership breaks down: the coral expels its algae, losing both its main food source and its characteristic colour in a process known as bleaching. A bleached coral is not necessarily dead, and can recover if temperatures return to normal quickly enough, but prolonged or repeated bleaching events sharply increase coral mortality. Mass bleaching events, once considered rare, have become dramatically more frequent since the 1980s, with several of the world's largest reef systems experiencing multiple severe bleaching events within a single decade, leaving reefs with less and less time to recover between episodes. Rising temperatures are not the only threat. Ocean acidification, caused by seawater absorbing increasing amounts of atmospheric carbon dioxide, makes it more difficult for coral polyps to build their calcium carbonate skeletons in the first place, slowing reef growth even where bleaching has not occurred. Local pressures compound these global threats: coastal development, overfishing and pollution from agricultural runoff can all weaken a reef's resilience, making it less able to withstand or recover from a bleaching event. Conservationists have experimented with a range of interventions, from breeding heat-resistant coral strains in laboratories to physically transplanting coral fragments onto damaged reefs, and some of these approaches have shown promising early results in small trial areas. However, most marine scientists caution that such interventions, while valuable for research and for preserving genetic diversity, cannot realistically be scaled up to protect reefs across entire ocean basins, and that reducing global carbon emissions remains the only measure capable of addressing the underlying cause of reef decline at a meaningful scale. In the meantime, some coastal communities that depend on reefs for fishing and tourism have begun establishing locally managed marine protected areas, which restrict fishing and anchoring in the hope of giving reefs at least a fighting chance to recover between global heat events.",
+				questions: [
+					{
+						q: "What percentage of marine species do coral reefs support, according to the passage?",
+						options: [
+							"About 1%",
+							"About a quarter",
+							"About 10%",
+							"About half"
+						],
+						answer: 1
+					},
+					{
+						q: "What role do zooxanthellae play for coral?",
+						options: [
+							"They attack the coral",
+							"They build the reef structure",
+							"They photosynthesise and provide most of the coral's energy",
+							"They protect coral from fish"
+						],
+						answer: 2
+					},
+					{
+						q: "What does the coral provide to the algae in return?",
+						options: [
+							"A protected home and access to sunlight",
+							"Food only",
+							"Nothing in return",
+							"Transportation to new locations"
+						],
+						answer: 0
+					},
+					{
+						q: "What happens during coral bleaching?",
+						options: [
+							"The coral expels its algae and loses its colour",
+							"The coral grows faster",
+							"The coral becomes more colourful",
+							"The algae multiply rapidly"
+						],
+						answer: 0
+					},
+					{
+						q: "Is a bleached coral necessarily dead?",
+						options: [
+							"Yes, always",
+							"Only if it turns white",
+							"No, it can recover if temperatures return to normal quickly",
+							"Only in shallow water"
+						],
+						answer: 2
+					},
+					{
+						q: "How have mass bleaching events changed since the 1980s?",
+						options: [
+							"They have become rarer",
+							"They have stayed the same",
+							"They have become dramatically more frequent",
+							"They have stopped entirely"
+						],
+						answer: 2
+					},
+					{
+						q: "What does ocean acidification make more difficult?",
+						options: [
+							"Coral building its calcium carbonate skeleton",
+							"Fish reproduction",
+							"Algae photosynthesis",
+							"Ocean currents forming"
+						],
+						answer: 0
+					},
+					{
+						q: "What causes ocean acidification, according to the passage?",
+						options: [
+							"Overfishing",
+							"Coastal development",
+							"Coral bleaching itself",
+							"Seawater absorbing atmospheric carbon dioxide"
+						],
+						answer: 3
+					},
+					{
+						q: "What local pressures can weaken a reef's resilience?",
+						options: [
+							"Only tourism",
+							"Only shipping traffic",
+							"Coastal development, overfishing and pollution",
+							"Only sunlight"
+						],
+						answer: 2
+					},
+					{
+						q: "What have some conservationists experimented with?",
+						options: [
+							"Draining affected reef areas",
+							"Removing all fish from reefs",
+							"Covering reefs with plastic sheeting",
+							"Breeding heat-resistant coral and transplanting fragments"
+						],
+						answer: 3
+					},
+					{
+						q: "What do most marine scientists caution about these interventions?",
+						options: [
+							"They are completely useless",
+							"They should replace emission reduction efforts",
+							"They cannot realistically be scaled up across entire ocean basins",
+							"They are more effective than reducing emissions"
+						],
+						answer: 2
+					},
+					{
+						q: "What do scientists say is the only measure capable of addressing the underlying cause?",
+						options: [
+							"Coral transplanting",
+							"Banning tourism",
+							"Reducing global carbon emissions",
+							"Building artificial reefs everywhere"
+						],
+						answer: 2
+					},
+					{
+						q: "What have some coastal communities established?",
+						options: [
+							"Locally managed marine protected areas",
+							"New fishing fleets",
+							"Coral export businesses",
+							"Underwater hotels"
+						],
+						answer: 0
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"How to build an aquarium",
+							"Coral reefs under threat",
+							"The history of ocean exploration",
+							"A guide to marine tourism"
+						],
+						answer: 1
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A phone call to a community library",
+				transcript: "Hello, thanks for calling the Riverside Community Library. I can help you book a study room for this Saturday. We have two rooms available: the small room on the ground floor holds up to four people, and the large room upstairs holds up to ten. Both are free to book online, but if you book over the phone like you're doing now, there's a small five-pound administration fee. The library closes at half past eight on weekdays, but on Saturdays we close earlier, at six. If you need the room for more than two hours, you'll have to bring your own library card, as guest bookings are limited to two hours. We also ask that groups keep noise to a reasonable level, since the reading area is just next door. If you'd like refreshments, there's a small kitchen on the first floor, though food isn't allowed inside the study rooms themselves, only drinks in closed containers. Parking is available behind the building, but it's limited to two hours during the day, so if your booking runs longer than that, I'd recommend using the car park across the road instead, which charges a flat rate of three pounds after six in the evening. Would you like the small or the large room, and shall I take a payment card number for the administration fee now?",
+				questions: [
+					{
+						q: "The large room upstairs can hold up to ___ people.",
+						accepted: ["10", "ten"]
+					},
+					{
+						q: "Booking a room over the phone carries a small administration fee of ___.",
+						accepted: [
+							"£5",
+							"5",
+							"5 pounds",
+							"five pounds",
+							"five pound"
+						]
+					},
+					{
+						q: "On Saturdays the library closes at ___.",
+						accepted: [
+							"6",
+							"6:00",
+							"6 pm",
+							"6pm",
+							"six",
+							"18:00"
+						]
+					},
+					{
+						q: "For any booking longer than two hours you must bring your own ___.",
+						accepted: ["library card", "a library card"]
+					},
+					{
+						q: "The caller wants to book a study room for ___.",
+						accepted: ["Saturday", "this Saturday"]
+					},
+					{
+						q: "Groups should keep noise reasonable because the ___ is just next door.",
+						accepted: ["reading area", "the reading area"]
+					},
+					{
+						q: "The small kitchen is on the ___ floor.",
+						accepted: ["first", "1st"]
+					},
+					{
+						q: "Only drinks in ___ are allowed inside the study rooms themselves.",
+						accepted: ["closed containers", "closed container"]
+					},
+					{
+						q: "Parking behind the building is limited to ___ during the day.",
+						accepted: ["two hours", "2 hours"]
+					},
+					{
+						q: "Across the road, parking after six in the evening costs a flat rate of ___.",
+						accepted: [
+							"£3",
+							"3",
+							"3 pounds",
+							"three pounds",
+							"three pound"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 2: A talk about a community allotment scheme",
+				transcript: "Good evening, everyone, and thank you for coming to find out more about the Greenfield community allotment scheme. We currently have thirty plots available at the site on Mill Lane, each measuring roughly five metres by ten metres, which is enough space for a small family to grow a good variety of vegetables throughout the year. The annual fee is twenty-five pounds for a full plot, or fifteen pounds if you'd prefer to share a half-plot with another household, which is a popular option for beginners who aren't sure how much time they'll have to commit. Water is provided free of charge from four standpipes around the site, but you'll need to bring your own hose or watering can, as none are supplied. New plot-holders are given a three-month trial period, during which the site committee will check that the plot is being kept reasonably tidy; after that, plots are allocated on a rolling annual basis. We do ask that you avoid using chemical pesticides, since the site borders a small nature reserve, and several plot-holders keep bees nearby. If you're interested, the site itself is open every day from dawn until dusk, but the on-site shed, where tools can be borrowed, is only staffed on Wednesday and Saturday mornings between nine and midday. There's also a waiting list at the moment, currently running at around four months, so if you sign up tonight, do expect a short delay before a plot becomes available. Applications can be submitted through the form at the back of the room, or online through the council website afterwards.",
+				questions: [
+					{
+						q: "The site on Mill Lane currently has ___ plots available.",
+						accepted: ["30", "thirty"]
+					},
+					{
+						q: "A full plot costs ___ a year.",
+						accepted: [
+							"£25",
+							"25",
+							"25 pounds",
+							"twenty-five pounds",
+							"twenty five pounds"
+						]
+					},
+					{
+						q: "Sharing a half-plot with another household costs ___ a year.",
+						accepted: [
+							"£15",
+							"15",
+							"15 pounds",
+							"fifteen pounds"
+						]
+					},
+					{
+						q: "Water is provided free of charge from ___ standpipes around the site.",
+						accepted: ["4", "four"]
+					},
+					{
+						q: "New plot-holders are given a trial period of ___.",
+						accepted: ["three months", "3 months"]
+					},
+					{
+						q: "Plot-holders must avoid chemical pesticides because the site borders a small ___.",
+						accepted: ["nature reserve", "the nature reserve"]
+					},
+					{
+						q: "The site itself is open every day from dawn until ___.",
+						accepted: ["dusk", "dark"]
+					},
+					{
+						q: "The tool shed is staffed between nine and midday on ___ mornings.",
+						accepted: [
+							"Wednesday and Saturday",
+							"Wednesdays and Saturdays",
+							"Wednesday & Saturday"
+						]
+					},
+					{
+						q: "The waiting list for a plot currently runs at around ___.",
+						accepted: ["four months", "4 months"]
+					},
+					{
+						q: "Tonight, applications can be submitted using the form at the ___ of the room.",
+						accepted: ["back", "back of the room"]
+					}
+				]
+			},
+			{
+				title: "Section 3: Two students discussing a research project with their tutor",
+				transcript: "Tutor: So, how's the research project coming along? You wanted to talk about your survey results today, didn't you? Student A: Yes, we've collected responses from about eighty participants so far, which is more than we expected at this stage. Student B: Although we're a bit worried the sample isn't balanced — most respondents are under thirty, so we might be missing older perspectives. Tutor: That's a fair concern. Have you thought about how you'll address that in your write-up? Student A: We were planning to mention it as a limitation, but Sarah suggested we could also try distributing a few paper copies at the community centre to reach an older age group. Tutor: That's a sensible idea, though be aware it'll take longer to collect and enter that data manually. I'd suggest setting a firm cut-off date, say two weeks from now, so it doesn't delay your final analysis. Student B: That makes sense. We were also unsure whether to present the data as percentages or raw numbers in the report. Tutor: Given your sample size, percentages will be clearer for your reader, but include the raw numbers in a footnote or appendix so anyone checking your work can verify the figures. Student A: Understood. One more thing — our supervisor mentioned we should include a short section on ethical approval. We did apply for that back in October, so I assume we're fine? Tutor: You should still describe the process briefly, even if approval was straightforward, because markers want to see that you understood why it mattered, not just that a form was signed. Student B: Got it. Should the whole write-up be around three thousand words, as stated in the handbook? Tutor: Yes, three thousand is the target, with a ten percent allowance either way, so anywhere between twenty-seven hundred and thirty-three hundred should be acceptable.",
+				questions: [
+					{
+						q: "The students have collected responses from about ___ participants so far.",
+						accepted: ["80", "eighty"]
+					},
+					{
+						q: "Most respondents are under ___, so older perspectives may be missing.",
+						accepted: ["30", "thirty"]
+					},
+					{
+						q: "Sarah suggested distributing a few paper copies at the ___.",
+						accepted: ["community centre", "community center"]
+					},
+					{
+						q: "The tutor suggests setting a firm cut-off date, say ___ from now.",
+						accepted: ["two weeks", "2 weeks"]
+					},
+					{
+						q: "Given the sample size, the tutor says the data will be clearer presented as ___.",
+						accepted: [
+							"percentages",
+							"percentage",
+							"per cent",
+							"percent"
+						]
+					},
+					{
+						q: "The students applied for ethical approval back in ___.",
+						accepted: ["October", "Oct"]
+					},
+					{
+						q: "The write-up should briefly describe the ethical approval ___, even if it was straightforward.",
+						accepted: [
+							"process",
+							"approval process",
+							"the process"
+						]
+					},
+					{
+						q: "The target for the write-up is ___ words.",
+						accepted: [
+							"3000",
+							"3,000",
+							"three thousand"
+						]
+					},
+					{
+						q: "The word count carries a ___ allowance either way.",
+						accepted: [
+							"10%",
+							"10 per cent",
+							"ten per cent",
+							"10 percent",
+							"ten percent"
+						]
+					},
+					{
+						q: "The acceptable word range is between twenty-seven hundred and ___.",
+						accepted: [
+							"3300",
+							"3,300",
+							"three thousand three hundred",
+							"thirty-three hundred"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on renewable energy on university campuses",
+				transcript: "Today I want to look at how universities have approached renewable energy on their own campuses, since they're often large enough to make a meaningful case study of what works at scale. Many universities began, in the early two-thousands, with fairly modest solar installations on single buildings, largely as demonstration projects rather than serious attempts to reduce overall energy use. Over the past fifteen years, though, this has changed considerably. Several universities now generate more than a quarter of their electricity needs from on-site renewable sources, primarily solar, though a smaller number in coastal or hilly regions have also invested in wind turbines. One frequently cited example is a university that converted a disused car park into a solar canopy, which simultaneously generates electricity and provides shaded parking, addressing two problems with a single structure. Interestingly, the financial case for these projects has shifted over time. Where early installations were often funded through grants or donations specifically earmarked for sustainability projects, more recent installations increasingly pay for themselves through reduced electricity bills within seven to ten years, making them attractive even to university finance departments primarily concerned with the bottom line rather than environmental goals. That said, researchers studying this trend caution that campus-based renewable energy, however visible and symbolically important, typically covers only a fraction of a university's total carbon footprint, since research activities, staff and student travel, and the construction of new buildings often account for a much larger share of emissions than electricity use for lighting and heating. Some institutions have responded by publishing detailed annual sustainability reports that separate these different categories, allowing students and staff to see clearly which measures are making the biggest difference and which remain largely symbolic. A few universities have gone further still, tying senior staff performance reviews to measurable progress on these sustainability targets, an approach that early evidence suggests produces faster reductions in emissions than voluntary pledges alone.",
+				questions: [
+					{
+						q: "Universities make meaningful case studies because they are large enough to show what works ___.",
+						accepted: ["at scale", "scale"]
+					},
+					{
+						q: "Early campus solar installations were largely ___ projects rather than serious energy measures.",
+						accepted: ["demonstration", "demo"]
+					},
+					{
+						q: "Several universities now generate more than ___ of their electricity needs from on-site renewables.",
+						accepted: [
+							"a quarter",
+							"one quarter",
+							"25%",
+							"25 per cent",
+							"25 percent"
+						]
+					},
+					{
+						q: "Some universities in coastal or hilly regions have also invested in ___.",
+						accepted: ["wind turbines", "wind turbine"]
+					},
+					{
+						q: "One university converted a disused car park into a solar ___.",
+						accepted: ["canopy", "solar canopy"]
+					},
+					{
+						q: "Early installations were often funded through grants or ___.",
+						accepted: [
+							"donations",
+							"a donation",
+							"donation"
+						]
+					},
+					{
+						q: "More recent installations typically pay for themselves within ___ years.",
+						accepted: [
+							"7 to 10",
+							"7-10",
+							"7–10",
+							"seven to ten"
+						]
+					},
+					{
+						q: "Campus renewable energy typically covers only a ___ of a university's total carbon footprint.",
+						accepted: ["fraction", "small fraction"]
+					},
+					{
+						q: "Research activities, travel and construction account for a larger share of ___ than electricity use.",
+						accepted: ["emissions", "carbon emissions"]
+					},
+					{
+						q: "A few universities tie senior staff ___ to measurable sustainability targets.",
+						accepted: ["performance reviews", "performance review"]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The chart below shows the percentage of electricity generated from renewable sources on three university campuses in 2010 and 2025.\n\nGreenfield University: 4%, 27%\nCoastal University: 9%, 34%\nRiverside University: 2%, 19%\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "Some people think that governments should spend more money on environmental projects such as urban beekeeping and green spaces, while others believe this money should be spent on more urgent issues like housing and healthcare. Discuss both views and give your own opinion. Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"Let's talk about your hometown. What do you like most about it?",
+				"Do you work or are you a student?",
+				"What do you usually do in your free time?"
+			]),
+			speakingPart2("Describe a skill you would like to learn. You should say: what the skill is, why you want to learn it, how you would learn it, and explain how learning it would change your life."),
+			...speakingPart3([
+				"Do you think it's more important for children to learn practical skills or academic knowledge?",
+				"How has technology changed the way people learn new skills?",
+				"Why do you think some adults are reluctant to learn new skills later in life?"
+			])
+		]
+	},
+	{
+		id: "mock-2",
+		order: 2,
+		title: "IELTS Mock Test 2",
+		reading: { passages: [
+			{
+				title: "The History of Tea",
+				passage: "The story of tea begins, so the legend goes, in China around 2737 BC, when leaves from a wild tea bush drifted into a pot of water being boiled for the Emperor Shen Nong. Whether or not the tale is true, by the Tang dynasty tea drinking was already a refined pleasure: in about 760 AD the scholar Lu Yu composed The Classic of Tea, the first systematic treatise on the plant, covering its cultivation, processing and correct preparation, and elevating tea drinking to something close to an art form. From China, the drink crossed to Japan, carried by Buddhist monks who had studied on the mainland and valued tea because it helped them stay alert through long hours of meditation. Tea reached Europe remarkably late for such an ancient beverage. It was Dutch traders who first brought it to Amsterdam in 1610, and by the 1650s it was being sold in the coffee houses of London as a novelty for the curious. Its breakthrough into polite society came through a marriage: when the Portuguese princess Catherine of Braganza married the English king Charles II in 1662, her love of tea made it instantly fashionable at court, and the fashion soon spread down through the aristocracy. For much of the eighteenth century, however, the British government's tea duties were extraordinarily high, sometimes exceeding one hundred per cent of the leaves' value, which made smuggling a thriving trade and led dealers to adulterate tea with coloured dust and dried leaves from other plants. National tastes nevertheless only grew, and the British East India Company, which held a monopoly on the China trade, grew anxious about depending on Chinese growers. In 1848 it sent the Scottish botanist Robert Fortune into China in disguise; Fortune secretly carried out thousands of tea seedlings along with skilled tea workers, allowing the company to establish its own plantations in Assam and the foothills of the Himalayas. Competition for market speed became fierce in Victorian times. Sleek sailing ships known as tea clippers raced from China to London to deliver the new season's harvest, since the first cargo home fetched the highest prices at auction. The product's political weight is equally legendary: in 1773, angered by being taxed without representation, American colonists threw 342 chests of tea into Boston harbour in the famous Boston Tea Party. Even the humble tea bag arrived by accident: in 1908 a New York merchant named Thomas Sullivan posted out samples in small silk pouches, customers simply dunked the whole pouch into hot water instead of opening it, and the idea proved so popular that Sullivan replaced the silk with gauze and, later, paper. Today tea is the most widely consumed drink on earth after water.",
+				questions: [
+					{
+						q: "According to legend, how was tea first discovered?",
+						options: [
+							"A monk boiled it as medicine",
+							"A trader tasted it in India",
+							"Leaves drifted into Emperor Shen Nong's pot of boiling water",
+							"It was roasted like coffee beans"
+						],
+						answer: 2
+					},
+					{
+						q: "Who wrote The Classic of Tea around 760 AD?",
+						options: [
+							"Lu Yu",
+							"Emperor Shen Nong",
+							"Robert Fortune",
+							"Confucius"
+						],
+						answer: 0
+					},
+					{
+						q: "Why did Buddhist monks find tea valuable?",
+						options: [
+							"It cured common illnesses",
+							"It was easy to sell for profit",
+							"It flavoured their plain rice meals",
+							"It helped them stay alert through long hours of meditation"
+						],
+						answer: 3
+					},
+					{
+						q: "When did tea first reach Europe?",
+						options: [
+							"1492",
+							"1610",
+							"1707",
+							"1805"
+						],
+						answer: 1
+					},
+					{
+						q: "Who is credited with making tea fashionable at the English court?",
+						options: [
+							"Catherine of Braganza",
+							"Queen Elizabeth I",
+							"Samuel Pepys",
+							"Queen Victoria"
+						],
+						answer: 0
+					},
+					{
+						q: "What effect did high tea duties have in eighteenth-century Britain?",
+						options: [
+							"They ended tea imports from China",
+							"They made tea equally cheap for everyone",
+							"They encouraged widespread smuggling and adulteration",
+							"They forced tea houses to close"
+						],
+						answer: 2
+					},
+					{
+						q: "Why was Robert Fortune sent to China in 1848?",
+						options: [
+							"To negotiate a new trade treaty",
+							"To secretly obtain tea seedlings and skilled workers for Indian plantations",
+							"To study Chinese tea ceremonies",
+							"To build Britain's first tea clipper"
+						],
+						answer: 1
+					},
+					{
+						q: "What were tea clippers designed for?",
+						options: [
+							"Carrying passengers in comfort to India",
+							"Defending trade routes from pirate ships",
+							"Transporting spices from the West Indies",
+							"Speed: racing the new season's harvest from China to London"
+						],
+						answer: 3
+					},
+					{
+						q: "What were the American colonists protesting in the Boston Tea Party?",
+						options: [
+							"The poor quality of imported tea",
+							"Being taxed without representation",
+							"A ban on growing tea locally",
+							"The price of harbour storage"
+						],
+						answer: 1
+					},
+					{
+						q: "How did Thomas Sullivan contribute to tea history?",
+						options: [
+							"He invented the tea strainer",
+							"He founded the first clipper race",
+							"He established tea gardens in Ceylon",
+							"He accidentally inspired the tea bag with his silk sample pouches"
+						],
+						answer: 3
+					},
+					{
+						q: "What happened to Sullivan's pouches once they proved popular?",
+						options: [
+							"They were banned by New York officials",
+							"They were doubled in size for families",
+							"The silk was replaced by gauze and then paper",
+							"They were hand-stitched by customers"
+						],
+						answer: 2
+					},
+					{
+						q: "According to the passage, tea is now the most consumed drink in the world after what?",
+						options: [
+							"Water",
+							"Coffee",
+							"Milk",
+							"Beer"
+						],
+						answer: 0
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The Boston Tea Party explained",
+							"Tea: from Chinese legend to the modern cup",
+							"How to grow tea in Assam",
+							"Why coffee is replacing tea"
+						],
+						answer: 1
+					}
+				]
+			},
+			{
+				title: "The Rise of Electric Vehicles",
+				passage: "It is tempting to think of the electric car as a twenty-first-century invention, but the idea is far older. Experimenters were building crude battery-powered vehicles as early as the 1830s, and by 1900 electric cars actually outnumbered petrol cars on America's roads. Drivers liked them because they were quiet, produced none of the smell of petrol and, crucially, did not need to be started with a strenuous hand crank. London had its own electric taxi fleet from 1897, the carriages of Walter Bersey, whose gentle whirring sound earned them the nickname 'the hummingbirds'. What destroyed the early electric car was not any fault in its design but three blows in quick succession. In 1908 Henry Ford's Model T entered mass production, cutting the price of a petrol car to a fraction of an electric one's cost. In 1912 the electric starter motor eliminated the hand crank, removing the electric car's most prized advantage. Meanwhile, vast new oilfields in Texas made petrol cheap and abundant, and expanding road networks rewarded long-range driving, which early batteries could not provide. Interest flickered back during the oil crises of the 1970s, but the real revival began in the 1990s. General Motors produced the EV1 from 1996, a sleek two-seat electric car that was leased but never sold, and which the company then controversially withdrew and mostly crushed by 2002. In 1997 the Toyota Prius went on sale in Japan, proving that hybrids combining an electric motor with a petrol engine could succeed commercially. The turning point for fully electric driving came in 2008 with the Tesla Roadster, the first highway-legal production car powered by lithium-ion cells, with a range above two hundred miles — clear evidence that batteries could meet real driving needs. Costs have since tumbled: lithium-ion battery packs fell from around 1,200 dollars per kilowatt-hour in 2010 to well under 150 dollars by the early 2020s, transforming what manufacturers could build at a profit. Policy has moved just as fast; Norway, through tax exemptions, toll waivers and free parking, now sees more than eight in ten new car sales fully electric. Difficulties remain, however. Charging networks are still patchy in rural regions, and the mining of lithium and cobalt, both essential for current batteries, often takes place under harsh conditions with serious human costs. Engineers have pinned their hopes on solid-state batteries, which promise faster charging and longer life, but the road from laboratory to showroom has historically proved slow.",
+				questions: [
+					{
+						q: "Around 1900, which type of car was more numerous on American roads?",
+						options: [
+							"Petrol cars",
+							"Electric cars",
+							"Steam cars",
+							"Diesel cars"
+						],
+						answer: 1
+					},
+					{
+						q: "What nickname did Londoners give to Walter Bersey's electric taxis?",
+						options: [
+							"The beetles",
+							"The silent knights",
+							"The sparklers",
+							"The hummingbirds"
+						],
+						answer: 3
+					},
+					{
+						q: "What advantage did early electric cars hold over petrol cars?",
+						options: [
+							"They were quiet and needed no hand crank to start",
+							"They were cheaper to buy",
+							"They had a longer driving range",
+							"They were faster on motorways"
+						],
+						answer: 0
+					},
+					{
+						q: "Which development of 1908 badly damaged the electric car's prospects?",
+						options: [
+							"The invention of the electric starter",
+							"A global shortage of copper",
+							"The mass production of Ford's cheap Model T",
+							"The collapse of road building"
+						],
+						answer: 2
+					},
+					{
+						q: "What did the 1912 electric starter motor eliminate?",
+						options: [
+							"The steering wheel",
+							"The gearbox",
+							"The foot brake",
+							"The need to hand-crank petrol engines"
+						],
+						answer: 3
+					},
+					{
+						q: "When did interest in electric vehicles first revive after their early decline?",
+						options: [
+							"During the 1920s boom",
+							"During the oil crises of the 1970s",
+							"During the 1950s space race",
+							"During the 1980s fuel glut"
+						],
+						answer: 1
+					},
+					{
+						q: "What ultimately happened to General Motors' EV1?",
+						options: [
+							"It sold millions of units worldwide",
+							"It remains on sale today",
+							"It was withdrawn and mostly crushed",
+							"It was converted to run on petrol"
+						],
+						answer: 2
+					},
+					{
+						q: "Which 1997 car proved hybrids could be commercially successful?",
+						options: [
+							"The Toyota Prius",
+							"The Ford Focus",
+							"The Mini Cooper",
+							"The Fiat 500"
+						],
+						answer: 0
+					},
+					{
+						q: "What did the 2008 Tesla Roadster demonstrate?",
+						options: [
+							"That batteries had become cheap",
+							"That hybrids beat pure electric cars",
+							"That lithium-ion batteries could meet genuine highway driving needs",
+							"That solar cars were practical"
+						],
+						answer: 2
+					},
+					{
+						q: "How did lithium-ion battery prices change between 2010 and the early 2020s?",
+						options: [
+							"They fell from around $1,200 to well under $150 per kilowatt-hour",
+							"They roughly doubled",
+							"They stayed essentially level",
+							"They rose fivefold due to demand"
+						],
+						answer: 0
+					},
+					{
+						q: "Why do most new car buyers in Norway choose electric vehicles?",
+						options: [
+							"Petrol is no longer sold there",
+							"Electric cars are given away free",
+							"Norwegian roads exclude other cars",
+							"Government policies such as tax exemptions, toll waivers and free parking"
+						],
+						answer: 3
+					},
+					{
+						q: "What concern does the passage raise about battery raw materials?",
+						options: [
+							"No lithium mines exist",
+							"Lithium and cobalt mining often happens under harsh conditions with human costs",
+							"Copper is radioactive",
+							"Batteries cannot be recycled at all"
+						],
+						answer: 1
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"Why petrol engines won the race",
+							"A history of the Tesla company",
+							"Electric cars: an old idea reborn",
+							"How an electric motor works"
+						],
+						answer: 2
+					}
+				]
+			},
+			{
+				title: "Exploring the Deep Ocean",
+				passage: "Humanity has mapped the surface of the Moon more precisely than the floor of its own oceans. The systematic study of the deep sea began with the voyage of HMS Challenger between 1872 and 1876, when scientists sailed nearly seventy thousand nautical miles studying the depths with little more than weighted sounding lines and dredges dragged along the seabed. They catalogued more than four thousand previously unknown species, and one of their soundings near the island of Guam detected the deepest place on Earth, the Mariana Trench; its lowest point is still named the Challenger Deep after the expedition. Pulling a dredge is a blunt instrument compared with going down in person. In the 1930s the naturalist William Beebe and the engineer Otis Barton pioneered the bathysphere, a bare steel sphere lowered on a cable from a support ship; in 1934 they reached a depth of over nine hundred metres, a world record. A generation later the Swiss-designed bathyscaphe Trieste floated rather than hung, using a tank of petrol for buoyancy, and in January 1960 Jacques Piccard and the United States Navy lieutenant Don Walsh took it down nearly eleven thousand metres to the floor of the Challenger Deep. The descent took almost five hours, and because the vessel had to conserve its batteries for the climb back, the two men had only about twenty minutes to observe the seabed, where they glimpsed what appeared to be a fish — suggesting that vertebrates might survive even there. The deep then yielded its greatest surprise. In 1977 the research submarine Alvin, working near the Galápagos Islands, discovered hydrothermal vents on the ocean floor, ringed by giant tube worms, crabs and clams in their thousands. Sunlight never reaches that water, so photosynthesis is impossible; the whole food web runs on bacteria that produce energy from vent chemicals, a process called chemosynthesis — the first ecosystem known to exist entirely without the Sun. Physically, it is a merciless realm: pressure rises by roughly one atmosphere for every ten metres of depth, so the trench floor endures about a thousand times the pressure at the surface. Even today, less than a quarter of the seafloor has been mapped in useful detail, which is why an international venture known as Seabed 2030 is attempting to chart it all. Commercial interest is growing too: mining companies covet the polymetallic nodules, mineral-rich lumps scattered across the abyssal plains, while conservationists note that plastic bags have already been photographed in the deepest trenches — proof that our reach exceeds our knowledge.",
+				questions: [
+					{
+						q: "When did the voyage of HMS Challenger begin?",
+						options: [
+							"1872",
+							"1772",
+							"1902",
+							"1960"
+						],
+						answer: 0
+					},
+					{
+						q: "What basic tools did the Challenger scientists use to study the depths?",
+						options: [
+							"Submarines",
+							"Underwater robots",
+							"Sounding lines and dredges",
+							"Sonar imaging"
+						],
+						answer: 2
+					},
+					{
+						q: "The deepest point of the Mariana Trench is named after what?",
+						options: [
+							"A Greek sea god",
+							"The Challenger expedition",
+							"A Japanese diving vessel",
+							"A deep-sea fish"
+						],
+						answer: 1
+					},
+					{
+						q: "What record did William Beebe set in 1934?",
+						options: [
+							"The first solo Atlantic crossing",
+							"The first underwater photograph",
+							"The first scuba-diving patent",
+							"A bathysphere descent to more than nine hundred metres"
+						],
+						answer: 3
+					},
+					{
+						q: "Who descended to the bottom of the Challenger Deep in 1960?",
+						options: [
+							"William Beebe and Otis Barton",
+							"Jacques Cousteau and a film crew",
+							"Jacques Piccard and Don Walsh aboard the Trieste",
+							"Robert Scott and a Norwegian team"
+						],
+						answer: 2
+					},
+					{
+						q: "How much time did Piccard and Walsh have to observe the seabed?",
+						options: [
+							"About twenty minutes",
+							"Three full hours",
+							"A whole day",
+							"One entire night"
+						],
+						answer: 0
+					},
+					{
+						q: "What did the crew of Alvin discover near the Galápagos Islands in 1977?",
+						options: [
+							"A lost continent",
+							"A fleet of sunken treasure ships",
+							"Frozen freshwater lakes",
+							"Hydrothermal vents with life supported by chemosynthesis"
+						],
+						answer: 3
+					},
+					{
+						q: "Why was the discovery of vent communities scientifically important?",
+						options: [
+							"The water there is fresh",
+							"They proved an ecosystem could exist entirely without sunlight",
+							"Fish cannot survive there",
+							"The pressure there is unusually low"
+						],
+						answer: 1
+					},
+					{
+						q: "Roughly how does pressure increase with ocean depth?",
+						options: [
+							"It doubles every kilometre",
+							"It remains almost unchanged",
+							"It rises tenfold per metre",
+							"It rises about one atmosphere for every ten metres"
+						],
+						answer: 3
+					},
+					{
+						q: "What is the Seabed 2030 venture trying to achieve?",
+						options: [
+							"To drain selected areas of the ocean",
+							"To map the entire ocean floor in useful detail",
+							"To ban fishing in all waters",
+							"To construct underwater hotels"
+						],
+						answer: 1
+					},
+					{
+						q: "According to the passage, what are polymetallic nodules?",
+						options: [
+							"Mineral-rich lumps on the deep seabed that mining companies covet",
+							"A rare type of coral",
+							"Artificial reefs made of steel",
+							"Underwater volcanic islands"
+						],
+						answer: 0
+					},
+					{
+						q: "What evidence of human impact has already been found in the deepest trenches?",
+						options: [
+							"Abandoned oil refineries",
+							"Old farm machinery",
+							"Plastic bags and similar litter",
+							"Railway carriages"
+						],
+						answer: 2
+					},
+					{
+						q: "How long did the Trieste's descent to the floor of the Challenger Deep take?",
+						options: [
+							"Almost five hours",
+							"About twenty minutes",
+							"Just under one hour",
+							"Two and a half days"
+						],
+						answer: 0
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"A history of whale hunting",
+							"How submarines are built",
+							"The wildlife of the Galápagos Islands",
+							"Exploring the deep ocean: challenges and discoveries"
+						],
+						answer: 3
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A phone call about joining a gym",
+				transcript: "Good morning, thanks for calling Powerhouse Gym on Cross Street, my name's Carla, and I can take you through the membership options. We've got three plans. The standard membership is forty-two pounds a month and gives you access to the gym floor and the swimming pool at any time. The gold plan costs fifty-eight pounds a month and additionally covers all of our fitness classes, including spin, yoga and pilates. If you're able to pay for a year upfront, the annual plan is four hundred and fifty pounds, which works out about two hundred and forty pounds cheaper than paying month by month at the gold rate. There's normally a twenty-five-pound joining fee, but that's being waived this month as part of our New Year promotion. We also run an off-peak membership at twenty-eight pounds a month for people who can come Monday to Friday between midday and four o'clock. The pool opens at six in the morning on weekdays and closes at a quarter to ten in the evening; at weekends it runs from eight until eight. All new members get a free thirty-minute induction with a trainer, which is compulsory before you use the free weights — it's purely for safety. If you're interested in personal training, a single session costs thirty-five pounds, or you can pre-book a block of ten for three hundred pounds. We don't have our own car park, I'm afraid, but there's free parking for two hours in the shopping centre car park across the road. Members on the gold and annual plans also receive one free guest pass each month. And a final note: if you ever want to cancel a monthly plan, we just need thirty days' notice. Would you like to start on the standard or the gold?",
+				questions: [
+					{
+						q: "The standard membership costs ___ a month.",
+						accepted: [
+							"£42",
+							"42",
+							"42 pounds",
+							"forty-two pounds",
+							"forty two pounds"
+						]
+					},
+					{
+						q: "All fitness classes, including spin and yoga, are covered by the ___ plan.",
+						accepted: [
+							"gold",
+							"gold plan",
+							"the gold plan"
+						]
+					},
+					{
+						q: "Paying annually works out about ___ cheaper than the gold monthly rate.",
+						accepted: [
+							"£240",
+							"240",
+							"240 pounds",
+							"two hundred and forty pounds",
+							"two hundred forty pounds"
+						]
+					},
+					{
+						q: "This month the joining fee is being waived as part of the ___ promotion.",
+						accepted: ["New Year", "new year"]
+					},
+					{
+						q: "On weekdays the pool closes at ___ in the evening.",
+						accepted: [
+							"9:45",
+							"9:45 pm",
+							"9:45pm",
+							"quarter to ten",
+							"9.45",
+							"21:45"
+						]
+					},
+					{
+						q: "The off-peak plan allows visits Monday to Friday between ___ and four o'clock.",
+						accepted: [
+							"midday",
+							"noon",
+							"12",
+							"12:00",
+							"12 pm",
+							"12pm"
+						]
+					},
+					{
+						q: "A pre-booked block of ten personal-training sessions costs ___.",
+						accepted: [
+							"£300",
+							"300",
+							"300 pounds",
+							"three hundred pounds"
+						]
+					},
+					{
+						q: "New members must complete a free ___ induction with a trainer.",
+						accepted: [
+							"thirty-minute",
+							"30-minute",
+							"thirty minute",
+							"30 minute",
+							"half-hour"
+						]
+					},
+					{
+						q: "Members can park free for two hours in the ___ car park across the road.",
+						accepted: ["shopping centre", "shopping center"]
+					},
+					{
+						q: "To cancel a monthly plan, the gym needs ___ notice.",
+						accepted: [
+							"30 days",
+							"thirty days",
+							"thirty days'"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 2: A talk about a weekly farmers' market",
+				transcript: "Good evening everyone, and thank you for coming. I'm delighted to tell you a little about the Castle Square farmers' market, which this year celebrates its twentieth anniversary — it has been running since 2005. The market opens every Saturday from eight in the morning until one in the afternoon, whatever the weather. This season we have about forty stalls, and the rule is that all regular stallholders must grow, rear or make their produce within thirty miles of the market, which is how we keep it genuinely local. The stall fee for regular traders is eighteen pounds, but community groups and school projects can have a pitch for just five pounds. You'll find fresh vegetables, cheese from Hill Farm, sourdough from the bakery stall and three hot food trucks serving breakfast. If you're driving, the Market Street multi-storey car park offers free parking for the first two hours — just remember to have your ticket validated at the information tent. Regular customers can pick up a loyalty card: collect six stamps and you get a free coffee from the café stall. We are always looking for volunteer stewards; the busiest shifts begin at six in the morning for setting up, and we only ask for two hours at a time. Dogs are welcome at the market, but please, keep them on a short lead. One thing to note: in December and January, when the weather turns, the market moves indoors to the Corn Exchange. And finally, on the second Saturday of August we host our annual berry festival — do make a note of that in your diaries.",
+				questions: [
+					{
+						q: "The market takes place every ___ from eight in the morning until one.",
+						accepted: ["Saturday", "Saturdays"]
+					},
+					{
+						q: "The Castle Square farmers' market has been running since ___.",
+						accepted: ["2005", "two thousand and five"]
+					},
+					{
+						q: "This season the market has about ___ stalls.",
+						accepted: [
+							"40",
+							"forty",
+							"about 40",
+							"about forty"
+						]
+					},
+					{
+						q: "Regular stallholders must produce their goods within ___ of the market.",
+						accepted: [
+							"thirty miles",
+							"30 miles",
+							"30",
+							"thirty"
+						]
+					},
+					{
+						q: "Community groups and school projects can have a pitch for just ___.",
+						accepted: [
+							"£5",
+							"5",
+							"5 pounds",
+							"five pounds"
+						]
+					},
+					{
+						q: "Drivers get two hours of free parking at the ___ multi-storey car park.",
+						accepted: [
+							"Market Street",
+							"Market St",
+							"market street"
+						]
+					},
+					{
+						q: "Collect six stamps on the loyalty card and you get a free ___ from the café stall.",
+						accepted: ["coffee", "free coffee"]
+					},
+					{
+						q: "The busiest steward shifts, for setting up, begin at ___ in the morning.",
+						accepted: [
+							"6",
+							"6:00",
+							"6 am",
+							"6am",
+							"six",
+							"06:00"
+						]
+					},
+					{
+						q: "In December and January the market moves indoors to the ___.",
+						accepted: ["Corn Exchange", "corn exchange"]
+					},
+					{
+						q: "Dogs are welcome at the market if they are kept on a ___.",
+						accepted: ["short lead", "lead"]
+					}
+				]
+			},
+			{
+				title: "Section 3: A tutor and two students planning a group presentation",
+				transcript: "Tutor: Thanks for coming, you two. Your group presentation is the next big assessment for this module — it's worth twenty-five per cent of your final grade — so today we need to settle your plans. Student A: We were hoping to decide on our topic today, actually. Tutor: Perfect timing. Just remember the topic must come from the approved list I handed out in the lecture, and you can't choose the one we demonstrated together in Week 6, otherwise every group would pick it. Student B: And how long should the presentation run for? Tutor: Fifteen minutes exactly, followed by five minutes of questions. I will stop you at fifteen, so rehearse carefully. Student A: Should one of us do most of the talking? Tutor: I'd much rather you shared the time evenly between you — the mark scheme rewards coordination, not solo brilliance. Student B: What about slides? Tutor: Ten slides is the absolute maximum, and any handout you give out must use the Harvard referencing style. Student A: Is there any peer marking involved? Tutor: Yes — twenty per cent of each person's score comes from anonymised feedback from the rest of the group, so contribute fairly to the preparation. Student B: We've actually already booked a rehearsal slot. We're in the media suite on Tuesday at four for a full run-through. Tutor: Excellent. Bring the handout to that rehearsal and time yourselves. And one last tip: glance at your notes, don't recite from them — examiners can always tell the difference.",
+				questions: [
+					{
+						q: "The topic must come from the tutor's ___ list.",
+						accepted: ["approved", "approved list"]
+					},
+					{
+						q: "The group presentation is worth ___ of the final module grade.",
+						accepted: [
+							"25%",
+							"25 per cent",
+							"twenty-five per cent",
+							"25 percent",
+							"twenty-five percent"
+						]
+					},
+					{
+						q: "The presentation itself must last exactly ___.",
+						accepted: ["15 minutes", "fifteen minutes"]
+					},
+					{
+						q: "After the presentation there will be five minutes of ___.",
+						accepted: [
+							"questions",
+							"question",
+							"questioning"
+						]
+					},
+					{
+						q: "Students may not choose the topic demonstrated together in Week ___.",
+						accepted: [
+							"6",
+							"six",
+							"6th"
+						]
+					},
+					{
+						q: "The mark scheme rewards ___, not solo brilliance.",
+						accepted: [
+							"coordination",
+							"co-ordination",
+							"cooperation"
+						]
+					},
+					{
+						q: "Presentations may include a maximum of ___ slides.",
+						accepted: ["10", "ten"]
+					},
+					{
+						q: "Any handout must use the ___ referencing style.",
+						accepted: [
+							"Harvard",
+							"harvard referencing",
+							"harvard style"
+						]
+					},
+					{
+						q: "The group's rehearsal in the media suite is booked for ___ at four.",
+						accepted: [
+							"Tuesday",
+							"Tues",
+							"Tuesday afternoon"
+						]
+					},
+					{
+						q: "___ of each person's score comes from anonymised feedback from the group.",
+						accepted: [
+							"20%",
+							"20 per cent",
+							"twenty per cent",
+							"20 percent",
+							"twenty percent"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on the history of public museums",
+				transcript: "Good morning. In this lecture I want to trace how the public museum came to be. The idea grew out of cabinets of curiosities — private collections of natural specimens, antiquities and oddities assembled in the homes of wealthy Europeans during the Renaissance, and shown only to invited guests. The real turning point for public access came in 1683, when the Ashmolean Museum in Oxford opened its doors. It was built around the collection of artefacts and natural objects that Elias Ashmole had given to the university, and it is often described as the world's first university museum open to the public. Seventy years later, the British Museum was established by an Act of Parliament in 1753, founded on the roughly seventy-one thousand books, drawings and specimens left to the nation by the physician Hans Sloane; it opened in 1759 and welcomed, in its own words, all 'studious and curious persons', free of charge. Revolutionary France went further still: in 1793 the royal palace of the Louvre became a public art museum, declaring that national treasures belonged to everyone. The idea crossed the Atlantic in 1846, when the Smithsonian Institution was created with the fortune of James Smithson — an English scientist who never once visited the United States, but left his money for, in his phrase, the 'increase and diffusion of knowledge'. In the twentieth century museums repositioned themselves as centres of popular education, and blockbuster exhibitions proved the appetite was enormous: the 1972 Tutankhamun exhibition in London attracted one point seven million visitors. Today the debates continue — repatriation claims over objects such as the Parthenon Marbles and the Benin Bronzes, the rapid growth of digital collections, and, in Britain, the principle of free general admission to national museums, which has been guaranteed since 2001.",
+				questions: [
+					{
+						q: "Cabinets of curiosities were private collections shown only to invited ___.",
+						accepted: ["guests", "guest"]
+					},
+					{
+						q: "The Ashmolean Museum opened its doors to the public in ___.",
+						accepted: [
+							"1683",
+							"sixteen eighty-three",
+							"one thousand six hundred and eighty-three"
+						]
+					},
+					{
+						q: "The British Museum was founded on the collection left by the physician ___.",
+						accepted: ["Hans Sloane", "Sloane"]
+					},
+					{
+						q: "Hans Sloane left roughly ___ books, drawings and specimens to the nation.",
+						accepted: [
+							"71,000",
+							"71000",
+							"seventy-one thousand",
+							"seventy one thousand"
+						]
+					},
+					{
+						q: "In 1793 the royal palace of the Louvre became a public ___ museum.",
+						accepted: [
+							"art",
+							"fine art",
+							"arts"
+						]
+					},
+					{
+						q: "James Smithson was an English scientist who never once visited the ___.",
+						accepted: [
+							"United States",
+							"USA",
+							"US",
+							"America",
+							"United States of America"
+						]
+					},
+					{
+						q: "Smithson left his money for the 'increase and ___ of knowledge'.",
+						accepted: ["diffusion", "spread"]
+					},
+					{
+						q: "The 1972 Tutankhamun exhibition in London attracted ___ visitors.",
+						accepted: [
+							"1.7 million",
+							"one point seven million",
+							"1,700,000",
+							"1700000"
+						]
+					},
+					{
+						q: "Repatriation debates cover objects such as the Parthenon Marbles and the ___.",
+						accepted: [
+							"Benin Bronzes",
+							"benin bronzes",
+							"Benin bronze"
+						]
+					},
+					{
+						q: "In Britain, free general admission to national museums has been guaranteed since ___.",
+						accepted: ["2001", "two thousand and one"]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The table below shows the number of visits per week to three leisure attractions in one town in 2015 and 2025.\n\nFarmers' market: 3,200, 5,100\nLeisure centre: 4,500, 6,800\nCinema: 6,200, 4,400\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "Some people believe that working from home offers employees a better quality of life, while others argue that working in an office is essential for teamwork, productivity and career development. Discuss both views and give your own opinion. Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"Let's talk about food. Do you enjoy cooking? What dishes can you make?",
+				"What food from your childhood do you still enjoy eating?",
+				"Do you prefer eating at home or in restaurants? Why?"
+			]),
+			speakingPart2("Describe a place you have visited that left a strong impression on you. You should say: where it is, when you visited it, what you did there, and explain why it left such a strong impression on you."),
+			...speakingPart3([
+				"Why do you think people enjoy visiting new places?",
+				"What are the benefits and drawbacks of tourism for local communities?",
+				"How do you think travel and tourism will change in the future?"
+			])
+		]
+	},
+	{
+		id: "mock-3",
+		order: 3,
+		title: "IELTS Mock Test 3",
+		reading: { passages: [
+			{
+				title: "The Story of Maps",
+				passage: "Some of the oldest surviving maps are not paper at all but baked clay. A Babylonian tablet from around 700 BC shows the world as a disc, with the city of Babylon at its heart, encircled by a circular ocean labelled the 'Bitter River'. For such early civilisations, a map was as much a statement of beliefs as a guide for travel. Greek thinkers transformed the practice. Around 240 BC the scholar Eratosthenes compared the noon shadows cast in two Egyptian cities and used the difference to estimate the Earth's circumference, arriving at a figure within a few per cent of the true value. Three centuries later, in Alexandria, the geographer Claudius Ptolemy compiled the Geographia, an atlas listing around eight thousand places with coordinates and instructions for drawing a map of the known world. His geometry was superb but his data imperfect: he placed Asia far too far to the east, an error which, centuries later, made Columbus's idea of sailing west to Asia look deceptively short. Medieval European maps often blurred accuracy on purpose. The Hereford mappa mundi, drawn around 1300, placed Jerusalem at the centre of the world and filled its margins with biblical scenes; guiding pilgrims in faith mattered more than guiding them in miles. Sailors needed something else, and found it in the portolan charts of the thirteenth century — practical sea charts drawn from compass bearings, with coastlines so startlingly accurate that historians still puzzle over how they were surveyed. The next breakthrough belongs to Gerardus Mercator, whose world map of 1569 projected the globe so that a line of constant compass bearing appeared straight, an enormous gift to ocean navigation, though it flatters the northern continents badly: on a Mercator map Greenland looks the size of Africa when the real continent is fourteen times larger. Governments then entered the business. Britain's Ordnance Survey was founded in 1791 amid military fears of invasion, mapping the south coast in fine detail; aerial photography during the First World War carried the surveyor's eye into the sky, and from the 1970s satellites carried it into orbit. The first NAVSTAR navigation satellite was launched in 1978, and the full GPS constellation was completed in 1993, handing everyone a pocket map that updates by the second. Modern quarrels over maps are not entirely new: in the 1970s the historian Arno Peters championed a projection that showed developing countries at their true size, proving that arguments about maps are really arguments about whose world we choose to draw.",
+				questions: [
+					{
+						q: "What did the ancient Babylonian tablet place at the centre of the world?",
+						options: [
+							"Jerusalem",
+							"Babylon",
+							"Athens",
+							"The rising sun"
+						],
+						answer: 1
+					},
+					{
+						q: "How did Eratosthenes estimate the Earth's circumference?",
+						options: [
+							"By sailing around the known world",
+							"By timing the phases of the moon",
+							"By comparing noon shadows in two Egyptian cities",
+							"By counting the days of a caravan journey"
+						],
+						answer: 2
+					},
+					{
+						q: "What did Ptolemy's Geographia contain?",
+						options: [
+							"Coordinates for around eight thousand places",
+							"A list of road tolls across Rome",
+							"Stories of sea monsters for sailors",
+							"Poems about distant continents"
+						],
+						answer: 0
+					},
+					{
+						q: "Why did Ptolemy's error about Asia matter much later?",
+						options: [
+							"It sank several trading fleets",
+							"It led to the invention of the compass",
+							"It caused the mapping of Atlantis",
+							"It made Columbus's planned westward crossing look deceptively short"
+						],
+						answer: 3
+					},
+					{
+						q: "What was the main purpose of the Hereford mappa mundi?",
+						options: [
+							"Planning military campaigns",
+							"Collecting agricultural taxes",
+							"Religious instruction, with Jerusalem at the centre",
+							"Charting fishing grounds in the North Sea"
+						],
+						answer: 2
+					},
+					{
+						q: "Why do historians still marvel at portolan charts?",
+						options: [
+							"Their coastlines are startlingly accurate for their day",
+							"They show the outline of Australia",
+							"They were richly painted in gold",
+							"They were extremely cheap to produce"
+						],
+						answer: 1
+					},
+					{
+						q: "What property does the Mercator projection preserve?",
+						options: [
+							"The true areas of continents",
+							"True distances from the equator",
+							"The real size of Greenland",
+							"Straight lines of constant compass bearing"
+						],
+						answer: 3
+					},
+					{
+						q: "What famous distortion does the Mercator projection produce?",
+						options: [
+							"Greenland appears as large as Africa",
+							"The oceans almost disappear",
+							"Europe looks smaller than reality",
+							"The two polar regions merge"
+						],
+						answer: 0
+					},
+					{
+						q: "Why was Britain's Ordnance Survey founded in 1791?",
+						options: [
+							"To serve a growing postal service",
+							"To plan the first railway network",
+							"Military fears of an invasion of the south coast",
+							"A royal interest in landscape painting"
+						],
+						answer: 2
+					},
+					{
+						q: "When was the full GPS satellite constellation completed?",
+						options: [
+							"1993",
+							"1918",
+							"2001",
+							"It has never been completed"
+						],
+						answer: 0
+					},
+					{
+						q: "What did Arno Peters argue in the 1970s?",
+						options: [
+							"That paper maps should be banned",
+							"That north should always point downwards",
+							"That GPS was fundamentally unreliable",
+							"That projections should show developing countries at their true size"
+						],
+						answer: 3
+					},
+					{
+						q: "Which development carried the surveyor's work into orbit from the 1970s?",
+						options: [
+							"Hot-air balloons",
+							"Satellites",
+							"Research submarines",
+							"Radio telescopes"
+						],
+						answer: 1
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"Why GPS is dangerous",
+							"The life of Claudius Ptolemy",
+							"Mapping the world: from clay tablets to satellites",
+							"How to read a compass at sea"
+						],
+						answer: 2
+					}
+				]
+			},
+			{
+				title: "Vertical Farming",
+				passage: "Of all the ideas for feeding the cities of the future, vertical farming sounds the most like science fiction: not open fields, but towers and warehouses in which trays of crops are stacked floor upon floor under artificial light. The term was popularised in 1999 by Dickson Despommier, a professor at Columbia University, who argued that a rising, urbanising population should grow its food indoors. In a vertical farm there is no soil at all. Plant roots sit in shallow channels of nutrient-enriched water — a technique known as hydroponics — or are misted with fine sprays as in aeroponics, while banks of LED lamps shine with the pink-purple blend of red and blue light that green leaves absorb most efficiently. Because the growing water is captured, filtered and recirculated, vertical farms can use up to ninety-five per cent less water than conventional agriculture, and because the buildings are sealed against the outside world, pests are excluded and chemical pesticides can be abandoned altogether. Rain, frost and drought become somebody else's problem: lettuces can be harvested about every thirty days, all year round. Advocates point to uncomfortable geographies. Singapore imports over ninety per cent of its food, and has responded with a '30 by 30' target of producing thirty per cent of its nutritional needs locally by 2030, spreading vertical farms across rooftops and warehouses. In Japan, after the 2011 earthquake, shuttered electronics factories were converted into spotless, LED-lit lettuce farms. Locating production inside cities also slashes 'food miles', since salad can be picked, packed and on shop shelves within a single morning. Yet the economics remain harsh. Replacing the free energy of the sun with electricity devours money: lighting and climate control dominate a farm's running costs. In practice, nearly every profitable vertical farm grows only fast, high-value crops — leafy greens, herbs and microgreens — because staples such as rice, wheat and potatoes can never cover the electricity bill; one analysis estimated that a loaf made from vertical-farm wheat would cost several times more than a conventional loaf even if everything ran perfectly. Several well-funded start-ups have already collapsed under that arithmetic. Nor can an indoor farm call itself automatically 'green': powered by a coal-heavy grid, indoor spinach may carry a larger carbon footprint than field-grown spinach shipped from abroad. The considered verdict is modest but optimistic: with cheap renewable electricity and ever more efficient LEDs, the industry sees itself as a complement to traditional farming rather than a replacement.",
+				questions: [
+					{
+						q: "Who popularised the term 'vertical farming' in 1999?",
+						options: [
+							"Dickson Despommier, a Columbia University professor",
+							"Gerardus Mercator, a Flemish cartographer",
+							"An unnamed Japanese engineer",
+							"A Singapore government minister"
+						],
+						answer: 0
+					},
+					{
+						q: "In hydroponics, where do plant roots grow?",
+						options: [
+							"In boxes of sterilised earth",
+							"In ordinary garden pots",
+							"In sealed bags of compost",
+							"In shallow channels of nutrient-rich water, with no soil"
+						],
+						answer: 3
+					},
+					{
+						q: "Why do vertical farms' LED lamps glow pink-purple?",
+						options: [
+							"They are designed to look attractive to visitors",
+							"Red and blue light is what green leaves absorb most efficiently",
+							"They are simply the cheapest bulbs available",
+							"City regulations require that colour"
+						],
+						answer: 1
+					},
+					{
+						q: "How much water can vertical farms save compared with conventional agriculture?",
+						options: [
+							"About half",
+							"None at all",
+							"Up to ninety-five per cent",
+							"Five per cent"
+						],
+						answer: 2
+					},
+					{
+						q: "How often can lettuces be harvested in a vertical farm?",
+						options: [
+							"About every thirty days, all year round",
+							"Once every year",
+							"Only every three years",
+							"Every single hour"
+						],
+						answer: 0
+					},
+					{
+						q: "Why does sealing the building matter for crop protection?",
+						options: [
+							"It keeps out heavy rain",
+							"It reduces noise pollution",
+							"It keeps pests out, making chemical pesticides unnecessary",
+							"It satisfies the insurance companies"
+						],
+						answer: 2
+					},
+					{
+						q: "What is Singapore's '30 by 30' target?",
+						options: [
+							"Producing thirty per cent of its nutritional needs locally by 2030",
+							"Building thirty new farms each year",
+							"Cutting food waste by thirty per cent",
+							"Doubling its food imports by 2030"
+						],
+						answer: 1
+					},
+					{
+						q: "What did Japan do after the 2011 earthquake, according to the passage?",
+						options: [
+							"It banned hydroponic farming",
+							"It moved all farming offshore",
+							"It rebuilt farms using draught animals",
+							"It converted closed electronics factories into LED-lit lettuce farms"
+						],
+						answer: 3
+					},
+					{
+						q: "What dominates a vertical farm's running costs?",
+						options: [
+							"Soil replacement",
+							"Electricity for lighting and climate control",
+							"The price of seeds",
+							"Leasing tractors"
+						],
+						answer: 1
+					},
+					{
+						q: "Why are staple crops like rice, wheat and potatoes unsuitable for vertical farming?",
+						options: [
+							"They grow poorly under LED light",
+							"They attract too many pests indoors",
+							"They grow too tall for warehouse shelves",
+							"They can never generate enough value to cover the electricity bill"
+						],
+						answer: 3
+					},
+					{
+						q: "What caveat does the passage give about the industry's 'green' reputation?",
+						options: [
+							"LED lamps cannot be recycled",
+							"Water cannot actually be reused",
+							"On a coal-heavy grid, indoor spinach may have a larger carbon footprint than imported field-grown spinach",
+							"Vertical farms burn crop waste daily"
+						],
+						answer: 2
+					},
+					{
+						q: "How does the industry ultimately see its own role?",
+						options: [
+							"As a complement to traditional farming, not a replacement",
+							"As the quick end of outdoor agriculture",
+							"As a passing fashion without consequence",
+							"As an expensive failure"
+						],
+						answer: 0
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"Why traditional soil is dying",
+							"Japan's lettuce factories",
+							"How to water a vegetable garden",
+							"Vertical farming: promise and its limits"
+						],
+						answer: 3
+					}
+				]
+			},
+			{
+				title: "The Science of Sleep",
+				passage: "That we spend a third of our lives asleep is one of life's stranger facts, and science is still catching up with the reasons why. The modern understanding of sleep began in 1953, when the researcher Eugene Aserinsky watched sleeping babies and noticed their eyes darting about beneath closed lids; with his supervisor Nathaniel Kleitman he showed that these periods of rapid eye movement, known as REM, pair with vivid dreaming. Healthy sleep is now understood as a repeating cycle of light sleep, deep sleep and REM, each cycle lasting about ninety minutes and repeating several times a night. What drives us into sleep is partly chemistry. From the moment we wake, a substance called adenosine accumulates in the brain, and the more of it we harbour, the sleepier we feel. Caffeine works by blocking adenosine receptors rather than by removing adenosine, so when the caffeine wears off, the pent-up sleepiness comes flooding back. Running in parallel is the circadian rhythm, an internal clock of roughly twenty-four hours that anticipates sunrise and sunset and instructs the pineal gland to release the hormone melatonin towards evening, preparing the body for rest. Some of what we know comes from celebrated experiments. In 1964 a seventeen-year-old American student, Randy Gardner, stayed awake for 264 hours — eleven days — under researchers' supervision. He suffered no lasting harm, which reassured doctors, but his attention, mood and memory all crumbled visibly during the ordeal, a vivid demonstration of sleep's worth. Modern research explains why: during deep sleep the hippocampus replays the day's experiences many times faster than real time, transferring what matters into long-term storage, which is why students who sleep after studying retain more than students who cram through the night. Sleep science has also produced practical warnings. Seventeen hours of wakefulness degrades performance to a level comparable to mild alcohol intoxication, a finding that has reshaped hospital shift patterns. Screens are a nightly enemy, since their blue-rich light suppresses melatonin and tells the brain it is still daytime. Even the common habit of getting up early on workdays but sleeping late at weekends imposes what researchers call 'social jet lag', a repeated disorientation of the body clock. The experts' advice is unglamorous but constant: seven to nine hours for most adults, kept at regular times, in a cool, dark room — with a twenty-minute afternoon nap permitted, since controlled studies have found short naps boost alertness substantially, provided they are taken early enough not to disturb the coming night.",
+				questions: [
+					{
+						q: "When was REM sleep first identified?",
+						options: [
+							"1863",
+							"1993",
+							"2016",
+							"1953"
+						],
+						answer: 3
+					},
+					{
+						q: "Who first noticed rapid eye movements during sleep?",
+						options: [
+							"Eugene Aserinsky, watching sleeping babies",
+							"Randy Gardner, during his vigil",
+							"Claudius Ptolemy, in Alexandria",
+							"A team of NASA pilots"
+						],
+						answer: 0
+					},
+					{
+						q: "How long does a typical sleep cycle last?",
+						options: [
+							"Exactly one hour",
+							"Six hours",
+							"About ninety minutes",
+							"A single minute"
+						],
+						answer: 2
+					},
+					{
+						q: "What role does adenosine play?",
+						options: [
+							"It wakes the brain each morning",
+							"It accumulates while we are awake and creates sleepiness",
+							"It helps wounds to heal overnight",
+							"It breaks down caffeine in the blood"
+						],
+						answer: 1
+					},
+					{
+						q: "How does caffeine actually make us feel less sleepy?",
+						options: [
+							"It dissolves adenosine in the blood",
+							"It blocks adenosine receptors rather than removing adenosine",
+							"It replaces melatonin entirely",
+							"It destroys tired neurons"
+						],
+						answer: 1
+					},
+					{
+						q: "Where does melatonin come from?",
+						options: [
+							"The stomach lining",
+							"The surface of the skin",
+							"The inside of the eyelids",
+							"The pineal gland, released towards evening"
+						],
+						answer: 3
+					},
+					{
+						q: "How long did Randy Gardner stay awake in 1964?",
+						options: [
+							"264 hours",
+							"A single night",
+							"Forty days",
+							"96 hours"
+						],
+						answer: 0
+					},
+					{
+						q: "What happened to Gardner's mental abilities during the experiment?",
+						options: [
+							"Nothing measurable changed",
+							"He never slept normally again",
+							"Attention, mood and memory crumbled, though he recovered afterwards",
+							"His memory noticeably improved"
+						],
+						answer: 2
+					},
+					{
+						q: "What does the brain do during deep sleep, according to the passage?",
+						options: [
+							"It deletes negative emotions",
+							"It becomes almost completely inactive",
+							"It processes only physical growth",
+							"It replays the day's experiences at high speed to store important memories"
+						],
+						answer: 3
+					},
+					{
+						q: "What does seventeen hours of wakefulness do to performance?",
+						options: [
+							"It triples concentration",
+							"It causes tension headaches",
+							"It degrades performance to a level comparable to mild alcohol intoxication",
+							"It has no measurable effect"
+						],
+						answer: 2
+					},
+					{
+						q: "Why do screens delay sleep?",
+						options: [
+							"Their hum disturbs light sleepers",
+							"Their blue-rich light suppresses melatonin",
+							"Their brightness damages eyesight",
+							"They warm up the bedroom"
+						],
+						answer: 1
+					},
+					{
+						q: "What is 'social jet lag'?",
+						options: [
+							"Body-clock disorientation caused by differing weekday and weekend schedules",
+							"Fear of international travel",
+							"A cure for travel sickness",
+							"Insomnia caused by skipping breakfast"
+						],
+						answer: 0
+					},
+					{
+						q: "What do the experts permit as a genuinely helpful habit?",
+						options: [
+							"Sleeping late at weekends to catch up",
+							"A twenty-minute afternoon nap taken early enough",
+							"Drinking coffee shortly before bedtime",
+							"Checking a bright screen in bed"
+						],
+						answer: 1
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"Famous dreams in history",
+							"The design of the perfect pillow",
+							"Why we sleep: what science has learned",
+							"How to stay awake for eleven days"
+						],
+						answer: 2
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A hotel booking phone call",
+				transcript: "Good afternoon, thanks for calling the Clarendon Hotel, this is Emma speaking. Certainly, I can check your dates for you — that's the twelfth and thirteenth of September, so two nights in total. Good news: we do have availability. A standard single is seventy-five pounds per night and a standard double is ninety-five, but I'd recommend our superior double at one hundred and twenty; it's on the top floor with a direct sea view. All of our rates include breakfast, which we serve from seven until ten on weekdays and from eight until eleven at weekends. If you're driving, we have parking spaces behind the hotel at eight pounds per night — the public car park next door charges more, so do reserve a space with us in advance. Our policy allows free cancellation up to forty-eight hours before arrival. Check-in is from two o'clock on your arrival day, and departure is normally at noon, although you can keep the room until two in the afternoon for fifteen pounds. The gym is open daily from six in the morning until ten at night, and the spa operates on an appointment-only basis at weekends. Yes, we do run an airport shuttle: it leaves at half past each hour from bay three outside the hotel entrance, and tickets are four pounds per person. To hold a room I'll just take a credit card number, but nothing is charged today — the card simply guarantees the booking and you pay when you arrive. May I take your full name, please?",
+				questions: [
+					{
+						q: "The caller's booking is for two nights, on the twelfth and thirteenth of ___.",
+						accepted: ["September", "september"]
+					},
+					{
+						q: "A standard double room costs ___ per night.",
+						accepted: [
+							"£95",
+							"95",
+							"95 pounds",
+							"ninety-five pounds",
+							"ninety five pounds"
+						]
+					},
+					{
+						q: "The superior double is on the top floor and has a direct ___ view.",
+						accepted: ["sea", "ocean"]
+					},
+					{
+						q: "At weekends breakfast is served from eight until ___.",
+						accepted: [
+							"11",
+							"11:00",
+							"11 am",
+							"11am",
+							"eleven"
+						]
+					},
+					{
+						q: "Parking behind the hotel costs ___ per night.",
+						accepted: [
+							"£8",
+							"8",
+							"8 pounds",
+							"eight pounds"
+						]
+					},
+					{
+						q: "The booking can be cancelled free of charge up to ___ before arrival.",
+						accepted: [
+							"48 hours",
+							"forty-eight hours",
+							"forty eight hours",
+							"two days"
+						]
+					},
+					{
+						q: "Guests may check in from ___ o'clock on arrival day.",
+						accepted: [
+							"2",
+							"two",
+							"2:00",
+							"2 pm",
+							"2pm",
+							"14:00"
+						]
+					},
+					{
+						q: "Keeping the room until two in the afternoon costs ___.",
+						accepted: [
+							"£15",
+							"15",
+							"15 pounds",
+							"fifteen pounds"
+						]
+					},
+					{
+						q: "The airport shuttle leaves from bay three at ___ past each hour.",
+						accepted: ["half", "thirty"]
+					},
+					{
+						q: "The caller's credit card will only be charged on ___.",
+						accepted: ["arrival", "check-in"]
+					}
+				]
+			},
+			{
+				title: "Section 2: A talk recruiting volunteers for a community theatre",
+				transcript: "Hello everyone, and thank you for coming along tonight to hear about volunteering with the Harbourside Players, our town's community theatre company. The theatre itself is a converted chapel — the building dates from 1860, though it only became our performance home in 1998 — and it seats an audience of one hundred and twenty. Our autumn production, The Importance of Being Earnest, opens on the fourteenth of October and will run for three weeks. But I should say straight away: we are not recruiting actors this evening. What we desperately need are volunteers behind the scenes. Front-of-house stewards welcome the audience and show people to their seats; those shifts run on show nights from a quarter past six until about ten. Our costume team meets on Wednesday afternoons to sew, mend and press, and set painting happens on Sunday mornings, supervised by our resident designer. Full training is provided for every role — nobody expects you to arrive already knowing anything. The rewards, besides the excellent company, are that volunteers watch every production free of charge and receive two guest tickets per season to bring family or friends. We do ask for a minimum commitment of about three hours a week during production months, though we can always be flexible around exams or holidays. If any of this appeals, we are holding an open evening here at the theatre on Tuesday the third of September at half past seven, with tea and biscuits provided. Every volunteer over the age of sixteen is covered by our insurance; only those helping with our youth theatre will need a background check, which we arrange and pay for ourselves. Sign-up sheets are by the door, and our box office takes calls every morning. We would genuinely love to see you.",
+				questions: [
+					{
+						q: "The theatre is housed in a converted ___, which dates from 1860.",
+						accepted: ["chapel", "church"]
+					},
+					{
+						q: "The theatre seats an audience of ___.",
+						accepted: [
+							"120",
+							"one hundred and twenty",
+							"one hundred twenty"
+						]
+					},
+					{
+						q: "The autumn production is Oscar Wilde's play, The ___ of Being Earnest.",
+						accepted: ["importance", "Importance of Being Earnest"]
+					},
+					{
+						q: "The autumn production opens on the ___ of October.",
+						accepted: [
+							"14th",
+							"fourteenth",
+							"14"
+						]
+					},
+					{
+						q: "The costume team meets on ___ afternoons.",
+						accepted: [
+							"Wednesday",
+							"Wed",
+							"wednesdays"
+						]
+					},
+					{
+						q: "Set painting happens on ___ mornings.",
+						accepted: [
+							"Sunday",
+							"Sun",
+							"sundays"
+						]
+					},
+					{
+						q: "Besides watching productions free, volunteers receive ___ guest tickets per season.",
+						accepted: ["2", "two"]
+					},
+					{
+						q: "During production months the minimum commitment is about ___ hours a week.",
+						accepted: ["3", "three"]
+					},
+					{
+						q: "The open evening is at half past seven on Tuesday the ___ of September.",
+						accepted: [
+							"3rd",
+							"third",
+							"3"
+						]
+					},
+					{
+						q: "Only volunteers helping with the ___ theatre will need a background check.",
+						accepted: [
+							"youth",
+							"young",
+							"young people"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 3: A tutor discussing essay feedback with two students",
+				transcript: "Tutor: Right, you've both got your essay marks back now, so let's talk through the feedback. Alex, looking at yours first: you used only four sources, and the expectation on this assignment is around ten, so that cost you heavily. Remember, forty per cent of the marks on this module come from critical evaluation — weighing sources against each other — and you can't weigh what you haven't read. Student A: I suppose I started too late, really. Tutor: Then let's make sure we plan better next time. Priya, your essay was much better supported, but your conclusion introduced entirely new material. A conclusion should weigh up what you have already argued; brand-new points at the end simply confuse the marker. Student B: Noted. And what about the referencing? Tutor: Both of you must use APA style on this module — the handbook is completely clear about that. Alex, I noticed the similarity score on your draft. Student A: It was eighteen per cent. Should I be worried? Tutor: Not necessarily. Eighteen per cent can be entirely proper if those matches are correctly quoted and referenced material. The report needs careful interpretation — it is not an automatic penalty. Now, some dates for your diaries. The word limit is two thousand with a ten per cent allowance either way. Resubmissions are due by five o'clock on Friday of week eleven, and marks appear on the online portal two weeks later, released anonymously so nobody sees anyone else's. And finally: if referencing still feels hazy, the library runs a workshop next Monday morning at ten o'clock — I would strongly encourage you both to attend.",
+				questions: [
+					{
+						q: "Alex's essay used only ___ sources.",
+						accepted: ["4", "four"]
+					},
+					{
+						q: "For this assignment the expectation is around ___ sources.",
+						accepted: ["10", "ten"]
+					},
+					{
+						q: "___ of the module marks come from critical evaluation.",
+						accepted: [
+							"40%",
+							"40 per cent",
+							"forty per cent",
+							"40 percent",
+							"forty percent"
+						]
+					},
+					{
+						q: "Priya's conclusion wrongly introduced entirely new ___.",
+						accepted: [
+							"material",
+							"points",
+							"new material",
+							"ideas"
+						]
+					},
+					{
+						q: "Both students must use ___ referencing style on this module.",
+						accepted: ["APA", "apa"]
+					},
+					{
+						q: "Alex's similarity score on the draft was ___.",
+						accepted: [
+							"18%",
+							"eighteen per cent",
+							"18 per cent",
+							"eighteen percent",
+							"18 percent"
+						]
+					},
+					{
+						q: "The word limit for the essay is ___, with a ten per cent allowance either way.",
+						accepted: [
+							"2000",
+							"2,000",
+							"two thousand"
+						]
+					},
+					{
+						q: "Resubmissions are due at five o'clock on Friday of week ___.",
+						accepted: ["11", "eleven"]
+					},
+					{
+						q: "Marks appear on the online portal ___ later, released anonymously.",
+						accepted: ["two weeks", "2 weeks"]
+					},
+					{
+						q: "The library's referencing workshop is next Monday at ___ o'clock.",
+						accepted: [
+							"10",
+							"ten",
+							"10:00",
+							"10 am",
+							"10am"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on bilingualism and the brain",
+				transcript: "Let us begin with definitions: a bilingual is simply someone who uses two languages regularly, whatever their level in each. The surprising thing is how recently bilingualism had a bad name. For much of the twentieth century, experts warned parents that two languages would confuse children and hold them back at school. Those early studies, however, were badly designed: they typically compared bilingual children from poor immigrant families with monolingual children from comfortable backgrounds, so what they measured was poverty as much as vocabulary. In 1962, the Canadian psychologists Elizabeth Peal and Wallace Lambert redid the work properly in Montreal, carefully matching children for background, and found that bilingual children often outperformed monolinguals, especially on tasks demanding flexible thought. Today's explanation runs like this: because both of a bilingual person's languages are always active, the brain must constantly select one and suppress the other. That routine suppression trains what psychologists call executive control — our capacity to direct attention and ignore distractions. One researcher summed it up neatly: for the brain, juggling two languages is like going to the gym. The most talked-about result comes from Ellen Bialystok and her colleagues, who reported that bilingual patients developed the symptoms of dementia some four to five years later than otherwise similar monolingual patients. On the other hand, bilingualism does have documented costs: each language typically holds a slightly smaller vocabulary, and finding exactly the right word can take a split second longer — the familiar tip-of-the-tongue moment. Brain scanning studies even report denser grey matter in the regions handling language control. And code-switching — slipping from one language into the other in a single sentence — is no sign of laziness: it follows strict, shared grammatical rules that only the genuinely fluent can manage. The overall picture, then, is positive but should not be exaggerated in the press: bilingualism offers real, though modest, advantages — and its richest dividend may be cultural rather than medical.",
+				questions: [
+					{
+						q: "For much of the twentieth century experts warned that two languages would hold children back at ___.",
+						accepted: ["school", "schools"]
+					},
+					{
+						q: "Early bilingualism studies were badly designed and measured ___ as much as vocabulary.",
+						accepted: ["poverty", "class"]
+					},
+					{
+						q: "The properly designed 1962 study by Peal and Lambert was carried out in ___.",
+						accepted: ["Montreal", "Canada"]
+					},
+					{
+						q: "Executive control is the capacity to direct attention and ignore ___.",
+						accepted: ["distractions", "distraction"]
+					},
+					{
+						q: "For the brain, juggling two languages is like going to the ___.",
+						accepted: ["gym", "gymnasium"]
+					},
+					{
+						q: "Bialystok found bilingual patients developed dementia symptoms some ___ to five years later.",
+						accepted: ["4", "four"]
+					},
+					{
+						q: "Code-switching follows strict shared ___ rules.",
+						accepted: ["grammatical", "grammar"]
+					},
+					{
+						q: "Each of a bilingual person's languages typically holds a slightly smaller ___.",
+						accepted: ["vocabulary", "word stock"]
+					},
+					{
+						q: "Brain scans show bilinguals have denser ___ matter in language-control regions.",
+						accepted: ["grey", "gray"]
+					},
+					{
+						q: "The lecturer concludes bilingualism's richest dividend may be ___ rather than medical.",
+						accepted: ["cultural", "culture"]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The chart below shows the different career routes chosen by school leavers in one country in 2005 and 2025.\n\nUniversity degree: 42%, 55%\nVocational training: 20%, 18%\nImmediate employment: 38%, 27%\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "Some people believe that a university education is the best route to a successful career, while others think that vocational training provides better preparation for today's workplace. Give your opinion and support it with reasons and examples from your own knowledge or experience. Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"Let's talk about the weather. What is the weather like in your country at this time of year?",
+				"Do you prefer hot or cold weather? Why?",
+				"How does the weather affect your mood or your daily routine?"
+			]),
+			speakingPart2("Describe a person who has inspired you. You should say: who this person is, how you know them, what they have done, and explain why they inspire you."),
+			...speakingPart3([
+				"What qualities do you think make someone a good role model?",
+				"Do celebrities have a responsibility to behave well in public? Why or why not?",
+				"For children, are parents or famous people more important as role models?"
+			])
+		]
+	},
+	{
+		id: "mock-4",
+		order: 4,
+		title: "IELTS Mock Test 4",
+		reading: { passages: [
+			{
+				title: "The Silk Road",
+				passage: "The 'Silk Road' is a modern romantic label for an ancient reality. The phrase was coined only in 1877 by a German geographer named Ferdinand von Richthofen, to describe the web of trading routes that had linked China with the Mediterranean for well over a thousand years. That web opened properly under the Han dynasty in 138 BC, when the Emperor Wu sent an envoy, Zhang Qian, westwards to seek allies against hostile nomads. Zhang Qian was captured by the Xiongnu, held for ten years, and escaped to finish the mission, bringing home the first reliable Chinese reports of Central Asia, including tales of unusually tall, swift horses in the Ferghana valley — animals the imperial court prized so highly that it traded silk for them by the herd. Very few individuals ever travelled the whole route. Goods passed from one middleman to the next, moving westwards through oasis cities such as Samarkand and Bukhara, prices climbing at every exchange. Travelling west went silk, porcelain, spices and, eventually, the secret of papermaking; eastwards came glassware, woollen cloth, gold and silver. The routes carried far more than objects. Buddhism travelled from India along these roads and took enduring root in China, while followers of Nestorian Christianity and, later, Islam founded congregations in oasis towns far from home. Some of the traffic was darker: historians believe the bubonic plague moved east to west along these very routes to reach Europe by 1347, where it may have wiped out a third of the population. Danger was an everyday companion. The Taklamakan Desert, skirted oasis by oasis, carries a name glossed locally as 'you go in and you do not come out', and its sandstorms buried whole staging posts. Then, through the thirteenth and fourteenth centuries, the routes enjoyed a golden age under the Pax Mongolica, when the single Mongol Empire policed roads across half of Eurasia so effectively that merchants crossed in unusual safety; it was into this settled world that Marco Polo set out in 1271, bound for the court of Kublai Khan. Peace could not outlast economics: by the fifteenth century, ocean shipping carried bulky goods far more cheaply than camel trains, and the overland routes dwindled. Memory, though, has revived them. When China launched its Belt and Road Initiative in 2013, laying railways and ports across the same geography, the old caravan tracks suddenly looked less like history than a plan remembered.",
+				questions: [
+					{
+						q: "Who coined the term 'Silk Road'?",
+						options: [
+							"Marco Polo",
+							"Zhang Qian",
+							"The Emperor Wu",
+							"Ferdinand von Richthofen"
+						],
+						answer: 3
+					},
+					{
+						q: "Why was Zhang Qian sent west in 138 BC?",
+						options: [
+							"To seek allies for the Han emperor against hostile nomads",
+							"To sell tea to the Romans",
+							"To conquer Central Asia",
+							"To map the desert stars"
+						],
+						answer: 1
+					},
+					{
+						q: "What did the Chinese imperial court prize from the Ferghana valley?",
+						options: [
+							"Remarkably tall, swift horses",
+							"War elephants",
+							"Trained racing camels",
+							"Flocks of fine sheep"
+						],
+						answer: 0
+					},
+					{
+						q: "Who typically carried goods along the entire route from China to the Mediterranean?",
+						options: [
+							"A single trusted merchant",
+							"Only imperial soldiers",
+							"Almost nobody — goods passed between a chain of middlemen",
+							"Pilgrims on religious journeys"
+						],
+						answer: 2
+					},
+					{
+						q: "Which city is named as a famed exchange point on the routes?",
+						options: [
+							"London",
+							"Athens",
+							"Cairo",
+							"Samarkand"
+						],
+						answer: 3
+					},
+					{
+						q: "Which religion travelled east along the routes and took root in China?",
+						options: [
+							"Buddhism",
+							"Judaism",
+							"Protestantism",
+							"Shinto"
+						],
+						answer: 0
+					},
+					{
+						q: "What does the Taklamakan Desert's local nickname convey?",
+						options: [
+							"A land of flowers",
+							"Those who enter may never return",
+							"A paradise for travellers",
+							"A valley of glass"
+						],
+						answer: 1
+					},
+					{
+						q: "Which disease is believed to have travelled the routes to reach Europe by 1347?",
+						options: [
+							"Cholera",
+							"Measles",
+							"The bubonic plague",
+							"Spanish influenza"
+						],
+						answer: 2
+					},
+					{
+						q: "Why did the routes enjoy a golden age in the thirteenth and fourteenth centuries?",
+						options: [
+							"The Pax Mongolica made the roads unusually secure",
+							"Roman legions guarded every oasis",
+							"Walls ran alongside the whole route",
+							"Armed gunboats patrolled the rivers"
+						],
+						answer: 0
+					},
+					{
+						q: "When did Marco Polo set out for the court of Kublai Khan?",
+						options: [
+							"1066",
+							"1492",
+							"1271",
+							"1601"
+						],
+						answer: 2
+					},
+					{
+						q: "Why did overland trade decline from the fifteenth century?",
+						options: [
+							"Silk was banned across Asia",
+							"Sea routes carried bulky goods far more cheaply",
+							"The deserts grew too hot to cross",
+							"Camel trains became extinct"
+						],
+						answer: 1
+					},
+					{
+						q: "What modern project deliberately echoes the ancient routes?",
+						options: [
+							"The widening of the Suez Canal",
+							"The transatlantic cable",
+							"The United Nations charter",
+							"China's Belt and Road Initiative"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The Silk Road: an ancient artery of goods, ideas and faiths",
+							"A biography of Richthofen",
+							"The silk industry of modern Italy",
+							"Deserts of Central Asia"
+						],
+						answer: 0
+					}
+				]
+			},
+			{
+				title: "The Value of Urban Trees",
+				passage: "Cities run several degrees hotter than the countryside around them. Dark roofs and tarmac soak up the day's heat and release it at night, a hotspot pattern known as the urban heat island. Trees fight back on two fronts. They throw shade over baking pavements, and through evapotranspiration — the steady release of moisture from their leaves — a single mature tree can cool its surroundings like several room-sized air-conditioning units working through a summer afternoon. Their services go well beyond cooling. Leaves trap airborne particles, which the rain then washes away, and a spreading canopy interrupts stormwater: a mature tree can intercept thousands of litres of rainfall in a year, easing the pressure on drains during a downpour. Even the housing market notices. Studies in a number of cities have found that houses on tree-lined streets fetch five to fifteen per cent more than similar homes on bare streets, while traffic noise, glare and dust all fall where trees thrive. Human bodies register the difference too: in a celebrated 1984 study, the researcher Roger Ulrich found that hospital patients whose windows faced trees recovered from surgery faster than patients whose rooms looked out onto a brick wall. Aware of these benefits, city halls have learned to count them. A freely available software package called i-Tree lets councils estimate, in money terms, what their trees accomplish every year. When London ran the numbers in 2015, it counted roughly 8.4 million trees and valued their combined services at around five billion pounds. Yet street trees live hard lives. Crammed into dry planting pits and hemmed in by pipes and cables, a street tree in a dense city centre often survives only seven to thirteen years before needing replacement — a fraction of its natural span in woodland — and insurers sometimes press for removals, blaming roots for cracked paving and damaged foundations. Practical wisdom has grown from such failures. Arborists now preach the '10-20-30' rule: no more than ten per cent of any one species, twenty per cent of one genus and thirty per cent of one family in a city's stock, so that a single new pest cannot fell a whole city. Equity matters just as much: canopy maps repeatedly show wealthy districts thickly shaded and poorer districts almost bare. Urban trees, it turns out, are public infrastructure that happens to be alive — and they must be budgeted for, diversified and defended accordingly.",
+				questions: [
+					{
+						q: "Why do cities become hotter than the surrounding countryside?",
+						options: [
+							"Trees soak up the cold air",
+							"City rivers release steam",
+							"Dark roofs and roads store the day's heat and release it at night",
+							"City evenings are longer"
+						],
+						answer: 2
+					},
+					{
+						q: "How do trees cool streets beyond merely giving shade?",
+						options: [
+							"Evapotranspiration: leaves release moisture that cools the air",
+							"Their roots drink heat from the pavement",
+							"Their leaves reflect sunlight into space",
+							"They attract cooling sea winds"
+						],
+						answer: 0
+					},
+					{
+						q: "What did Roger Ulrich's 1984 hospital study find?",
+						options: [
+							"Trees have no effect on health",
+							"Windows served no purpose in recovery",
+							"Patients preferred facing brick walls",
+							"Patients with tree views recovered from surgery faster than those facing a wall"
+						],
+						answer: 3
+					},
+					{
+						q: "What effect do trees have on the housing market, according to studies?",
+						options: [
+							"They halve all nearby prices",
+							"Homes on tree-lined streets fetch several per cent more",
+							"They have no measurable effect",
+							"Only office blocks gain in value"
+						],
+						answer: 1
+					},
+					{
+						q: "What is i-Tree?",
+						options: [
+							"A robotic tree planter",
+							"A new species of elm",
+							"Software that estimates a city's arboreal benefits in money terms",
+							"A network of weather stations"
+						],
+						answer: 2
+					},
+					{
+						q: "How many trees did the 2015 exercise count in London?",
+						options: [
+							"About 800,000",
+							"About 840 million",
+							"Exactly 84 trees",
+							"Roughly 8.4 million"
+						],
+						answer: 3
+					},
+					{
+						q: "What monetary value did it place on London's urban forest?",
+						options: [
+							"About £5 billion",
+							"About £50,000",
+							"About £500 million",
+							"It found the value incalculable"
+						],
+						answer: 0
+					},
+					{
+						q: "What typical lifespan do street trees in dense city centres achieve?",
+						options: [
+							"Two hundred years or more",
+							"Only seven to thirteen years",
+							"A single growing season",
+							"Several centuries"
+						],
+						answer: 1
+					},
+					{
+						q: "Why do insurers sometimes press for trees to be removed?",
+						options: [
+							"Trees create too much noise",
+							"Trees cause river flooding",
+							"Roots are blamed for cracked paving and damaged foundations",
+							"Trees block the streetlights"
+						],
+						answer: 2
+					},
+					{
+						q: "What does the '10-20-30' rule recommend?",
+						options: [
+							"Planting only oak trees for strength",
+							"No more than ten per cent of one species, so a single pest cannot fell a city",
+							"Letting trees seed themselves at random",
+							"Cloning one hardy tree across the city"
+						],
+						answer: 1
+					},
+					{
+						q: "What inequality do canopy maps repeatedly reveal?",
+						options: [
+							"Poorer districts have far less canopy than wealthy ones",
+							"Rich districts are completely bare of trees",
+							"Every district is equally shaded",
+							"Suburbs have banned tree planting"
+						],
+						answer: 0
+					},
+					{
+						q: "How can a mature tree reduce strain on city drains?",
+						options: [
+							"It pumps water away through its roots",
+							"It dries out the surrounding soil",
+							"It lowers the wind speed",
+							"Its canopy intercepts thousands of litres of rainfall each year"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"How to fell a street tree safely",
+							"The story of a single software package",
+							"Urban trees: quietly earning their keep",
+							"Gardens versus parks"
+						],
+						answer: 2
+					}
+				]
+			},
+			{
+				title: "The Psychology of Colour in Marketing",
+				passage: "Walk along any high street and the first things your brain registers, before a single word or price tag, are colours. Marketers have exploited this for generations. Red quickens the pulse and, by common repute, the appetite, which is why it saturates fast-food signage and 'SALE' lettering alike; it is the colour of urgency. Blue does the opposite: it reads as calm, competent and trustworthy, and it belongs to banks, airlines and technology companies. Green has been signed over to health and nature, splashed across eco-labels and organic packaging. Black, at the other end of the register, signals premium exclusivity — think of the matte jacket on an expensive phone — while purple, once ruinously costly as a dye, still trades on a trace of royalty and luxury. Some firms have grown so possessive of a shade that they defend it in court: Cadbury spent years in legal battle to protect a particular purple on chocolate wrappers, and the mobile operator T-Mobile has repeatedly guarded its magenta. That a colour can be valuable enough to litigate over tells you it is genuinely doing commercial work. Researchers have measured the effect too. When psychologists reviewed the combat sports at the 2004 Athens Olympics, they found that contestants randomly assigned red kits won bouts noticeably more often than those assigned blue — an astonishing, if much debated, result. Online, the story repeats in miniature: in one much-cited test, changing a website's single button from green to red lifted clicks by around a fifth. Yet tidy rules collapse at airports. White suggests purity and weddings in much of the West but mourning and funerals in parts of East Asia; red means luck and celebration in China, where brides traditionally wear it, far from its Western note of warning. Sceptical psychologists add a further caution: the popular claim that up to ninety per cent of snap judgements about products are colour-based rests on weaker ground than its retelling suggests, and real effects are usually modest, context-bound and culture-bound. The sensible advice, then, is not to memorise a universal code but to fit colour to the personality a brand wants to project — a gentle shampoo in ferocious black, or a banking app in chaotic lime, will confuse precisely the customers it hopes to reassure. Colour is not the whole message, but it is always the first word of it.",
+				questions: [
+					{
+						q: "Why do marketers care so much about a design's colour?",
+						options: [
+							"Colour printing is cheaper than ever",
+							"Colour is processed by the brain before words or prices",
+							"Regulations require distinct brand colours",
+							"Fashion changes force constant redesigns"
+						],
+						answer: 1
+					},
+					{
+						q: "Which qualities are commonly associated with the colour red in marketing?",
+						options: [
+							"Sleepiness and distance",
+							"Cleanliness and sanitation",
+							"Arousal, appetite and urgency",
+							"Silence and privacy"
+						],
+						answer: 2
+					},
+					{
+						q: "Why do banks and technology firms lean towards blue?",
+						options: [
+							"It reads as calm and trustworthy",
+							"It is the cheapest pigment to print",
+							"It hides fingerprints on screens",
+							"Financial law requires it"
+						],
+						answer: 0
+					},
+					{
+						q: "What does black packaging usually communicate?",
+						options: [
+							"Products for children",
+							"Dairy freshness",
+							"Clearance discounts",
+							"Premium exclusivity"
+						],
+						answer: 3
+					},
+					{
+						q: "What does the Cadbury purple litigation demonstrate?",
+						options: [
+							"A single colour can be commercial property worth fighting for",
+							"Purple printing is unreliable",
+							"Packaging errors are common",
+							"Courts dislike chocolate companies"
+						],
+						answer: 0
+					},
+					{
+						q: "What did researchers find when they reviewed combat sports at the 2004 Olympics?",
+						options: [
+							"Blue kits always lost their bouts",
+							"Contests randomly assigned red kits won more often than those in blue",
+							"The judges ignored kit colours",
+							"Colour differences had no visibility at all"
+						],
+						answer: 1
+					},
+					{
+						q: "Why can the same colour be risky for a global brand?",
+						options: [
+							"Ink supply chains are unstable",
+							"Television screens display it badly",
+							"Children universally dislike it",
+							"Its meaning can be reversed across cultures — white celebrates in the West but mourns in parts of East Asia"
+						],
+						answer: 3
+					},
+					{
+						q: "What associations does red carry in China?",
+						options: [
+							"Danger and prohibition",
+							"Illness and sorrow",
+							"Luck and celebration — brides traditionally wear it",
+							"Silence and retreat"
+						],
+						answer: 2
+					},
+					{
+						q: "How should a firm choose a brand colour, according to the passage?",
+						options: [
+							"Copy the market leader closely",
+							"Fit the shade to the personality the brand wants to project",
+							"Always default to blue",
+							"Test colours completely at random"
+						],
+						answer: 1
+					},
+					{
+						q: "What do sceptical researchers say about the claim that colour dictates 'ninety per cent' of snap judgements?",
+						options: [
+							"Colour blinds all consumers",
+							"Such statistics are illegal to publish",
+							"The studies are repeated every day",
+							"The genuine effects are more modest and bound by context and culture"
+						],
+						answer: 3
+					},
+					{
+						q: "What do online colour experiments tend to show?",
+						options: [
+							"Colour is irrelevant on websites",
+							"Web pages crash when recoloured",
+							"Changing a button's colour can measurably alter click rates",
+							"Users only ever read the text"
+						],
+						answer: 2
+					},
+					{
+						q: "Which colours are assigned to 'health and environment' brands?",
+						options: [
+							"Greens",
+							"Greys",
+							"Oranges",
+							"Maroons"
+						],
+						answer: 0
+					},
+					{
+						q: "Which company has repeatedly guarded its shade of magenta?",
+						options: [
+							"Cadbury",
+							"A national railway",
+							"The World Health Organisation",
+							"The mobile operator T-Mobile"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The physics of rainbows",
+							"Colour as a silent salesman",
+							"Painting your house tastefully",
+							"The world's favourite colour"
+						],
+						answer: 1
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A phone call to a letting agent about renting a flat",
+				transcript: "Good afternoon, Ashworths Lettings, this is Megan. Yes, we do have flats within that budget — you said up to fourteen hundred pounds a month, is that right? Two properties stand out. There is a one-bedroom flat in the city centre at one thousand one hundred and fifty, and a two-bedroom flat on Park Road at one thousand two hundred and ninety-five. The Park Road flat is a first-floor conversion with a small balcony; the only drawback some viewers mention is that the building sits above a bakery, so you get lovely breakfast smells but also early-morning delivery noise. Now, about the costs and the rules. By law, a security deposit can be no more than five weeks' rent, and a holding deposit is capped at one week's rent while we do the checks. For referencing we will need a letter from your employer confirming your salary, plus a reference from a previous landlord if you have one. Our standard tenancy runs for twelve months, though it includes a break clause at six months should your circumstances change. The rent covers water rates, but council tax is separate; Park Road is band C, which works out at roughly one hundred and forty-five pounds a month. One more piece of good news: agency admin fees were banned back in 2019, so apart from the deposits and the first month's rent, there are no upfront charges from us at all. Viewings for both flats are available this Thursday after five o'clock — and honestly, evening light is the best way to judge a home. Shall I book you in for both?",
+				questions: [
+					{
+						q: "The caller's maximum monthly budget is ___.",
+						accepted: [
+							"£1,400",
+							"1400",
+							"1,400",
+							"£1400",
+							"fourteen hundred pounds",
+							"1,400 pounds"
+						]
+					},
+					{
+						q: "The two-bedroom flat on Park Road rents for ___ per month.",
+						accepted: [
+							"£1,295",
+							"1295",
+							"1,295",
+							"£1295",
+							"one thousand two hundred and ninety-five",
+							"1,295 pounds"
+						]
+					},
+					{
+						q: "The Park Road flat sits above a bakery, which causes early-morning delivery ___.",
+						accepted: ["noise", "delivery noise"]
+					},
+					{
+						q: "By law, a security deposit can be no more than ___ rent.",
+						accepted: [
+							"five weeks'",
+							"5 weeks'",
+							"five weeks",
+							"5 weeks"
+						]
+					},
+					{
+						q: "A holding deposit is capped at ___ rent.",
+						accepted: [
+							"one week's",
+							"1 week's",
+							"one weeks",
+							"1 weeks",
+							"a week's"
+						]
+					},
+					{
+						q: "For referencing the caller needs a letter from an employer and a reference from a previous ___.",
+						accepted: ["landlord", "landlady"]
+					},
+					{
+						q: "The standard tenancy runs for ___ months.",
+						accepted: ["12", "twelve"]
+					},
+					{
+						q: "The rent covers ___ rates, but council tax is separate.",
+						accepted: [
+							"water",
+							"water rates",
+							"water rate"
+						]
+					},
+					{
+						q: "Council tax for the band C flat works out at roughly ___ a month.",
+						accepted: [
+							"£145",
+							"145",
+							"one hundred and forty-five pounds",
+							"145 pounds",
+							"one hundred forty five pounds"
+						]
+					},
+					{
+						q: "Viewings of both flats are available this ___ after five o'clock.",
+						accepted: [
+							"Thursday",
+							"Thurs",
+							"thursday evening"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 2: A talk introducing a city bike-share scheme",
+				transcript: "Hello everyone, and welcome to this short presentation about WheelGo, our city's public bike-share scheme, which launched last April. We now have six hundred bikes stationed at eighty docking points across the city centre, and one hundred and twenty of those bikes are electric-assist models for the hillier streets. Pricing is kept simple: a single ride costs two pounds for up to thirty minutes, a day pass is eight pounds for unlimited half-hour rides, and the annual membership works out best for regulars at sixty pounds. Electric bikes carry a supplement of one pound each time you unlock one, which covers the extra charging costs. The early numbers have delighted us. We passed ten thousand rides in the first month alone, and the average trip lasts twelve minutes — mostly short hops between the station, the offices and the shops. A word about safety: all bikes have lights that come on automatically at dusk, and we strongly encourage helmets, which we hand out free at our launch events around the city. Do use the app before you set out, as it shows live maps of which docks have bikes and which have spaces to return one. Expansion is already planned: next spring we are adding twenty new stations at the university campus and the outer suburbs. We have listened to complaints, too — a few docks were blocking shopfronts, so those have been moved a short distance along the pavement. Theft, you will be pleased to hear, has been almost unknown, because every bike is fitted with a GPS tracker, which rather deters the opportunist. Finally, students receive a twenty-per-cent discount on all passes with a valid university card. Thank you, and happy cycling.",
+				questions: [
+					{
+						q: "The WheelGo scheme launched last ___.",
+						accepted: ["April", "april"]
+					},
+					{
+						q: "Bikes are stationed at ___ docking points across the city centre.",
+						accepted: ["80", "eighty"]
+					},
+					{
+						q: "A single ride costs ___ for up to thirty minutes.",
+						accepted: [
+							"£2",
+							"2",
+							"2 pounds",
+							"two pounds"
+						]
+					},
+					{
+						q: "Annual membership costs ___.",
+						accepted: [
+							"£60",
+							"60",
+							"60 pounds",
+							"sixty pounds"
+						]
+					},
+					{
+						q: "Electric bikes carry a supplement of ___ each time one is unlocked.",
+						accepted: [
+							"£1",
+							"1",
+							"1 pound",
+							"one pound"
+						]
+					},
+					{
+						q: "The average trip lasts ___.",
+						accepted: ["12 minutes", "twelve minutes"]
+					},
+					{
+						q: "Next spring twenty new stations will be added at the university campus and the ___ suburbs.",
+						accepted: ["outer", "outlying"]
+					},
+					{
+						q: "A few docks have been moved because they were blocking ___.",
+						accepted: [
+							"shopfronts",
+							"shop fronts",
+							"the shopfronts"
+						]
+					},
+					{
+						q: "Students with a valid university card receive a ___ discount on all passes.",
+						accepted: [
+							"20%",
+							"twenty-per-cent",
+							"20 per cent",
+							"twenty per cent",
+							"20 percent",
+							"twenty percent"
+						]
+					},
+					{
+						q: "Theft has been rare because every bike is fitted with a ___ tracker.",
+						accepted: [
+							"GPS",
+							"gps",
+							"G.P.S."
+						]
+					}
+				]
+			},
+			{
+				title: "Section 3: Two students choosing dissertation topics with a supervisor",
+				transcript: "Supervisor: Thanks both for coming. Sam, you were set on calling your dissertation 'social media marketing'. Student A: Yes — it's everywhere, everyone uses it, so there will be endless material to write about. Supervisor: Which is exactly the problem: it is far too broad either to research or to read. Narrow it down to one platform and one kind of business — small independent restaurants, for example — and, crucially, check right now whether you can get access to real business data, because nothing sinks a marketing dissertation faster than realising in March that nobody will show you their figures. Student A: I know the owner of the pizza place near campus; he might cooperate. Supervisor: Then sound him out this week, and remember anything involving real businesses needs ethics approval, which takes about six weeks, so don't leave it late. Student B: My interests are completely different — I wanted to look at renewable-energy subsidies. Supervisor: Good instinct, and better still if you angle it as an evaluation of one particular policy. The government's investment datasets are public, so your data problem is largely solved. For either of you, our programme expects around thirty sources in the literature review, and the dissertation itself is twelve thousand words, with a ten per cent allowance. Your immediate deadline is the fifteenth of November, when a two-page proposal is due in — treat that date as immovable. Student A: Will you be marking them yourself? Supervisor: No, every dissertation is marked independently by two examiners who then compare notes, so write for a stranger, not for me. Any other questions? No? Then go and make those topics small and precise — the smaller the question, the bigger the answer you can give.",
+				questions: [
+					{
+						q: "Sam's proposed dissertation topic is ___ marketing.",
+						accepted: ["social media", "social media marketing"]
+					},
+					{
+						q: "According to the supervisor, Sam's topic is far too ___ to research or read.",
+						accepted: ["broad", "wide"]
+					},
+					{
+						q: "The supervisor advises focusing on one platform and one kind of ___ — small independent restaurants, for example.",
+						accepted: ["business", "businesses"]
+					},
+					{
+						q: "The supervisor tells Sam to check for access to real business ___ right now.",
+						accepted: ["data", "figures"]
+					},
+					{
+						q: "Ethics approval takes about ___ weeks.",
+						accepted: ["6", "six"]
+					},
+					{
+						q: "Student B wants to look at renewable-energy ___.",
+						accepted: ["subsidies", "subsidy"]
+					},
+					{
+						q: "For Student B's topic the government's investment ___ are public.",
+						accepted: [
+							"datasets",
+							"data sets",
+							"data"
+						]
+					},
+					{
+						q: "The programme expects around ___ sources in the literature review.",
+						accepted: ["30", "thirty"]
+					},
+					{
+						q: "A two-page proposal is due on the fifteenth of ___.",
+						accepted: ["November", "november"]
+					},
+					{
+						q: "Each dissertation is marked independently by ___ examiners who then compare notes.",
+						accepted: ["2", "two"]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on archaeological dating methods",
+				transcript: "Good morning, everyone. Archaeological dating falls neatly into two families: relative methods, which can only say that one thing is older or younger than another, and absolute methods, which attach actual calendar years. The bedrock of the relative family is stratigraphy, resting on the law of superposition — the principle, borrowed from geology, that in undisturbed deposits the deeper layers are the older ones. Alongside it sits typology: the fashions of pottery rise and fall like the hemlines of skirts, so the changing shapes of pots let us cross-date one site against another. The absolute revolution arrived in 1949, when Willard Libby unveiled radiocarbon dating, work that earned him the Nobel Prize in Chemistry in 1960. While a living thing breathes and feeds, it keeps its carbon-14 topped up from the atmosphere; at death, that clock starts, the isotope decaying with a half-life of about 5,730 years. Measuring what remains can date organic material — bone, charcoal, cloth — back about fifty thousand years, beyond which the signal fades away. There is a complication, though: cosmic radiation has varied through time, so raw radiocarbon ages have to be recalibrated against tree-ring records. Those same tree rings are themselves a method, dendrochronology, which can pin a timber to the exact year it was felled, though only where long local reference sequences exist. For timescales entirely beyond radiocarbon we need deeper clocks. Potassium-argon dating tracks a half-life of 1.25 billion years in volcanic ash layers and famously helped date the early hominid deposits at Olduvai Gorge in East Africa. Where there is pottery but nothing organic, thermoluminescence measures the energy trapped in minerals since the clay was last fired. A closing warning applies to them all: samples are delicate creatures, and a modern root working into an old layer, or a careless fingertip on ancient charcoal, can drag an age wrong by centuries. That is why the golden rule of archaeological dating is triangulation — never trust a single clock when two or three can be made to agree.",
+				questions: [
+					{
+						q: "Under the law of superposition, in undisturbed deposits the deeper layers are the ___ ones.",
+						accepted: ["older", "oldest"]
+					},
+					{
+						q: "Radiocarbon dating was unveiled in 1949 by Willard ___.",
+						accepted: ["Libby", "libby"]
+					},
+					{
+						q: "Willard Libby won the Nobel Prize in Chemistry in ___.",
+						accepted: ["1960", "nineteen sixty"]
+					},
+					{
+						q: "The half-life of carbon-14 is about ___ years.",
+						accepted: [
+							"5730",
+							"5,730",
+							"five thousand seven hundred and thirty",
+							"approximately 5730"
+						]
+					},
+					{
+						q: "Radiocarbon dating works for organic material back about ___ years, beyond which the signal fades.",
+						accepted: [
+							"50000",
+							"50,000",
+							"fifty thousand"
+						]
+					},
+					{
+						q: "Radiocarbon can date organic material such as bone, charcoal and ___.",
+						accepted: [
+							"cloth",
+							"fabric",
+							"textiles"
+						]
+					},
+					{
+						q: "The method based on tree rings is called ___.",
+						accepted: ["dendrochronology", "tree-ring dating"]
+					},
+					{
+						q: "Potassium-argon dating tracks a half-life of ___ years in volcanic ash.",
+						accepted: [
+							"1.25 billion",
+							"one point two five billion",
+							"1250000000",
+							"1,250,000,000"
+						]
+					},
+					{
+						q: "The hominid deposits at Olduvai Gorge, in East ___, were dated using potassium-argon.",
+						accepted: ["Africa", "africa"]
+					},
+					{
+						q: "The golden rule of archaeological dating is ___.",
+						accepted: ["triangulation", "triangulating"]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The table below shows the average monthly rent for a two-bedroom flat in four British cities in 2015 and 2025.\n\nBirmingham: £850 a month, £1,295 a month\nLeeds: £750 a month, £1,150 a month\nSheffield: £640 a month, £975 a month\nNewcastle: £590 a month, £890 a month\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "In many countries, companies are allowed to advertise products directly to children on television and online. Some people argue that all advertising aimed at children should be banned. To what extent do you agree or disagree? Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"Let's talk about music. What kind of music do you usually listen to?",
+				"Can you play a musical instrument, or would you like to learn one?",
+				"Do you like the same kind of music now that you liked as a child?"
+			]),
+			speakingPart2("Describe an important decision you have made. You should say: what the decision was, when you made it, what alternatives you considered, and explain why it was important to you."),
+			...speakingPart3([
+				"Why do you think some people find it difficult to make decisions?",
+				"Is it better to make big decisions alone or after asking others for advice?",
+				"How has technology changed the way people make everyday decisions?"
+			])
+		]
+	},
+	{
+		id: "mock-5",
+		order: 5,
+		title: "IELTS Mock Test 5",
+		reading: { passages: [
+			{
+				title: "The Development of the Bicycle",
+				passage: "The bicycle, now so commonplace that it barely attracts a second glance, took more than a century of experimentation to reach its familiar modern form. The first verifiable ancestor of the bicycle was the 'running machine', built in 1817 by the German inventor Karl Drais. Made almost entirely of wood, Drais's contraption had two wheels in line and a steerable front wheel, but no pedals; riders propelled themselves by pushing their feet against the ground. Nevertheless, it allowed a fit adult to travel roughly twice as fast as walking, and Drais demonstrated it successfully near Mannheim that year, covering fourteen kilometres in about an hour. For several decades the design barely advanced, since poor roads and limited metalworking made more sophisticated machines impractical. The crucial breakthrough came in the 1860s in Paris, where the carriage builder Pierre Michaux and his son Ernest fitted cranks and pedals directly to the hub of the front wheel. The resulting machine, later nicknamed the 'boneshaker' for its iron-banded wheels and gruelling ride over cobblestones, became a genuine craze, and in 1869 the first long-distance bicycle race, between Paris and Rouen over one hundred and twenty-three kilometres, was won by the English rider James Moore. The following decade produced the celebrated penny-farthing. Inventors realised that, with pedals fixed directly to the front wheel, a larger wheel meant that each turn of the pedals carried the rider further, so front wheels grew to two metres or more in diameter. Competition clubs such as the Pickwick Bicycle Club in London attracted daring young men, but the riding position, perched directly over the front wheel, made 'headers' — accidents in which a sudden stop threw the rider over the handlebars — a frequent and occasionally fatal occurrence. The remedy arrived in 1885, when John Kemp Starley of Coventry launched the Rover 'safety bicycle'. By using a chain-driven rear wheel and gearing, Starley could place the rider lower and give the bicycle two wheels of equal, manageable size. Three years later, in 1888, the Belfast veterinary surgeon John Boyd Dunlop patented the pneumatic tyre, which dramatically softened the ride. Between 1890 and 1895, during what historians call the 'Bicycle Boom', prices fell sharply and British factories expanded; Raleigh in Nottingham was soon producing more than ten thousand bicycles a year. The social effects were profound. Cheap personal transport let rural workers take jobs in neighbouring towns, and cycling became strongly associated with women's independence; the American reformer Susan B. Anthony declared in 1896 that the bicycle had done more to emancipate women than anything else in the world. Innovation continued throughout the twentieth century: lightweight steel tubing in the 1930s, mass-produced derailleur gears after the Second World War, mountain bikes developed by Californian enthusiasts in the 1970s, and carbon-fibre frames from the 1980s onwards. Today, with thousands of cities operating bicycle-share schemes, the wooden running machine of 1817 has descendants numbering well over one billion worldwide.",
+				questions: [
+					{
+						q: "When did Karl Drais build his 'running machine'?",
+						options: [
+							"In 1790",
+							"In 1845",
+							"In 1817",
+							"In 1888"
+						],
+						answer: 2
+					},
+					{
+						q: "How was the running machine propelled?",
+						options: [
+							"By the rider pushing his feet against the ground",
+							"By pedals and cranks attached to the front wheel",
+							"By a small steam engine",
+							"By coasting downhill wherever possible"
+						],
+						answer: 0
+					},
+					{
+						q: "Who won the first long-distance bicycle race in 1869?",
+						options: [
+							"Pierre Michaux",
+							"Karl Drais",
+							"John Boyd Dunlop",
+							"James Moore"
+						],
+						answer: 3
+					},
+					{
+						q: "Why was the penny-farthing's front wheel made so large?",
+						options: [
+							"To make the bicycle look impressive in competitions",
+							"Because a larger wheel carried the rider further with each pedal turn",
+							"To clear potholes on poor roads",
+							"To allow two riders to sit in line"
+						],
+						answer: 1
+					},
+					{
+						q: "What was a 'header', as described in the passage?",
+						options: [
+							"A type of bicycle race",
+							"A component of the front wheel",
+							"An accident in which the rider was thrown over the handlebars",
+							"A special riding costume"
+						],
+						answer: 2
+					},
+					{
+						q: "How did Starley's Rover 'safety bicycle' improve safety?",
+						options: [
+							"It used a chain-driven rear wheel and two equal-sized wheels",
+							"It added two extra balancing wheels",
+							"It was fitted with a padded seat",
+							"It used stronger iron tyres"
+						],
+						answer: 0
+					},
+					{
+						q: "Where did John Kemp Starley launch the Rover bicycle?",
+						options: [
+							"In Belfast",
+							"In Nottingham",
+							"In Paris",
+							"In Coventry"
+						],
+						answer: 3
+					},
+					{
+						q: "What did John Boyd Dunlop patent in 1888?",
+						options: [
+							"The chain drive",
+							"The pneumatic tyre",
+							"Derailleur gears",
+							"The carbon-fibre frame"
+						],
+						answer: 1
+					},
+					{
+						q: "Where was the factory that soon produced over ten thousand bicycles a year?",
+						options: [
+							"Raleigh, in Coventry",
+							"Raleigh, in Belfast",
+							"Raleigh, in Nottingham",
+							"Raleigh, in London"
+						],
+						answer: 2
+					},
+					{
+						q: "According to Susan B. Anthony in 1896, what had the bicycle done?",
+						options: [
+							"More to emancipate women than anything else in the world",
+							"More damage to rural roads than any other machine",
+							"More to harm public health than rail travel",
+							"More for professional sport than amateur clubs"
+						],
+						answer: 0
+					},
+					{
+						q: "Where were mountain bikes first developed, according to the passage?",
+						options: [
+							"In the Scottish Highlands",
+							"In Coventry's factories",
+							"On European racing circuits",
+							"By Californian enthusiasts"
+						],
+						answer: 3
+					},
+					{
+						q: "What characterised the 'Bicycle Boom' of 1890 to 1895?",
+						options: [
+							"A sharp rise in bicycle prices",
+							"Sharply falling prices and expanding production",
+							"The return of the penny-farthing",
+							"A nationwide ban on racing"
+						],
+						answer: 1
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The History of Rail Travel",
+							"A Guide to Bicycle Maintenance",
+							"The Development of the Bicycle",
+							"Famous Bicycle Races of the Nineteenth Century"
+						],
+						answer: 2
+					}
+				]
+			},
+			{
+				title: "The Rise of the Sharing Economy",
+				passage: "The activities now grouped together as the 'sharing economy' — renting a spare room from a stranger, travelling in someone else's car, or paying to use equipment only when it is needed — feel distinctly modern, yet the idea has surprisingly deep academic roots. In 1978, the American sociologists Marcus Felson and Joe Spaeth coined the expression 'collaborative consumption' in a paper describing how students shared goods among themselves. Early internet marketplaces such as eBay, founded in 1995, and Craigslist showed that digital platforms could connect buyers and sellers at almost no cost, but it was not until the following decade that sharing became an industry. Zipcar, a car-sharing company, was founded in 2000 in Cambridge, Massachusetts, on the principle that many households do not need to own a car at all. The best-known example arrived in 2008, when Brian Chesky and two friends, unable to afford their San Francisco rent, let out air mattresses on the floor of their flat to guests attending a design conference; their company, Airbnb, now lists homes in more than two hundred and twenty countries and regions. Uber followed in 2009, connecting passengers with drivers through a smartphone app. The economic logic behind these platforms rests on utilisation: the average privately owned car sits idle for about ninety-five per cent of the time, and many other possessions, from drills to holiday homes, are similarly underused. The consultancy PwC estimated that global revenues in the five main sharing sectors could rise from around fifteen billion dollars in 2013 to three hundred and thirty-five billion dollars by 2025. Supporters also make an environmental case, arguing that when goods are shared, fewer new products need to be manufactured, and noting that car-sharing members drive fewer miles on average than private owners. Critics, however, raise serious objections. Platform drivers and couriers are typically classified as independent contractors rather than employees, and therefore lack sick pay and other protections, while Airbnb has been blamed for draining the supply of long-term rented housing in cities such as Barcelona and Paris. Regulation has followed: Amsterdam, for instance, limited entire-home holiday listings to thirty nights a year. How this fast-growing model should be regulated — and for whose benefit — remains the central question.",
+				questions: [
+					{
+						q: "Who coined the expression 'collaborative consumption', and when?",
+						options: [
+							"Brian Chesky in 2008",
+							"Marcus Felson and Joe Spaeth in 1978",
+							"Economists at the World Bank in 2013",
+							"City planners in Amsterdam in 2000"
+						],
+						answer: 1
+					},
+					{
+						q: "What event triggered the founding of Airbnb in 2008?",
+						options: [
+							"A national housing crisis",
+							"A government tourism scheme",
+							"The founders renting air mattresses to design-conference visitors",
+							"A lost hotel booking while on holiday"
+						],
+						answer: 2
+					},
+					{
+						q: "When was the car-sharing company Zipcar founded?",
+						options: [
+							"In 2000",
+							"In 1995",
+							"In 2008",
+							"In 2009"
+						],
+						answer: 0
+					},
+					{
+						q: "How much of the time does an average privately owned car sit idle?",
+						options: [
+							"About 50 per cent",
+							"About 65 per cent",
+							"About 80 per cent",
+							"About 95 per cent"
+						],
+						answer: 3
+					},
+					{
+						q: "What revenue did PwC forecast for the main sharing sectors by 2025?",
+						options: [
+							"Around 15 billion dollars",
+							"Around 100 billion dollars",
+							"Around 335 billion dollars",
+							"Around 3 trillion dollars"
+						],
+						answer: 2
+					},
+					{
+						q: "Which platform followed Airbnb, launching in 2009?",
+						options: [
+							"eBay",
+							"Uber",
+							"Craigslist",
+							"Zipcar"
+						],
+						answer: 1
+					},
+					{
+						q: "What employment-related criticism do critics make of the platforms?",
+						options: [
+							"Drivers and couriers are classified as independent contractors without full protections",
+							"Platforms are unable to make a profit",
+							"Drivers are paid too much",
+							"The apps are too complicated for workers to use"
+						],
+						answer: 0
+					},
+					{
+						q: "How did Amsterdam respond to the growth of tourist rentals?",
+						options: [
+							"It banned all short stays",
+							"It introduced a tourist tax on airlines",
+							"It closed all city-centre hotels",
+							"It limited entire-home listings to thirty nights a year"
+						],
+						answer: 3
+					},
+					{
+						q: "What environmental argument do supporters of the sharing economy make?",
+						options: [
+							"Sharing always increases overall emissions",
+							"Sharing goods reduces the demand for newly manufactured products",
+							"Sharing has no measurable environmental effect",
+							"Sharing only benefits urban transport"
+						],
+						answer: 1
+					},
+					{
+						q: "What do car-sharing members actually do, on average?",
+						options: [
+							"Buy more cars",
+							"Drive more miles than private owners",
+							"Drive fewer miles than private owners",
+							"Move out of cities"
+						],
+						answer: 2
+					},
+					{
+						q: "What problem has Airbnb been blamed for in cities such as Barcelona?",
+						options: [
+							"Reducing the supply of long-term rented housing",
+							"Increasing profits for luxury hotels",
+							"Causing traffic congestion",
+							"Pushing up school fees"
+						],
+						answer: 0
+					},
+					{
+						q: "What does the passage identify as the central remaining question?",
+						options: [
+							"How platforms can raise their fees",
+							"Whether users are properly insured",
+							"Whether the model can be stopped entirely",
+							"How the model should be regulated, and for whose benefit"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The History of eBay",
+							"The Rise of the Sharing Economy",
+							"How to Rent a Car Abroad",
+							"The Problems of Mass Tourism"
+						],
+						answer: 1
+					}
+				]
+			},
+			{
+				title: "How Human Memory Works",
+				passage: "Few abilities are as central to human experience as memory, yet the mechanics of remembering remain only partly understood. Psychologists generally divide the process into three stages: encoding, in which information is taken in and prepared; storage, in which it is maintained over time; and retrieval, in which it is brought back to consciousness. Sensory memory holds fleeting impressions of sights and sounds for a second or two, while short-term, or working, memory holds the information we are actively thinking about. In a famous 1956 paper, the Harvard psychologist George Miller proposed the 'magical number seven', suggesting that short-term memory can hold around seven items, give or take two, which helps to explain why telephone numbers were traditionally designed to that length. In 1974, the British researchers Alan Baddeley and Graham Hitch replaced this single-store view with a multi-component model of working memory, separating verbal information, visual material and a directing 'central executive'. Long-term memory itself divides into declarative memory — knowledge of facts (semantic) and personal events (episodic) — and procedural memory for skills such as riding a bicycle, which can be exercised without any conscious recall. The brain structure most central to forming new long-term memories is the hippocampus, a role dramatised by the case of Henry Molaison, known for decades only by his initials, who lost the ability to form new declarative memories after brain surgery in 1953, while his existing skills and older memories remained largely intact. Forgetting has also been mapped with remarkable precision: in 1885 the German scholar Hermann Ebbinghaus memorised thousands of meaningless syllables and plotted a 'forgetting curve', showing that we lose roughly half of newly learned material within an hour and about two-thirds within a day unless it is reviewed, though spaced revision flattens the curve dramatically. Perhaps most unsettlingly, memory is reconstructive rather than a faithful recording. In the 1970s, the psychologist Elizabeth Loftus showed that witnesses to a filmed car accident estimated higher speeds when asked how fast the cars were going when they 'smashed' into each other, rather than 'hit'; the very wording of a question reshaped what people remembered. Each act of recall, it seems, slightly rewrites the memory itself, while many memories are stabilised during sleep, with deep slow-wave sleep particularly important for consolidating facts and events.",
+				questions: [
+					{
+						q: "Into which three stages do psychologists generally divide memory?",
+						options: [
+							"Recalling, relearning and repeating",
+							"Encoding, keeping and searching",
+							"Input, output and feedback",
+							"Encoding, storage and retrieval"
+						],
+						answer: 3
+					},
+					{
+						q: "What did Miller's 'magical number seven' refer to?",
+						options: [
+							"Seven distinct types of memory",
+							"The approximate capacity of short-term memory",
+							"Seven stages of skill learning",
+							"A crucial seven hours of sleep"
+						],
+						answer: 1
+					},
+					{
+						q: "What did Baddeley and Hitch propose in 1974?",
+						options: [
+							"The forgetting curve",
+							"The visual field map",
+							"A multi-component model of working memory",
+							"The magical number seven"
+						],
+						answer: 2
+					},
+					{
+						q: "What does procedural memory store?",
+						options: [
+							"Skills such as riding a bicycle",
+							"Names, dates and facts",
+							"Brief sensory impressions",
+							"The content of dreams"
+						],
+						answer: 0
+					},
+					{
+						q: "What happened to Henry Molaison after his brain surgery in 1953?",
+						options: [
+							"He lost his first language",
+							"He forgot his own name",
+							"He lost his eyesight",
+							"He became unable to form new declarative memories"
+						],
+						answer: 3
+					},
+					{
+						q: "What material did Ebbinghaus use to measure forgetting?",
+						options: [
+							"German poems",
+							"Dates of battles",
+							"Meaningless syllables",
+							"Foreign vocabulary"
+						],
+						answer: 2
+					},
+					{
+						q: "According to the forgetting curve, how much new material is lost within a day without review?",
+						options: [
+							"About a quarter",
+							"About two-thirds",
+							"Nearly all of it",
+							"Very little"
+						],
+						answer: 1
+					},
+					{
+						q: "What does the passage say flattens the forgetting curve dramatically?",
+						options: [
+							"Spaced revision",
+							"Cramming the night before",
+							"Typing up notes",
+							"Listening to music"
+						],
+						answer: 0
+					},
+					{
+						q: "In Loftus's experiment, witnesses who heard the word 'smashed' tended to give:",
+						options: [
+							"Lower speed estimates",
+							"No estimates at all",
+							"Higher speed estimates",
+							"More accurate memories overall"
+						],
+						answer: 2
+					},
+					{
+						q: "What does Loftus's research suggest about memory?",
+						options: [
+							"Memory always improves under stress",
+							"Stress destroys all memories",
+							"Children remember better than adults",
+							"Memory is reconstructive rather than a faithful recording"
+						],
+						answer: 3
+					},
+					{
+						q: "Which type of sleep is described as particularly important for consolidating facts and events?",
+						options: [
+							"Deep slow-wave sleep",
+							"Afternoon naps",
+							"Light dozing",
+							"Any amount of sleep at all"
+						],
+						answer: 0
+					},
+					{
+						q: "Which brain structure is most central to forming new long-term memories?",
+						options: [
+							"The cerebellum",
+							"The hippocampus",
+							"The brainstem",
+							"The frontal lobe"
+						],
+						answer: 1
+					},
+					{
+						q: "How long does sensory memory retain impressions, according to the passage?",
+						options: [
+							"Roughly one hour",
+							"A full day",
+							"Several weeks",
+							"A second or two"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"How to Sleep Better",
+							"The Philosophy of the Mind",
+							"How Human Memory Works",
+							"Famous Psychology Experiments"
+						],
+						answer: 2
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A phone call to a car-hire company",
+				transcript: "Good morning, GoTravel Car Hire, Rachel speaking, how can I help you? Right, so you're landing at Bristol Airport on the fourteenth of July and you need a car for five days. Let me check what we have available. We have two suitable models at the moment: the small hatchback, which is thirty-two pounds a day, and the family saloon, at forty-five pounds a day. Both prices include unlimited mileage and basic insurance, but do be aware that the basic cover carries an excess of six hundred pounds — you'd be fully protected only if you take our comprehensive cover, which costs nine pounds a day and reduces the excess to zero. If you collect from the airport desk there's no surcharge, though you may have to queue in the arrivals hall; the cars are parked in the main car park, a five-minute walk away. Alternatively, you can take the free shuttle bus to our depot — it runs every twenty minutes from bay number four outside the terminal — and collection there is usually quicker at busy times. There's one fee to watch for: pick-up after eight in the evening carries an out-of-hours charge of twenty-five pounds, whichever location you choose. Additional drivers cost seven pounds per day each, and any additional driver must be present with their licence at collection. A child seat is five pounds per day, but you must reserve it in advance, as we can't guarantee one on the day. Fuel works on a full-to-full policy: you receive a full tank and return it full, otherwise there's a thirty-pound refuelling charge on top of the fuel itself. Finally, cancellations are free up to forty-eight hours before collection; after that we have to keep the first day's rental. To confirm the booking I'll need a credit card in the main driver's name, and the same card must be shown at the desk when you collect the car.",
+				questions: [
+					{
+						q: "The family saloon costs £___ a day.",
+						accepted: [
+							"45",
+							"45 pounds",
+							"forty-five pounds"
+						]
+					},
+					{
+						q: "Both prices include unlimited mileage and basic ___.",
+						accepted: ["insurance", "basic insurance"]
+					},
+					{
+						q: "The excess with basic cover is £___.",
+						accepted: [
+							"600",
+							"600 pounds",
+							"six hundred pounds"
+						]
+					},
+					{
+						q: "Comprehensive cover costs £___ a day.",
+						accepted: [
+							"9",
+							"9 pounds",
+							"nine pounds"
+						]
+					},
+					{
+						q: "The free shuttle bus runs every ___ minutes.",
+						accepted: [
+							"20",
+							"twenty",
+							"20 minutes",
+							"twenty minutes"
+						]
+					},
+					{
+						q: "The shuttle bus leaves from bay number ___ outside the terminal.",
+						accepted: [
+							"4",
+							"four",
+							"bay 4",
+							"bay four"
+						]
+					},
+					{
+						q: "Pick-up after 8 p.m. carries an out-of-hours charge of £___.",
+						accepted: [
+							"25",
+							"25 pounds",
+							"twenty-five pounds"
+						]
+					},
+					{
+						q: "Any additional driver must be present with their ___ at collection.",
+						accepted: ["licence", "driving licence"]
+					},
+					{
+						q: "Fuel works on a ___ policy: receive a full tank and return it full.",
+						accepted: ["full-to-full", "full to full"]
+					},
+					{
+						q: "Cancellations are free up to ___ hours before collection.",
+						accepted: [
+							"48",
+							"forty-eight",
+							"48 hours",
+							"forty-eight hours"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 2: A talk for visitors to a historic castle",
+				transcript: "Well, good morning, everyone, and welcome to Hartleigh Castle. Before you begin exploring, let me give you a quick overview of the site and what's on today. The castle was first built in 1274 by the Earl of Brantford, mainly to guard the river crossing, and was largely rebuilt in the sixteenth century as a family residence. We open daily at nine thirty, and last admission is at four, although the grounds stay open until six. Admission is eleven pounds for adults, nine pounds fifty for concessions, five pounds for children under sixteen, and free for the under-fives. Your ticket covers the Great Hall and the chapel, but the North Tower needs a separate climbing pass costing two pounds extra. It is worth doing for the view, but be warned: it's a hundred and fifteen narrow spiral steps with no lift, so it's not suitable for anyone with mobility problems. Guided tours of the state rooms leave from the courtyard at eleven, one and three, last about forty minutes, and are free with your entry ticket. Photography is welcome everywhere except the chapel, where flash would damage the medieval wall paintings. If you'd like lunch, our tearoom in the old bakehouse serves hot food from twelve until half past two. Do note that the hourly bus from the market square doesn't run on Sundays, so Sunday visitors usually drive; the car park is two pounds for the whole day. Every August Bank Holiday weekend we stage a medieval fair with archery and falconry displays, which is very popular with families. And finally, if you'd prefer to explore at your own pace, audio guides are available from the ticket desk in five languages, hired at two pounds fifty per handset.",
+				questions: [
+					{
+						q: "Hartleigh Castle was first built by the ___.",
+						accepted: ["Earl of Brantford", "the Earl of Brantford"]
+					},
+					{
+						q: "The castle opens daily at ___.",
+						accepted: [
+							"9:30",
+							"nine thirty",
+							"half past nine",
+							"half 9"
+						]
+					},
+					{
+						q: "Admission costs £___ for concessions.",
+						accepted: [
+							"9.50",
+							"9.5",
+							"nine pounds fifty",
+							"9 pounds 50"
+						]
+					},
+					{
+						q: "The North Tower climbing pass costs £___ extra.",
+						accepted: [
+							"2",
+							"2 pounds",
+							"two pounds"
+						]
+					},
+					{
+						q: "The North Tower has ___ narrow spiral steps.",
+						accepted: [
+							"115",
+							"a hundred and fifteen",
+							"one hundred and fifteen"
+						]
+					},
+					{
+						q: "Guided tours of the state rooms leave from the ___.",
+						accepted: ["courtyard", "the courtyard"]
+					},
+					{
+						q: "Photography is welcome everywhere except the ___.",
+						accepted: ["chapel", "the chapel"]
+					},
+					{
+						q: "The tearoom serves hot food from twelve until ___.",
+						accepted: [
+							"half past two",
+							"2:30",
+							"two thirty",
+							"half 2"
+						]
+					},
+					{
+						q: "The medieval fair is staged every ___.",
+						accepted: [
+							"August Bank Holiday weekend",
+							"August bank holiday",
+							"Bank Holiday weekend"
+						]
+					},
+					{
+						q: "Audio guides are available in ___ languages.",
+						accepted: [
+							"5",
+							"five",
+							"5 languages",
+							"five languages"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 3: A discussion about a geography field trip",
+				transcript: "Tutor: Right, let's go through the plans for the geography field trip next month. You've been organising the booking, so can you update us? Student A: Yes. We're going to Snowdonia for three days, leaving on Friday the fourteenth at seven thirty in the morning — from the sports hall car park, not the main gate, because the coach can't turn round at the gate. Student B: And we're staying at the field studies centre in Betws-y-Coed, which comes to a hundred and ten pounds each for the whole trip, including all meals. The department wants a deposit of thirty pounds by the fifteenth of March at the latest to secure the rooms. Tutor: Good. Now, what about the fieldwork itself? Student A: We'll be measuring river discharge along the Afon Llugwy. We've booked the flow meters and we plan to take readings at six sites between the upper course and the confluence. Student B: We're also recording slope angles with the clinometers, and at each site we'll collect thirty pebbles to measure their size and roundness, to test whether they get smaller and rounder downstream. Tutor: That's a solid design, but thirty pebbles per site is the minimum I'd accept — if you can manage fifty, your results will be much more convincing. Also remember that the risk assessment forms must be with me at least two weeks before departure, or the university won't let the trip go ahead. Student A: Right. One practical point — is there wifi at the centre? I was hoping to start analysing the data in the evenings. Tutor: There isn't, I'm afraid, and mobile reception is patchy at best, so take paper recording sheets and plan to enter the data once we're back. Student B: And the report afterwards is two thousand words, due on the twentieth of April — is that correct? Tutor: Correct. And it's an individual report, even though you collect the data in groups, so make sure your write-ups aren't identical.",
+				questions: [
+					{
+						q: "The coach leaves from the sports hall ___, not the main gate.",
+						accepted: [
+							"car park",
+							"carpark",
+							"parking area"
+						]
+					},
+					{
+						q: "The trip to Snowdonia lasts ___ days.",
+						accepted: [
+							"3",
+							"three",
+							"3 days",
+							"three days"
+						]
+					},
+					{
+						q: "The stay costs £___ per person, including all meals.",
+						accepted: [
+							"110",
+							"110 pounds",
+							"a hundred and ten pounds",
+							"one hundred and ten pounds"
+						]
+					},
+					{
+						q: "The deposit of £30 must be paid by the ___ at the latest.",
+						accepted: [
+							"fifteenth of March",
+							"15th of March",
+							"15th March",
+							"15 March",
+							"fifteenth March"
+						]
+					},
+					{
+						q: "River readings will be taken at ___ sites.",
+						accepted: [
+							"6",
+							"six",
+							"6 sites",
+							"six sites"
+						]
+					},
+					{
+						q: "The tutor would prefer the students to collect ___ pebbles per site.",
+						accepted: [
+							"50",
+							"fifty",
+							"50 pebbles",
+							"fifty pebbles"
+						]
+					},
+					{
+						q: "Risk assessment forms must be submitted at least ___ before departure.",
+						accepted: ["two weeks", "2 weeks"]
+					},
+					{
+						q: "The field studies centre has no ___ for evening data analysis.",
+						accepted: ["wifi", "wi-fi"]
+					},
+					{
+						q: "The follow-up report is due on the ___.",
+						accepted: [
+							"twentieth of April",
+							"20th of April",
+							"20th April",
+							"20 April",
+							"twentieth April"
+						]
+					},
+					{
+						q: "Each report is ___, even though the data is collected in groups.",
+						accepted: [
+							"individual",
+							"individually written",
+							"an individual report"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on bird migration",
+				transcript: "Good morning. In this final lecture of the module, I want to look at bird migration — how far birds travel, how they find their way, and why their journeys are becoming more dangerous. Let's start with distances. The long-distance champion is the Arctic tern, which travels from its breeding grounds in Greenland and northern Canada to spend the southern summer in Antarctic waters: a round trip of over seventy thousand kilometres a year. Over a long life, a single tern may fly the equivalent of three return journeys to the Moon. The record for a non-stop flight belongs to the bar-tailed godwit. In 2007, satellite tags showed one female flying more than eleven thousand kilometres from Alaska to New Zealand in about nine days, without feeding or resting on the way. To fuel flights like this, birds store enormous quantities of fat in the weeks before departure; some small warblers effectively double their body weight, and during flight they may even shrink parts of their digestive organs to save weight, regrowing them when they arrive. Then there is the question of navigation. Experiments indicate that birds use the sun by day and the patterns of the stars at night, and that they sense the Earth's magnetic field, probably through iron-rich structures in the upper beak and possibly through light-sensitive molecules in the eye. Curiously, Italian experiments in which homing pigeons were deprived of their sense of smell lost their way, suggesting that odour maps also play a role, at least over familiar territory. You may also come across the German term Zugunruhe, meaning migratory restlessness: even caged birds born in captivity become restless at migration time, fluttering in the direction their wild relatives travel, which is strong evidence that the urge to migrate, and even its direction, are inherited. Unfortunately the journey is increasingly hazardous. Glass is a far bigger killer than most people realise: collisions with buildings are estimated to claim hundreds of millions of birds a year in North America alone. Equally serious is the destruction of wetland stopover sites, such as the tidal flats of the Wadden Sea in northern Europe, where great numbers of wading birds traditionally stop to refuel.",
+				questions: [
+					{
+						q: "The Arctic tern makes a round trip of over ___ kilometres a year.",
+						accepted: [
+							"70,000",
+							"70000",
+							"seventy thousand",
+							"70 thousand"
+						]
+					},
+					{
+						q: "The godwit's record flight was measured using ___.",
+						accepted: [
+							"satellite tags",
+							"satellite tag",
+							"a satellite tag"
+						]
+					},
+					{
+						q: "One female godwit flew more than ___ kilometres non-stop.",
+						accepted: [
+							"11,000",
+							"11000",
+							"eleven thousand",
+							"11 thousand"
+						]
+					},
+					{
+						q: "Some small warblers effectively ___ their body weight before departure.",
+						accepted: ["double", "doubled"]
+					},
+					{
+						q: "Birds may shrink parts of their digestive organs to save ___.",
+						accepted: ["weight", "body weight"]
+					},
+					{
+						q: "Iron-rich structures for sensing the magnetic field are in the upper ___.",
+						accepted: ["beak", "the beak"]
+					},
+					{
+						q: "The Italian experiments suggest that ___ maps also play a role in navigation.",
+						accepted: ["odour", "smell"]
+					},
+					{
+						q: "Zugunruhe is strong evidence that the urge to migrate is ___.",
+						accepted: [
+							"inherited",
+							"innate",
+							"inborn"
+						]
+					},
+					{
+						q: "Glass is described as a far bigger ___ than most people realise.",
+						accepted: ["killer", "threat"]
+					},
+					{
+						q: "Wading birds stop to refuel on the tidal flats of the ___.",
+						accepted: ["Wadden Sea", "the Wadden Sea"]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The chart below shows the number of international overnight visitors to three European cities, in millions, in 2010 and 2020.\n\nLisbon: 4.2 million in 2010, 7.8 million in 2020\nPrague: 5.4 million in 2010, 9.2 million in 2020\nBudapest: 3.6 million in 2010, 5.9 million in 2020\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "Some people believe that international tourism is damaging to local cultures and traditions, while others argue that it brings valuable economic benefits and promotes mutual understanding. Discuss both views and give your own opinion. Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"Let's talk about reading. Do you enjoy reading books?",
+				"What kind of books did you like reading as a child?",
+				"Where do you usually like to read?"
+			]),
+			speakingPart2("Describe a festival or celebration you enjoyed. You should say: what festival or celebration it was, who you celebrated it with, what you did during the celebration, and explain why you enjoyed it so much."),
+			...speakingPart3([
+				"Why do you think traditional festivals remain popular in many countries?",
+				"Do you think globalisation threatens local traditions and customs?",
+				"How important are national traditions in shaping a country's identity?"
+			])
+		]
+	},
+	{
+		id: "mock-6",
+		order: 6,
+		title: "IELTS Mock Test 6",
+		reading: { passages: [
+			{
+				title: "The Story of Glass",
+				passage: "Few materials surround us as constantly, yet pass as unnoticed, as glass. It holds our water, forms our windows and screens, and carries most of the world's data, yet its story stretches back several thousand years. Stone Age peoples made tools from obsidian, a natural glass formed by volcanoes, but the first glass deliberately manufactured by humans appeared around 1500 BCE, probably in Mesopotamia or Egypt, in the form of small vessels shaped around a removable clay core. The decisive breakthrough came on the Syrian coast in the first century BCE with the invention of glassblowing: blowing molten glass through an iron pipe allowed thin-walled vessels to be produced quickly and cheaply, and under the Roman Empire glass became an everyday material, used even for windows in wealthy houses. After the fall of Rome, glassmaking survived in monasteries and, above all, in Venice, where in 1291 the authorities ordered all glass furnaces to relocate to the island of Murano. The official reason was the fear that furnace fires would destroy the crowded city, but the ruling also protected Venetian trade secrets, since the craftsmen on Murano were effectively forbidden to leave. In 1674 the English glassmaker George Ravenscroft patented lead crystal, a brilliant, heavy glass that transformed the market for fine tableware. Industrialisation brought machines: in the early nineteen hundreds the American inventor Michael Owens automated bottle manufacture, multiplying output many times over. The modern era of flat glass began in Britain, where Alastair Pilkington announced the float-glass process in 1959 after seven years of secret experiments; in this method, molten glass flows onto a bath of molten tin and spreads into a perfectly flat sheet, eliminating the laborious grinding and polishing previously required. Glass then found an entirely new purpose. In 1966, Charles Kao and George Hockham proposed that extremely pure glass fibres could carry information as pulses of light, and by 1970 researchers at Corning Glass Works had produced fibre with losses low enough for real telecommunications — the origin of the fibre-optic cables on which today's internet depends. Finally, glass has one environmental virtue rare among modern materials: it can be melted down and recycled endlessly without any loss of quality.",
+				questions: [
+					{
+						q: "Which natural glass did Stone Age peoples use for tools?",
+						options: [
+							"Quartz",
+							"Obsidian",
+							"Amber",
+							"Sandstone"
+						],
+						answer: 1
+					},
+					{
+						q: "When did the first deliberately manufactured glass appear?",
+						options: [
+							"Around 3500 BCE",
+							"In the Roman era",
+							"Around 1500 BCE",
+							"In 1291"
+						],
+						answer: 2
+					},
+					{
+						q: "What did the invention of glassblowing make possible?",
+						options: [
+							"Thin-walled vessels produced quickly and cheaply",
+							"Stained-glass windows for cathedrals",
+							"Early eyeglasses",
+							"Glass mirrors"
+						],
+						answer: 0
+					},
+					{
+						q: "Where did glassblowing emerge?",
+						options: [
+							"In Venice",
+							"In Egypt",
+							"In England",
+							"On the Syrian coast"
+						],
+						answer: 3
+					},
+					{
+						q: "Why were Venice's glass furnaces moved to Murano in 1291?",
+						options: [
+							"Because land there was cheaper",
+							"Officially because of fire risk, and effectively to protect trade secrets",
+							"To be closer to raw materials",
+							"To attract wealthy tourists"
+						],
+						answer: 1
+					},
+					{
+						q: "Who patented lead crystal in 1674?",
+						options: [
+							"Michael Owens",
+							"Alastair Pilkington",
+							"George Ravenscroft",
+							"Charles Kao"
+						],
+						answer: 2
+					},
+					{
+						q: "What did Michael Owens automate?",
+						options: [
+							"Window manufacture",
+							"Float-glass production",
+							"Lens grinding",
+							"Bottle manufacture"
+						],
+						answer: 3
+					},
+					{
+						q: "What is the key principle of the float-glass process?",
+						options: [
+							"Glass is pressed between steel rollers",
+							"Glass is cooled slowly in ovens",
+							"Glass is floated on liquid mercury",
+							"Molten glass spreads onto a bath of molten tin"
+						],
+						answer: 3
+					},
+					{
+						q: "When did Pilkington announce the float-glass process?",
+						options: [
+							"In 1952",
+							"In 1959",
+							"In 1966",
+							"In 1970"
+						],
+						answer: 1
+					},
+					{
+						q: "What did Kao and Hockham propose in 1966?",
+						options: [
+							"That glass fibres could carry information as pulses of light",
+							"That glass could be recycled",
+							"That glass was ideal for telescope mirrors",
+							"That glass could strengthen car windows"
+						],
+						answer: 0
+					},
+					{
+						q: "What had researchers at Corning Glass Works achieved by 1970?",
+						options: [
+							"The first automatic bottle machine",
+							"The patent for lead crystal",
+							"Fibre with losses low enough for telecommunications",
+							"The invention of glassblowing"
+						],
+						answer: 2
+					},
+					{
+						q: "What environmental quality of glass does the passage stress?",
+						options: [
+							"It can be recycled endlessly without loss of quality",
+							"It must be melted with expensive chemicals",
+							"It can be recycled only once",
+							"Recycling it halves its quality each time"
+						],
+						answer: 0
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The Story of Glass",
+							"Venetian Artisans and Their Secrets",
+							"The Physics of Light",
+							"Recycling in Modern Britain"
+						],
+						answer: 0
+					}
+				]
+			},
+			{
+				title: "How Wildlife Adapts to Cities",
+				passage: "More than half of humanity now lives in cities, and wild animals must either adapt to urban life or retreat from it. Surprisingly, some of nature's most successful urban pioneers began their conquest almost a century ago. Red foxes began moving into British towns in the nineteen thirties, and researchers now estimate that there are around one hundred and fifty thousand urban foxes in Britain, surviving on an omnivorous diet that ranges from insects and fruit to discarded takeaway food. City birds, meanwhile, make remarkable acoustic adjustments. Since the rumble of traffic is low-pitched, great tits in noisy districts have been found to sing at higher frequencies, lifting their songs above the din so that they remain audible to rivals and mates; studies in the Netherlands first documented the pattern. Pigeons and taller buildings have even attracted a rapacious new resident: the peregrine falcon, which nests on skyscrapers and cathedral towers in cities on both sides of the Atlantic, treating the streets below as a limitless hunting ground. Urbanisation brings genetic as well as behavioural change. Because cities are typically several degrees warmer than the surrounding countryside — the 'urban heat island' effect — insects enjoy a longer active season, and some urban moth populations now show coloration less suited to soot-darkened trees than their rural ancestors'. Field studies underline how quickly city life can reshape a species. Chicago's Cook County Coyote Project has tracked more than five hundred individual animals, finding that urban coyotes move confidently through rail yards and quiet suburban streets. Experiments with urban raccoons show they are quicker than rural raccoons at opening latched food bins, a difference researchers attribute to learned problem-solving. Even coastal birds have joined the movement inland: herring gulls now follow the weekly rhythm of landfill sites and school lunch breaks in pursuit of food waste. Taken together, these cases suggest that cities are fast becoming laboratories of evolution, with some changes visible within decades rather than the millennia we usually associate with adaptation.",
+				questions: [
+					{
+						q: "When did red foxes begin moving into British towns?",
+						options: [
+							"In the 1930s",
+							"In the 1970s",
+							"In 2000",
+							"In the nineteenth century"
+						],
+						answer: 0
+					},
+					{
+						q: "What is the estimated number of urban foxes in Britain?",
+						options: [
+							"Around 15,000",
+							"Around 50,000",
+							"Around 150,000",
+							"Around 1.5 million"
+						],
+						answer: 2
+					},
+					{
+						q: "How do great tits in noisy districts adjust their song?",
+						options: [
+							"They stop singing altogether",
+							"They sing only at dawn",
+							"They copy the sound of traffic",
+							"They sing at higher frequencies"
+						],
+						answer: 3
+					},
+					{
+						q: "Why does a higher pitch help the birds?",
+						options: [
+							"Insects can only hear high notes",
+							"Low-pitched traffic noise would mask their lower notes",
+							"Females always prefer higher-pitched songs",
+							"High notes travel further over water"
+						],
+						answer: 1
+					},
+					{
+						q: "Where do urban peregrine falcons nest, according to the passage?",
+						options: [
+							"In street trees",
+							"On power cables",
+							"On skyscrapers and cathedral towers",
+							"In underground stations"
+						],
+						answer: 2
+					},
+					{
+						q: "What is the 'urban heat island' effect?",
+						options: [
+							"Cities are several degrees warmer than the countryside",
+							"Cities are cooler than the countryside at night",
+							"It affects cities only in mid-summer",
+							"It shortens the active season of insects"
+						],
+						answer: 0
+					},
+					{
+						q: "What has the Cook County Coyote Project done?",
+						options: [
+							"Released coyotes into city parks",
+							"Tracked more than five hundred individual coyotes",
+							"Removed all wild coyotes from Chicago",
+							"Studied only rural coyote packs"
+						],
+						answer: 1
+					},
+					{
+						q: "What did experiments with latched food bins show about urban raccoons?",
+						options: [
+							"They cannot learn new tasks",
+							"They avoid human areas entirely",
+							"They prefer parks to streets",
+							"They open them more quickly than rural raccoons"
+						],
+						answer: 3
+					},
+					{
+						q: "What has drawn herring gulls inland?",
+						options: [
+							"Salt deposits",
+							"Cleaner air",
+							"Food waste",
+							"River fishing"
+						],
+						answer: 2
+					},
+					{
+						q: "On what timescale do the passage's examples show adaptation occurring?",
+						options: [
+							"Within decades rather than millennia",
+							"Always more slowly than in rural areas",
+							"Never, according to researchers",
+							"Over many millennia, as usual"
+						],
+						answer: 0
+					},
+					{
+						q: "Which two kinds of change does the passage explicitly distinguish?",
+						options: [
+							"Changes in colour and size",
+							"Changes in diet and habitat",
+							"Morning and evening habits",
+							"Behavioural and genetic changes"
+						],
+						answer: 3
+					},
+					{
+						q: "Why do urban insects enjoy a longer active season?",
+						options: [
+							"Because of street lighting",
+							"Because cities are warmer",
+							"Because there are fewer predators",
+							"Because gardens are watered"
+						],
+						answer: 1
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The Lives of European Foxes",
+							"A Guide to Urban Architecture",
+							"How Wildlife Adapts to Cities",
+							"Famous Animal Behaviour Experiments"
+						],
+						answer: 2
+					}
+				]
+			},
+			{
+				title: "The Neuroscience of Learning a Second Language",
+				passage: "The question of what a second language does to the brain has moved from philosophy seminar to brain-scanning laboratory over the past century and a half. The scientific study began in 1861, when the French surgeon Paul Broca examined a long-term patient who could say only the single syllable 'Tan'; after the patient's death, Broca identified damage to a region of the left frontal lobe, now called Broca's area, and linked it to the production of speech. Thirteen years later, Carl Wernicke described a different region associated with understanding language. Modern imaging lets researchers watch the bilingual brain in action, with revealing results. A widely cited 2004 study by Andrea Mechelli and colleagues at University College London found that grey matter density in the left inferior parietal cortex increased with second-language proficiency, and was higher in people who had learned their second language early. Functional scans have also shown that both of a bilingual person's languages remain active in the brain even when only one is being used, producing constant low-level competition. Supervising that competition appears to exercise the brain's executive-control network — much as regular training strengthens a muscle. The possible real-world payoff emerged strikingly in a 2013 study in Hyderabad, India, led by Suvarna Alladi, which found that lifelong bilingualism was associated with symptoms of dementia appearing on average about four and a half years later than in comparable monolingual patients. Age of learning still matters enormously: in 1967 Eric Lenneberg proposed a 'critical period', arguing that acquiring a native-like accent and grammar becomes much harder after puberty, a claim still debated today. Adults do begin with advantages — their existing knowledge lets them master grammar rules faster at first — but rarely reach native-level pronunciation. Intriguingly, researchers have also documented a 'foreign-language effect': work by Boaz Keysar and colleagues in 2012 found that people making decisions in a second language respond more deliberately and are less swayed by emotional wording. The picture that emerges is of a brain permanently reshaped by a second language, in ways mostly for the better.",
+				questions: [
+					{
+						q: "What was notable about Paul Broca's patient?",
+						options: [
+							"He spoke five languages fluently",
+							"He could read but not write",
+							"He could say only the syllable 'Tan'",
+							"He made a complete recovery"
+						],
+						answer: 2
+					},
+					{
+						q: "What did the 2004 University College London study find?",
+						options: [
+							"Grey matter density increased with second-language proficiency",
+							"Grey matter density decreased with age in bilinguals",
+							"Grey matter density was identical in all participants",
+							"Language learning affected only young children"
+						],
+						answer: 0
+					},
+					{
+						q: "What have functional scans of bilinguals revealed?",
+						options: [
+							"Only the language in use is active",
+							"The brain barely distinguishes languages",
+							"Bilingual brains are usually smaller",
+							"Both languages remain active even when one is being used"
+						],
+						answer: 3
+					},
+					{
+						q: "What does supervising competition between languages appear to exercise?",
+						options: [
+							"Hearing",
+							"The brain's executive-control network",
+							"Long-term vision",
+							"Musical ability"
+						],
+						answer: 1
+					},
+					{
+						q: "By how much did the 2013 study find dementia symptoms delayed in lifelong bilinguals?",
+						options: [
+							"About one month",
+							"About ten years",
+							"About four and a half years",
+							"It found no delay at all"
+						],
+						answer: 2
+					},
+					{
+						q: "What did Lenneberg's critical period hypothesis claim?",
+						options: [
+							"Native-like accent and grammar become much harder to acquire after puberty",
+							"Children cannot learn foreign languages",
+							"Adults always learn languages faster",
+							"Puberty improves grammatical ability"
+						],
+						answer: 0
+					},
+					{
+						q: "What is the 'foreign-language effect' reported by Keysar's team?",
+						options: [
+							"Translators make choices almost at random",
+							"Decisions in a second language are more deliberate and less swayed by emotional wording",
+							"People think better only in their first language",
+							"Second languages damage judgement"
+						],
+						answer: 1
+					},
+					{
+						q: "Why do adult learners often progress faster at first?",
+						options: [
+							"They have fewer distractions",
+							"Children's brains work more slowly",
+							"Their existing knowledge helps them master grammar rules",
+							"They study for more hours per day"
+						],
+						answer: 2
+					},
+					{
+						q: "What do adult learners rarely achieve, according to the passage?",
+						options: [
+							"Native-level pronunciation",
+							"A large vocabulary",
+							"Fast reading speed",
+							"Good examination marks"
+						],
+						answer: 0
+					},
+					{
+						q: "With what is Broca's area associated?",
+						options: [
+							"The sense of smell",
+							"Balance",
+							"Speech production",
+							"Vision"
+						],
+						answer: 2
+					},
+					{
+						q: "Who led the study carried out in Hyderabad?",
+						options: [
+							"Andrea Mechelli",
+							"Suvarna Alladi",
+							"Eric Lenneberg",
+							"Carl Wernicke"
+						],
+						answer: 1
+					},
+					{
+						q: "Which metaphor does the passage use to explain how bilingualism trains the brain?",
+						options: [
+							"A growing tree",
+							"A building under construction",
+							"A muscle strengthened by regular training",
+							"A musical instrument"
+						],
+						answer: 3
+					},
+					{
+						q: "With what was the region described by Carl Wernicke associated?",
+						options: [
+							"The production of speech",
+							"The recognition of faces",
+							"The control of breathing",
+							"Understanding language"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The Neuroscience of Learning a Second Language",
+							"A Brief History of English",
+							"How to Memorise Vocabulary Quickly",
+							"Brain Surgery in the 1800s"
+						],
+						answer: 0
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A phone call about an evening language course",
+				transcript: "Good afternoon, Mendip College of Adult Education, Karen speaking, how can I help you? Certainly — you'd like to enrol on one of our evening language courses. The Spanish course at Level Two runs on Tuesday evenings from half past six until half past eight, here at the main campus on Station Road, and there's also an online version on Thursday evenings at the same time, taught live over video call. The ten-week course costs one hundred and forty pounds, or ninety-five pounds if you're over sixty or receiving benefits, and the first class is on the fifteenth of September. The coursebook isn't included in the fee — it's called Aula Internacional, and you can buy it new from the college shop for twenty-five pounds, or second-hand from about fifteen. Because Level Two isn't a beginners' class, we ask everyone to complete a short online placement test first; it takes around twenty minutes and the results go straight to the tutor, who confirms you're in the right group. Classes are kept small, with a maximum of twelve students, so as long as you enrol by the end of August there shouldn't be any problem finding a place. If you're hesitating, we're holding a free open evening on the second of September, from six until eight, where you can try a sample lesson and meet the tutors. A couple of practical details: the college café closes at eight, so most students eat before class, and parking on campus is free after half past six. Finally, if your plans change, please bear in mind we can only refund your fees up to seven days before the course starts. Shall I email you the link to the placement test now?",
+				questions: [
+					{
+						q: "The on-campus Spanish class runs on ___ evenings.",
+						accepted: ["Tuesday", "Tuesdays"]
+					},
+					{
+						q: "The college's main campus is on ___.",
+						accepted: ["Station Road", "Station Rd"]
+					},
+					{
+						q: "The ten-week course costs £___ at the full rate.",
+						accepted: [
+							"140",
+							"140 pounds",
+							"a hundred and forty pounds",
+							"one hundred and forty pounds"
+						]
+					},
+					{
+						q: "Learners over sixty or on benefits pay a reduced fee of £___.",
+						accepted: [
+							"95",
+							"95 pounds",
+							"ninety-five pounds"
+						]
+					},
+					{
+						q: "A new coursebook costs £___ from the college shop.",
+						accepted: [
+							"25",
+							"25 pounds",
+							"twenty-five pounds"
+						]
+					},
+					{
+						q: "Before joining Level Two, everyone completes a short online ___ test.",
+						accepted: ["placement", "placement test"]
+					},
+					{
+						q: "Classes have a maximum of ___ students.",
+						accepted: [
+							"12",
+							"twelve",
+							"12 students",
+							"twelve students"
+						]
+					},
+					{
+						q: "The free open evening is on the ___.",
+						accepted: [
+							"second of September",
+							"2nd of September",
+							"2nd September",
+							"2 September",
+							"second September"
+						]
+					},
+					{
+						q: "Parking on campus is free after ___.",
+						accepted: [
+							"6:30",
+							"half past six",
+							"six thirty",
+							"half past 6"
+						]
+					},
+					{
+						q: "Fees can be refunded up to ___ days before the course starts.",
+						accepted: [
+							"7",
+							"seven",
+							"7 days",
+							"seven days"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 2: A talk about a new sports centre",
+				transcript: "Hello, everyone, and thank you for coming along tonight. I'm Sarah, manager of the new Riverside Sports Centre, and I'm delighted to say we open to the public on the first of October, so in just under three weeks. Let me walk you through the facilities. Our main attraction is a twenty-five-metre pool with six lanes, and because it has a moveable floor, we can adjust the water depth for everything from diving practice to toddlers' lessons, which run on Saturday mornings in six-week blocks. The gym has one hundred and twenty exercise stations, and next door the studio offers forty classes a week, from yoga to spin. If you're feeling adventurous, our climbing wall is eleven metres high, and our instructor resets the routes every month so regulars never get bored. There's also a sports hall marked out for two badminton courts, which converts for five-a-side football in the evenings. Now, membership. Anytime membership costs thirty-eight pounds a month and covers the gym, pool and all classes; off-peak membership is twenty-eight pounds, but entry with that is restricted to between nine and four on weekdays. There is normally a joining fee of fifteen pounds, but that will be waived for anyone who signs up during October. Not ready to commit? Day passes cost eight pounds. Our opening hours are six in the morning until ten at night on weekdays, and eight until eight at weekends, with last entry an hour before closing. Parking is free for up to three hours as long as you validate your ticket at reception. One final point: before your first gym session you must book an induction at reception — it only takes half an hour, but it is compulsory for everyone's safety.",
+				questions: [
+					{
+						q: "The Riverside Sports Centre opens to the public on the ___.",
+						accepted: [
+							"first of October",
+							"1st of October",
+							"1st October",
+							"1 October"
+						]
+					},
+					{
+						q: "The twenty-five-metre pool has ___ lanes.",
+						accepted: [
+							"6",
+							"six",
+							"6 lanes",
+							"six lanes"
+						]
+					},
+					{
+						q: "Thanks to a moveable floor, staff can adjust the water ___.",
+						accepted: ["depth", "water depth"]
+					},
+					{
+						q: "The gym has ___ exercise stations.",
+						accepted: [
+							"120",
+							"a hundred and twenty",
+							"one hundred and twenty",
+							"120 stations"
+						]
+					},
+					{
+						q: "The studio offers ___ classes a week.",
+						accepted: [
+							"40",
+							"forty",
+							"40 classes",
+							"forty classes"
+						]
+					},
+					{
+						q: "The climbing wall is ___ metres high.",
+						accepted: [
+							"11",
+							"eleven",
+							"11 metres",
+							"eleven metres"
+						]
+					},
+					{
+						q: "Anytime membership costs £___ a month.",
+						accepted: [
+							"38",
+							"38 pounds",
+							"thirty-eight pounds"
+						]
+					},
+					{
+						q: "Off-peak entry is restricted to between nine and ___ on weekdays.",
+						accepted: [
+							"four",
+							"4",
+							"4 p.m.",
+							"four o'clock"
+						]
+					},
+					{
+						q: "The joining fee is waived for anyone who signs up during ___.",
+						accepted: ["October", "Oct"]
+					},
+					{
+						q: "On weekdays the centre closes at ___ at night.",
+						accepted: [
+							"10",
+							"ten",
+							"10 p.m.",
+							"ten p.m.",
+							"22:00"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 3: Students discussing a statistics project with a tutor",
+				transcript: "Tutor: So, tell me how your statistics project is coming along. Student A: We're investigating whether the number of hours students study each week relates to their end-of-term test scores. Student B: We've designed an online questionnaire and sent it to the whole year group, and we've had sixty replies so far. Tutor: That's a decent sample. And how will you treat the study hours? Student A: We were going to group them into three bands — under five hours, five to fifteen hours, and over fifteen — and then compare the average test scores in each band. Student B: We are a bit worried that self-reported hours may not be entirely honest, though. Tutor: It's good that you've noticed that — make sure you mention it as a limitation in the report. And whatever patterns you find, avoid claiming that study hours cause the scores. Correlation is not causation, and I do take marks off for that mistake. Student A: Understood. For presentation, we were thinking of pie charts? Tutor: I'd advise against it. A scatter plot showing every student, plus a simple bar chart of the three bands, would be far more convincing. Student B: And should we analyse everything in SPSS? Tutor: It's installed in the computer lab, but honestly, for what you're doing, Excel is quite sufficient. Student A: Right. The brief says the report should be fifteen hundred words and due on Friday of week ten — is the presentation at the same time? Tutor: No — the presentation is in week eleven, twelve minutes per group, and slides aren't required, though you may use them. One more thing, before you collect any more data: even for a low-risk project like this, you must include a consent statement at the start of your questionnaire. Student B: That's already in there. Tutor: Excellent. Anything else? Student A: No, I think we're on track. Tutor: Good — keep your raw data backed up, and I look forward to reading the report.",
+				questions: [
+					{
+						q: "The project examines whether weekly study hours relate to end-of-term ___.",
+						accepted: [
+							"test scores",
+							"scores",
+							"test results"
+						]
+					},
+					{
+						q: "The students have received ___ questionnaire replies so far.",
+						accepted: [
+							"60",
+							"sixty",
+							"60 replies",
+							"sixty replies"
+						]
+					},
+					{
+						q: "Study hours will be grouped into ___ bands.",
+						accepted: [
+							"3",
+							"three",
+							"3 bands",
+							"three bands"
+						]
+					},
+					{
+						q: "The students fear self-reported hours may not be entirely ___.",
+						accepted: [
+							"honest",
+							"accurate",
+							"reliable"
+						]
+					},
+					{
+						q: "The tutor warns that correlation is not ___.",
+						accepted: ["causation", "cause and effect"]
+					},
+					{
+						q: "The tutor recommends a scatter plot plus a simple ___ chart of the bands.",
+						accepted: ["bar", "bar chart"]
+					},
+					{
+						q: "The tutor says ___ is quite sufficient for the analysis.",
+						accepted: ["Excel", "Microsoft Excel"]
+					},
+					{
+						q: "The written report should be ___ words.",
+						accepted: [
+							"1,500",
+							"1500",
+							"fifteen hundred",
+							"one thousand five hundred"
+						]
+					},
+					{
+						q: "Each group's presentation in week eleven lasts ___ minutes.",
+						accepted: [
+							"12",
+							"twelve",
+							"12 minutes",
+							"twelve minutes"
+						]
+					},
+					{
+						q: "The questionnaire must begin with a ___ statement.",
+						accepted: ["consent", "consent statement"]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on the history of the global coffee trade",
+				transcript: "Today we're tracing the journey of coffee from a local stimulant to a global commodity. The story begins in the highlands of Ethiopia, where legend credits a goatherd named Kaldi with noticing that his goats became unusually lively after eating berries from a particular shrub. Whatever the truth of the legend, by the fifteenth century coffee was being cultivated deliberately across the Red Sea in Yemen, and exported through the port of Mocha, whose name is still attached to a style of coffee today. Coffee houses spread through Mecca, Cairo and Istanbul, becoming centres of conversation and commerce — and, to the authorities, occasionally of dangerous political talk. England's first coffee house opened in Oxford in 1650, followed two years later by Pasqua Rosée's establishment in London. For a long time Yemen held a practical monopoly, but the Dutch broke it around 1690 by planting coffee on the island of Java. Transplants continued across the tropics: in 1723 the French officer Gabriel de Clieu carried a single coffee plant across the Atlantic to Martinique, reportedly watering it with his own ration on the voyage; within half a century the island supported millions of bushes. Brazil's coffee story began in 1727, when Francisco de Melo Palheta smuggled seeds out of French Guiana, and by the 1850s the country was supplying around half of the world's coffee, a dominance built partly on enslaved labour that we must not overlook. The next consumer revolution was instant coffee, launched by Nestlé under the Nescafé brand in 1938, initially to use up surplus Brazilian beans. Today Brazil remains the largest producer, with Vietnam second thanks to its massive cultivation of robusta, and humanity drinks an estimated two billion cups a day. Yet the industry's future is not secure: climate change is steadily shrinking the land suited to the finicky arabica species.",
+				questions: [
+					{
+						q: "Legend credits a goatherd named ___ with noticing coffee's effect.",
+						accepted: ["Kaldi", "a goatherd named Kaldi"]
+					},
+					{
+						q: "By the fifteenth century coffee was being cultivated across the Red Sea in ___.",
+						accepted: ["Yemen", "the Yemen"]
+					},
+					{
+						q: "Coffee was exported through the port of ___.",
+						accepted: ["Mocha", "Mokha"]
+					},
+					{
+						q: "England's first coffee house opened in Oxford in ___.",
+						accepted: ["1650", "sixteen fifty"]
+					},
+					{
+						q: "Around 1690 the Dutch broke the monopoly by planting coffee on ___.",
+						accepted: ["Java", "the island of Java"]
+					},
+					{
+						q: "In 1723 Gabriel de Clieu carried a single coffee plant to ___.",
+						accepted: ["Martinique", "the island of Martinique"]
+					},
+					{
+						q: "Palheta smuggled Brazil's first seeds out of ___.",
+						accepted: ["French Guiana", "Guiana"]
+					},
+					{
+						q: "By the 1850s Brazil supplied around ___ of the world's coffee.",
+						accepted: [
+							"half",
+							"a half",
+							"50%",
+							"50 per cent"
+						]
+					},
+					{
+						q: "Nestlé launched the Nescafé instant brand in ___.",
+						accepted: ["1938", "nineteen thirty-eight"]
+					},
+					{
+						q: "Today ___ remains the world's largest coffee producer.",
+						accepted: ["Brazil", "Brasil"]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The chart below shows the percentage of secondary school students who owned a laptop or tablet in three countries in 2015 and 2023.\n\nUnited Kingdom: 38% in 2015, 84% in 2023\nBrazil: 22% in 2015, 61% in 2023\nJapan: 45% in 2015, 78% in 2023\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "Some people believe that the increasing use of technology such as laptops and tablets in the classroom improves the quality of education. Others think that these devices cause more problems than they solve. To what extent do you agree or disagree? Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"Let's talk about your daily routine. What part of your day do you enjoy most?",
+				"Do you usually follow the same routine every day?",
+				"How do you usually plan your day or week ahead?"
+			]),
+			speakingPart2("Describe a gift you gave or received. You should say: what the gift was, who gave it to you or who you gave it to, why it was special, and explain how you felt about it."),
+			...speakingPart3([
+				"Why do you think some people spend so much money on gifts?",
+				"Do you think advertising influences what gifts people choose to buy?",
+				"Is the tradition of gift-giving changing in your country? How?"
+			])
+		]
+	},
+	{
+		id: "mock-7",
+		order: 7,
+		title: "IELTS Mock Test 7",
+		reading: { passages: [
+			{
+				title: "The Race to the South Pole",
+				passage: "On the fourteenth of December 1911, five Norwegians led by Roald Amundsen planted their country's flag at the South Pole, becoming the first people to stand at the southernmost point on Earth. Just over a month later, on the seventeenth of January 1912, a British party under Captain Robert Falcon Scott reached the same spot, only to find Amundsen's tent and the Norwegian flag already there. The contrasting fates of the two expeditions have fascinated historians ever since, and much of the explanation lies in preparation. Amundsen was a veteran of the Arctic who had led the first successful voyage through the Northwest Passage in 1906, and he chose his Antarctic base at the Bay of Whales, almost a hundred kilometres closer to the Pole than Scott's base on Ross Island. Before the sledging season he laid three supply depots in advance, at eighty, eighty-one and eighty-two degrees south, marking each with lines of flags so that his men could find them even in poor visibility. Most importantly, he took ninety-seven Greenland dogs and adopted Inuit polar clothing and techniques, reasoning that proven native methods were safer than untested machinery. Scott, by contrast, relied on a mixture of motor sledges — which broke down quickly — and Siberian ponies that proved unsuited to the ice, with man-hauling as the eventual fallback. The results in daily travel were stark: Amundsen's men regularly covered forty kilometres a day on skis pulled by dogs, reaching the Pole and returning without the death of a single man, while Scott's party of five — Scott, Wilson, Bowers, Oates and Evans — struggled homeward as the weather closed in. Evans died in mid-February after a fall; Oates, badly frostbitten, famously walked out of the tent into the snow saying he was 'just going outside' and might be some time; and the remaining three perished in their tent at the end of March, only eleven miles short of the supply cache at One Ton Depot. A search party found the bodies and Scott's diaries eight months later, in November 1912. Opinion remains divided over how much blame Scott bears, but most scholars agree that Amundsen's triumph was the product of meticulous planning and a willingness to learn from indigenous polar expertise.",
+				questions: [
+					{
+						q: "When did Amundsen reach the South Pole?",
+						options: [
+							"The seventeenth of January 1912",
+							"The fourteenth of December 1911",
+							"The first of November 1911",
+							"The fifteenth of February 1912"
+						],
+						answer: 1
+					},
+					{
+						q: "Where did Amundsen establish his Antarctic base?",
+						options: [
+							"On Ross Island",
+							"At Cape Evans",
+							"In McMurdo Sound",
+							"At the Bay of Whales"
+						],
+						answer: 3
+					},
+					{
+						q: "How did Amundsen's and Scott's bases differ?",
+						options: [
+							"Amundsen's was almost a hundred kilometres closer to the Pole",
+							"Scott's was supplied throughout the winter",
+							"Amundsen's was built of stone",
+							"Scott's was beside open water all year"
+						],
+						answer: 0
+					},
+					{
+						q: "How did Amundsen mark his supply depots?",
+						options: [
+							"With radio beacons",
+							"With stone cairns only",
+							"With lines of flags",
+							"With coloured dye on the snow"
+						],
+						answer: 2
+					},
+					{
+						q: "What happened to Scott's motor sledges?",
+						options: [
+							"They proved essential to the journey",
+							"They broke down quickly",
+							"They were never delivered",
+							"They only worked on hills"
+						],
+						answer: 1
+					},
+					{
+						q: "What did the passage say about Scott's Siberian ponies?",
+						options: [
+							"They proved unsuited to the ice",
+							"They were too fast",
+							"They were stolen",
+							"They stayed healthy throughout"
+						],
+						answer: 0
+					},
+					{
+						q: "What daily distance did Amundsen's team regularly cover?",
+						options: [
+							"Ten kilometres",
+							"Twenty kilometres",
+							"Fifty kilometres",
+							"Around forty kilometres"
+						],
+						answer: 3
+					},
+					{
+						q: "How many men were in Scott's polar party?",
+						options: [
+							"Three",
+							"Seven",
+							"Five",
+							"Eight"
+						],
+						answer: 2
+					},
+					{
+						q: "What did Lawrence Oates do as the party's situation worsened?",
+						options: [
+							"He walked out of the tent, saying he might be gone some time",
+							"He reached One Ton Depot alone",
+							"He was lost earlier on a glacier",
+							"He survived to be rescued"
+						],
+						answer: 0
+					},
+					{
+						q: "How far short of One Ton Depot was the final camp?",
+						options: [
+							"110 miles",
+							"11 miles",
+							"80 miles",
+							"23 miles"
+						],
+						answer: 1
+					},
+					{
+						q: "When were the bodies found?",
+						options: [
+							"In January 1912",
+							"In March 1912",
+							"In October 1913",
+							"In November 1912"
+						],
+						answer: 3
+					},
+					{
+						q: "According to most scholars, what lay behind Amundsen's success?",
+						options: [
+							"Simply better weather luck",
+							"A much larger expedition budget",
+							"Meticulous planning and learning from indigenous polar expertise",
+							"Superior maps of the coastline"
+						],
+						answer: 2
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The Race to the South Pole",
+							"The History of Dog-Sledging",
+							"Exploring the Arctic Ocean",
+							"A Biography of Robert Falcon Scott"
+						],
+						answer: 0
+					}
+				]
+			},
+			{
+				title: "The Growth of Online Education",
+				passage: "Over the past two decades, higher education has been reshaped by the internet more profoundly than by any development since the spread of mass universities. The transformation began quietly in 2002, when the Massachusetts Institute of Technology launched OpenCourseWare, placing its teaching materials online free for anyone in the world to use. The idea of free instruction for all was taken further by Salman Khan, who began tutoring a cousin in mathematics using online videos and in 2008 founded the Khan Academy, whose short lessons have since been viewed by hundreds of millions of learners. The watershed moment came in 2011, when two Stanford professors, Sebastian Thrun and Peter Norvig, put their artificial-intelligence course online expecting a few thousand sign-ups; about one hundred and sixty thousand students enrolled. The following year — which the New York Times christened the 'Year of the MOOC', or massive open online course — Harvard and MIT jointly founded the non-profit platform edX, while the Stanford-based academics Andrew Ng and Daphne Koller launched Coursera as a commercial rival. Enrolments soared into the millions, but the revolution had an awkward secret: completion rates for courses were routinely below ten per cent, suggesting that while the curious signed up freely, relatively few had the time or discipline to finish. The advantages, where they bite, are real — courses can be fitted around work and family commitments, and few charge anything like traditional tuition — but the digital divide remains a serious barrier, with around forty per cent of the world's population still lacking a reliable internet connection. Opinions in the employment market are also mixed, and many employers continue to value traditional in-person degrees more highly for numerous roles. The COVID-19 pandemic then turned experiment into necessity: in 2020 more than one point six billion learners worldwide were affected by school and university closures, and institutions switched teaching online almost overnight. What has survived the crisis is a blended model, mixing online material with face-to-face teaching, which many analysts now regard as the likeliest long-term future of the lecture hall.",
+				questions: [
+					{
+						q: "What did MIT launch in 2002?",
+						options: [
+							"A degree delivered by post",
+							"Its own commercial tutoring service",
+							"OpenCourseWare, making teaching materials freely available online",
+							"The Coursera platform"
+						],
+						answer: 2
+					},
+					{
+						q: "How did the Khan Academy begin?",
+						options: [
+							"With Salman Khan tutoring his cousin using online videos",
+							"As a university research project",
+							"As a television programme",
+							"As an investment company"
+						],
+						answer: 0
+					},
+					{
+						q: "How many students enrolled on Thrun and Norvig's 2011 online course?",
+						options: [
+							"1,600",
+							"16,000",
+							"60,000",
+							"About 160,000"
+						],
+						answer: 3
+					},
+					{
+						q: "What did the New York Times call 2012?",
+						options: [
+							"'The Year of the MOOC'",
+							"'The Year of the Tablet'",
+							"'The Digital Decade'",
+							"'The Broadband Boom'"
+						],
+						answer: 0
+					},
+					{
+						q: "Who founded the edX platform?",
+						options: [
+							"Harvard and MIT in 2012",
+							"Stanford and Google",
+							"The United Nations",
+							"A single private billionaire"
+						],
+						answer: 0
+					},
+					{
+						q: "What were typical completion rates for MOOCs?",
+						options: [
+							"Over 80 per cent",
+							"About half",
+							"Below ten per cent",
+							"Exactly a quarter"
+						],
+						answer: 2
+					},
+					{
+						q: "Which practical advantage of online courses does the passage name?",
+						options: [
+							"Cheaper textbooks",
+							"Faster internet connections",
+							"Smaller class sizes",
+							"Flexibility to study around work and family"
+						],
+						answer: 3
+					},
+					{
+						q: "What does the passage say about the digital divide?",
+						options: [
+							"Around forty per cent of the world's population lacks a reliable internet connection",
+							"Fewer than a thousand people remain offline",
+							"It affects only schools",
+							"It was resolved by 2015"
+						],
+						answer: 0
+					},
+					{
+						q: "How many learners were affected by closures in 2020?",
+						options: [
+							"16 million",
+							"160 million",
+							"More than 1.6 billion",
+							"About 2 billion"
+						],
+						answer: 2
+					},
+					{
+						q: "What do many employers still tend to do?",
+						options: [
+							"Treat all online degrees as equal to traditional ones",
+							"Refuse to hire online graduates at all",
+							"Value traditional in-person degrees more highly for numerous roles",
+							"Ignore qualifications entirely"
+						],
+						answer: 2
+					},
+					{
+						q: "What model do many analysts now see as the likeliest long-term future?",
+						options: [
+							"A return solely to lecture halls",
+							"The abolition of university campuses",
+							"A large reduction in online resources",
+							"A blended model mixing online and face-to-face teaching"
+						],
+						answer: 3
+					},
+					{
+						q: "Who founded Coursera?",
+						options: [
+							"Salman Khan",
+							"Andrew Ng and Daphne Koller",
+							"Bill Gates",
+							"Sebastian Thrun"
+						],
+						answer: 1
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"How to Choose a Laptop for Study",
+							"The Growth of Online Education",
+							"A History of Harvard University",
+							"Why University Exams Are Unfair"
+						],
+						answer: 1
+					}
+				]
+			},
+			{
+				title: "The Science of Taste and Flavour",
+				passage: "Taste seems the simplest of the senses, yet scientists have spent more than a century unpicking it. Most people once learned from textbooks that the tongue is divided into zones — sweet at the tip, bitter at the back — but this famous 'tongue map' is a myth, arising largely from a mistranslation in 1901 of a German thesis; in fact, all five basic tastes can be detected over most of the tongue. The fifth of those tastes, umami, was only formally identified in 1908, when the Tokyo chemist Kikunae Ikeda isolated it from kombu seaweed and named it after the word for savouriness. Flavour, moreover, is much more than taste alone. Researchers estimate that the greater part of what we describe as flavour comes from smell travelling from the mouth to the nose — so-called retronasal olfaction — as the classic experiment of comparing apple and raw onion while pinching one's nose readily shows. Individuals also differ biologically. About a quarter of the population are 'supertasters', born with more fungiform papillae and usually carrying variants of the TAS2R38 gene, which makes bitter compounds taste especially intense; supertasters often find cruciferous vegetables such as broccoli and Brussels sprouts unpleasantly bitter. The environment, too, alters perception. Research associated with the Fraunhofer Institute in Germany found that the dry air and low pressure of an aircraft cabin reduce sensitivity to sweet and salty tastes by as much as thirty per cent — one reason airline meals are seasoned far more heavily than the same dishes served on the ground. Perhaps most striking of all is the power of expectation. In a celebrated 2001 experiment at the University of Bordeaux, fifty-four wine students were given a white wine that had been dyed red, and described it using vocabulary normally reserved for red wine — notes of berries and cherries — showing how vision and belief can overrule the tongue. Taken together, the evidence suggests that flavour is constructed in the brain rather than simply received from the food, with eyesight, memory, altitude, price and even wording all quietly shaping what we believe we taste.",
+				questions: [
+					{
+						q: "Including umami, how many basic tastes are recognised?",
+						options: [
+							"Four",
+							"Five",
+							"Six",
+							"Seven"
+						],
+						answer: 1
+					},
+					{
+						q: "Where did the 'tongue map' idea come from?",
+						options: [
+							"An experiment involving lemons",
+							"A government nutrition survey",
+							"A mistranslation of a German thesis in 1901",
+							"Ancient Greek medicine"
+						],
+						answer: 2
+					},
+					{
+						q: "Who identified umami, and from what?",
+						options: [
+							"A French chef, from beef stock",
+							"A German doctor, from honey",
+							"A British sailor, from sea salt",
+							"The Tokyo chemist Kikunae Ikeda, from kombu seaweed"
+						],
+						answer: 3
+					},
+					{
+						q: "According to the passage, what is flavour largely made of?",
+						options: [
+							"Taste combined with retronasal smell",
+							"Taste alone",
+							"Smell combined with sound",
+							"The temperature of food"
+						],
+						answer: 0
+					},
+					{
+						q: "Roughly what proportion of people are supertasters?",
+						options: [
+							"5 per cent",
+							"10 per cent",
+							"About 25 per cent",
+							"Nearly 60 per cent"
+						],
+						answer: 2
+					},
+					{
+						q: "What do supertasters commonly find?",
+						options: [
+							"That all food is delicious",
+							"Cruciferous vegetables intensely bitter",
+							"That they cannot taste salt",
+							"That only bland food is acceptable"
+						],
+						answer: 1
+					},
+					{
+						q: "Which gene is associated with supertasting?",
+						options: [
+							"TAS2R38",
+							"BRCA1",
+							"A1C2",
+							"DNA7"
+						],
+						answer: 0
+					},
+					{
+						q: "Why does airline food often seem bland?",
+						options: [
+							"Because the food is frozen at sea level",
+							"Because chefs are required to use less sugar",
+							"Because passengers eat their meals too quickly",
+							"Because dry air and low pressure cut sensitivity to sweet and salty tastes by up to thirty per cent"
+						],
+						answer: 3
+					},
+					{
+						q: "In the 2001 Bordeaux experiment, how did students describe the dyed white wine?",
+						options: [
+							"Correctly, as a white wine",
+							"Using vocabulary normally reserved for red wine",
+							"As completely undrinkable",
+							"As a sparkling wine"
+						],
+						answer: 1
+					},
+					{
+						q: "What does the Bordeaux experiment suggest?",
+						options: [
+							"Colour has no influence on tasting",
+							"Expert tasters are always honest",
+							"Expectations can shape perceived flavour",
+							"French wine students are superior tasters"
+						],
+						answer: 2
+					},
+					{
+						q: "What does the pinch-your-nose test with apple and onion demonstrate?",
+						options: [
+							"That smell contributes heavily to what we call flavour",
+							"That apples naturally taste like onions",
+							"That taste buds die quickly",
+							"That the tongue genuinely has five zones"
+						],
+						answer: 0
+					},
+					{
+						q: "Which institution is linked to the cabin-pressure research on airline food?",
+						options: [
+							"NASA",
+							"The University of Tokyo",
+							"Heathrow Airport",
+							"The Fraunhofer Institute in Germany"
+						],
+						answer: 3
+					},
+					{
+						q: "How many wine students took part in the 2001 Bordeaux experiment?",
+						options: [
+							"Twelve",
+							"Twenty-four",
+							"One hundred and four",
+							"Fifty-four"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"Airline Food Recipes",
+							"The Science of Taste and Flavour",
+							"A History of Cooking",
+							"The Biology of the Ear"
+						],
+						answer: 1
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A phone call to book a wedding reception venue",
+				transcript: "Good afternoon, The Old Mill Hotel, events office, Sophie speaking. Hello, yes, we do host wedding receptions. You're looking at Saturday the twenty-first of June, for about ninety guests — let me check the diary for you. Good news: both of our function rooms are free that day. Our largest room, the Riverside Suite, holds up to a hundred and twenty seated guests, and the hire fee for that is seven hundred and fifty pounds. The Garden Room is a more intimate space for up to sixty guests, at five hundred pounds for the day. For catering, most couples choose our three-course sit-down menu, which is forty-five pounds per head, while an evening buffet for guests arriving later costs thirty-two pounds per person. Drinks packages start at fifteen pounds per guest, or if you'd rather supply your own wine we charge a corkage fee of ten pounds per bottle. To confirm the date we take a deposit of five hundred pounds, with the balance due one month before the wedding. Once you're booked, we offer a free menu-tasting evening for two people, so you can choose your dishes with the chef. We will need your final numbers no later than two weeks before the day, so we can plan the seating properly. A few practicalities: we have free overnight parking for eighty cars, and the nearest train station, Marshfield, is about two miles away. Entertainment is fine within limits — DJs may play until midnight, but live bands have to finish by half past eleven under the terms of our noise licence. And finally, the Riverside Suite is also licensed for civil ceremonies, for an additional two hundred pounds, in case you'd like everything under one roof. Shall I pencil in the date and email you our brochure and sample menus?",
+				questions: [
+					{
+						q: "The reception is planned for Saturday the ___.",
+						accepted: [
+							"twenty-first of June",
+							"21st of June",
+							"21st June",
+							"21 June",
+							"twenty-first June"
+						]
+					},
+					{
+						q: "The couple are expecting about ___ guests.",
+						accepted: [
+							"90",
+							"ninety",
+							"90 guests",
+							"ninety guests"
+						]
+					},
+					{
+						q: "The Riverside Suite holds up to ___ seated guests.",
+						accepted: [
+							"120",
+							"a hundred and twenty",
+							"one hundred and twenty",
+							"120 guests"
+						]
+					},
+					{
+						q: "The Garden Room takes up to ___ guests.",
+						accepted: [
+							"60",
+							"sixty",
+							"60 guests",
+							"sixty guests"
+						]
+					},
+					{
+						q: "Hiring the Garden Room costs £___ for the day.",
+						accepted: [
+							"500",
+							"500 pounds",
+							"five hundred pounds"
+						]
+					},
+					{
+						q: "The three-course sit-down menu costs £___ per head.",
+						accepted: [
+							"45",
+							"45 pounds",
+							"forty-five pounds"
+						]
+					},
+					{
+						q: "Corkage is charged at £___ per bottle.",
+						accepted: [
+							"10",
+							"10 pounds",
+							"ten pounds"
+						]
+					},
+					{
+						q: "A deposit of £___ is taken to confirm the date.",
+						accepted: [
+							"500",
+							"500 pounds",
+							"five hundred pounds"
+						]
+					},
+					{
+						q: "Live bands must finish by ___.",
+						accepted: [
+							"half past eleven",
+							"11:30",
+							"eleven thirty",
+							"half 11"
+						]
+					},
+					{
+						q: "Final numbers are required no later than ___ before the day.",
+						accepted: ["two weeks", "2 weeks"]
+					}
+				]
+			},
+			{
+				title: "Section 2: A radio interview about volunteering abroad",
+				transcript: "Presenter: Tonight we're talking about gap years and volunteering abroad. My guest is Helen Carter from the charity Global Reach. Helen, what does Global Reach offer? Helen: We run placements of between four and twelve weeks for school leavers and students. There are three main programmes: teaching English in Nepal, conservation work in Costa Rica, and healthcare support in Uganda. Presenter: And what does it cost to take part? Helen: The programme fee for an eight-week placement is one thousand eight hundred pounds. That covers accommodation, meals and training, but not flights or insurance. Most of our volunteers fundraise towards it, and we give everyone a step-by-step fundraising guide plus a mentor who has been on placement themselves. Presenter: Are there any age limits? Helen: Volunteers must be at least eighteen by the date they fly. There's no upper limit, but the majority are between eighteen and twenty-two. Presenter: How do you prepare people for the experience? Helen: Everyone attends a mandatory briefing weekend in Birmingham, held in April, which covers safety, cultural expectations and emergency procedures. Presenter: Some listeners might worry this is really 'voluntourism' — tourism dressed up as charity. Helen: It's a fair concern, and it's why we only partner with projects that have existed locally for more than five years. Volunteers do real work — teaching classes of up to thirty children, for example — and it is not a holiday: accommodation is basic, usually a shared room with a host family, and the working day often starts at seven. Presenter: And for anyone tempted to apply? Helen: Applications for the summer programme close on the first of March. Do note that the Nepal programme usually fills earlier, by around mid-February, so don't leave it to the last minute. Presenter: Helen Carter of Global Reach, thank you very much.",
+				questions: [
+					{
+						q: "Helen Carter works for the charity ___.",
+						accepted: ["Global Reach", "the charity Global Reach"]
+					},
+					{
+						q: "Placements last between ___ and twelve weeks.",
+						accepted: ["4", "four"]
+					},
+					{
+						q: "The English-teaching programme is based in ___.",
+						accepted: ["Nepal", "in Nepal"]
+					},
+					{
+						q: "The fee covers accommodation, meals and ___.",
+						accepted: ["training", "training sessions"]
+					},
+					{
+						q: "An eight-week placement costs £___.",
+						accepted: [
+							"1,800",
+							"1800",
+							"1800 pounds",
+							"one thousand eight hundred pounds"
+						]
+					},
+					{
+						q: "Every volunteer receives a fundraising guide plus a ___.",
+						accepted: ["mentor", "a mentor"]
+					},
+					{
+						q: "Volunteers must be at least ___ years old by the date they fly.",
+						accepted: ["18", "eighteen"]
+					},
+					{
+						q: "The mandatory briefing weekend is held in ___.",
+						accepted: ["Birmingham", "the city of Birmingham"]
+					},
+					{
+						q: "Partner projects must have existed locally for more than ___ years.",
+						accepted: [
+							"5",
+							"five",
+							"5 years",
+							"five years"
+						]
+					},
+					{
+						q: "Applications for the summer programme close on the ___.",
+						accepted: [
+							"first of March",
+							"1st of March",
+							"1st March",
+							"1 March"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 3: Students and a tutor discussing a marketing case study",
+				transcript: "Tutor: Let's discuss your marketing case study on Zest Drinks, the company launching a new low-sugar sparkling water. What approach are you taking? Student A: We're structuring it around the four P's — product, price, place and promotion — and we've surveyed two hundred consumers aged eighteen to thirty-five, which is the target market the company specified in its brief. Student B: The most striking finding was that sixty-eight per cent of them said the flavour range mattered more to them than the price, which surprised us, because the company's brief assumed price would be the main driver of sales. Tutor: An interesting result — so what are you recommending? Student A: We're advising them to reposition around three unusual flavours instead of cutting prices, and to launch first in independent gyms and health-food shops rather than supermarkets, in order to build a premium image. Student B: For the promotion section we compared television with social media advertising, and with a launch budget of only fifty thousand pounds, television is simply unrealistic — a single thirty-second slot would consume most of that money. So we're recommending partnerships with online fitness influencers, which can reach exactly the same age group for a fraction of the cost. Tutor: There's solid reasoning there, but one weakness. You need to acknowledge the trade-off openly: supermarkets would give Zest far wider distribution than independent gyms, so your report must justify why the premium channel is still the better choice. Student A: Understood. And is the final output the report or the presentation? Tutor: Both. The presentation is twelve minutes per group, delivered in week twelve, and the written report — two and a half thousand words — is due on the Monday after the presentations. One last point: include a proper limitations section. A survey of two hundred people, all from one town, cannot be presented as a national picture. Present it honestly, and qualify your conclusions accordingly.",
+				questions: [
+					{
+						q: "Zest Drinks is launching a new low-sugar ___ water.",
+						accepted: ["sparkling", "fizzy"]
+					},
+					{
+						q: "The students surveyed ___ consumers in the target age group.",
+						accepted: [
+							"200",
+							"two hundred",
+							"200 consumers",
+							"two hundred consumers"
+						]
+					},
+					{
+						q: "___ per cent of respondents said flavour mattered more than price.",
+						accepted: [
+							"68",
+							"68 per cent",
+							"68%",
+							"sixty-eight",
+							"sixty-eight per cent"
+						]
+					},
+					{
+						q: "The students advise launching first in independent gyms and ___ shops.",
+						accepted: [
+							"health-food",
+							"health food",
+							"health food shops",
+							"health-food shops"
+						]
+					},
+					{
+						q: "The launch budget is only £___.",
+						accepted: [
+							"50,000",
+							"50000",
+							"fifty thousand pounds",
+							"fifty thousand"
+						]
+					},
+					{
+						q: "A single thirty-second television slot would consume most of the ___.",
+						accepted: [
+							"budget",
+							"money",
+							"launch budget"
+						]
+					},
+					{
+						q: "For promotion, the students recommend partnerships with online fitness ___.",
+						accepted: [
+							"influencers",
+							"online influencers",
+							"fitness influencers"
+						]
+					},
+					{
+						q: "Supermarkets would give Zest far wider ___ than independent gyms.",
+						accepted: ["distribution", "reach"]
+					},
+					{
+						q: "The group presentation lasts ___ minutes.",
+						accepted: [
+							"12",
+							"twelve",
+							"12 minutes",
+							"twelve minutes"
+						]
+					},
+					{
+						q: "The written report is ___ words long.",
+						accepted: [
+							"2,500",
+							"2500",
+							"two and a half thousand",
+							"two thousand five hundred"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on designing walkable cities",
+				transcript: "In this final lecture, I want to ask what makes a city walkable, and why urban planners increasingly treat walking not as an afterthought but as the foundation of good design. The modern argument begins, as so often in urbanism, with Jane Jacobs, whose 1961 book The Death and Life of Great American Cities insisted that safe, lively streets depend on what she memorably called 'eyes on the street' — the constant informal supervision provided by residents and shopkeepers. A year later, in 1962, Copenhagen closed its main shopping street, Strøget, to cars. Shopkeepers predicted disaster; instead the street, now 1.1 kilometres long and one of the longest pedestrian thoroughfares in Europe, became the model for a radical redesign of the city centre. Copenhagen went on to hire the Danish architect Jan Gehl, who spent decades systematically measuring how people actually use public space, coining the discipline of 'public life studies'. Later examples followed the same principle. Melbourne revived its neglected laneways in the 1990s, and Barcelona introduced its 'superblocks' in the Eixample district in 2016, funnelling through-traffic to the perimeter of nine-block areas so that the streets within effectively belong to residents. The German district of Vauban, near Freiburg, designed from scratch in the late 1990s, permits car parking only at the community's edge, and around seventy per cent of households live without a car at all. The health case for walkability is well documented: just thirty minutes of daily walking is associated with substantially reduced risk of several chronic diseases, which is why planners work to a rule of thumb that daily amenities — shops, schools, parks — should lie within four hundred to eight hundred metres of home, roughly a five-to-ten-minute walk. There is even a financial argument: property values in highly walkable neighbourhoods consistently command a premium over car-dependent suburbs. The lesson of the past sixty years is that cities designed around the pedestrian do not merely function better; they prove, time and again, to be places where people actually want to live.",
+				questions: [
+					{
+						q: "Jane Jacobs called informal supervision by residents '___ on the street'.",
+						accepted: ["eyes", "eyes on the street"]
+					},
+					{
+						q: "Copenhagen closed its main shopping street, Strøget, to cars in ___.",
+						accepted: ["1962", "nineteen sixty-two"]
+					},
+					{
+						q: "Strøget is now ___ kilometres long.",
+						accepted: [
+							"1.1",
+							"1.1 kilometres",
+							"one point one kilometres"
+						]
+					},
+					{
+						q: "Jan Gehl coined the discipline of 'public life ___'.",
+						accepted: ["studies", "research"]
+					},
+					{
+						q: "Barcelona's superblocks funnel through-traffic around ___-block areas.",
+						accepted: [
+							"9",
+							"nine",
+							"9-block",
+							"nine-block"
+						]
+					},
+					{
+						q: "In Vauban, car parking is permitted only at the community's ___.",
+						accepted: ["edge", "edges"]
+					},
+					{
+						q: "Around ___ per cent of Vauban households live without a car.",
+						accepted: [
+							"70",
+							"seventy",
+							"70%",
+							"70 per cent",
+							"seventy per cent"
+						]
+					},
+					{
+						q: "Just ___ minutes of daily walking reduces the risk of chronic disease.",
+						accepted: [
+							"30",
+							"thirty",
+							"30 minutes",
+							"thirty minutes"
+						]
+					},
+					{
+						q: "Planners want daily amenities within four hundred to ___ metres of home.",
+						accepted: [
+							"800",
+							"eight hundred",
+							"800 metres",
+							"eight hundred metres"
+						]
+					},
+					{
+						q: "Highly walkable neighbourhoods command a property-value ___ over suburbs.",
+						accepted: ["premium", "price premium"]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The chart below shows the number of satellites launched per year in 2015 and 2023, by sector.\n\nCommercial: 62 satellites in 2015, 1,930 in 2023\nGovernment: 98 in 2015, 460 in 2023\nMilitary: 45 in 2015, 182 in 2023\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "Some people believe that governments should continue to spend large amounts of money on space exploration, while others think this money would be better spent solving problems such as poverty, disease and climate change here on Earth. To what extent do you agree or disagree? Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"Let's talk about transport. How do you usually travel to work or college?",
+				"How long does your daily journey usually take?",
+				"What do you think of public transport in your area?"
+			]),
+			speakingPart2("Describe a skill you taught to another person. You should say: what the skill was, who you taught it to, how you taught them, and explain how you felt about the experience."),
+			...speakingPart3([
+				"Do you think people learn better through practice or through studying theory?",
+				"How has technology changed the way skills are taught and learned?",
+				"Why do some people find it difficult to learn new skills as they get older?"
+			])
+		]
+	},
+	{
+		id: "mock-8",
+		order: 8,
+		title: "IELTS Mock Test 8",
+		reading: { passages: [
+			{
+				title: "From Telegraph to Internet",
+				passage: "On 24 May 1844, Samuel Morse demonstrated the electric telegraph by transmitting the words 'What hath God wrought' from the Supreme Court chamber in Washington to his assistant Alfred Vail in Baltimore, some sixty kilometres away. For the first time in human history, a message could travel faster than the person or horse carrying it. The commercial consequences were dramatic: a letter from New York to London normally spent ten days or more in the hold of a steamship, whereas a telegraphic message crossed the country in minutes. Within a decade, wires linked most of the eastern United States and much of northern Europe. The boldest engineering project of the century followed. In 1858 the entrepreneur Cyrus Field oversaw the laying of a cable across the floor of the Atlantic Ocean between Valentia in Ireland and Heart's Content in Newfoundland. The first cable worked for only three weeks before its insulation failed, but a second attempt, completed in 1866, worked permanently. The service was ruinously expensive — a message of twenty words could cost roughly a farm labourer's weekly wage — yet newspapers, merchants and governments paid willingly, because the cable collapsed a ten-day ocean crossing into a handful of minutes. The telephone, patented by Alexander Graham Bell in 1876, removed the need for trained operators who translated messages into Morse code, and by the early twentieth century ordinary households could speak directly to one another across a city. Meanwhile, in 1901, the Italian inventor Guglielmo Marconi received the first radio signal sent across the Atlantic — the letter S repeated in Morse code — proving that communication needed no wires at all. The internet grew from a very different concern: military researchers in the United States wanted a network able to survive the destruction of any single office. The result, ARPANET, linked its first four university computers in 1969, and in 1983 the network standardised the protocols, known as TCP/IP, still used to direct data around the world today. Many historians of technology date the true birth of the modern internet to 1989, when the British computer scientist Tim Berners-Lee, working at the CERN physics laboratory in Switzerland, proposed a system of documents linked by 'hypertext' — the World Wide Web. His aim was modest: to help physicists share research papers without posting floppy disks to one another. The arrival of the Mosaic browser in 1993, which could display pictures as well as text, turned the web into a mass medium. In 1995 the web had fewer than twenty thousand commercial websites; within a single decade the internet reached its one billionth user, a milestone the telephone had taken more than a century to achieve.",
+				questions: [
+					{
+						q: "Who received the first demonstration telegram from Samuel Morse?",
+						options: [
+							"President Tyler in Washington",
+							"Cyrus Field in Newfoundland",
+							"His assistant Alfred Vail in Baltimore",
+							"Alexander Graham Bell in New York"
+						],
+						answer: 2
+					},
+					{
+						q: "How long did a letter from New York to London normally take by steamship?",
+						options: [
+							"Ten days or more",
+							"Two days",
+							"One month",
+							"Six weeks"
+						],
+						answer: 0
+					},
+					{
+						q: "What happened to the first transatlantic cable, laid in 1858?",
+						options: [
+							"It was never connected to Ireland",
+							"It still carries messages today",
+							"It was pulled up within a week",
+							"It worked for only three weeks before its insulation failed"
+						],
+						answer: 3
+					},
+					{
+						q: "Why did businesses and governments pay high prices for telegrams?",
+						options: [
+							"There was a government tax on ordinary letters",
+							"Prices and political news arrived within minutes rather than weeks",
+							"The cable company refused all other customers",
+							"Telegrams were considered more fashionable than letters"
+						],
+						answer: 1
+					},
+					{
+						q: "What did the invention of the telephone remove the need for?",
+						options: [
+							"Trained operators translating messages into Morse code",
+							"Copper wires between cities",
+							"A general postal service",
+							"Newspapers entirely"
+						],
+						answer: 0
+					},
+					{
+						q: "What did Guglielmo Marconi receive in 1901?",
+						options: [
+							"The first telephone call across the Atlantic Ocean",
+							"A full spoken sentence broadcast across Europe",
+							"The first transatlantic radio signal — the letter S in Morse code",
+							"A radio signal from a ship in distress"
+						],
+						answer: 2
+					},
+					{
+						q: "What concern lay behind the design of ARPANET?",
+						options: [
+							"Reducing the cost of telephone calls",
+							"Selling computers to universities",
+							"Connecting every household in America",
+							"Keeping a network running despite the destruction of any single office"
+						],
+						answer: 3
+					},
+					{
+						q: "When did ARPANET standardise the TCP/IP protocols?",
+						options: [
+							"1969",
+							"1983",
+							"1989",
+							"1993"
+						],
+						answer: 1
+					},
+					{
+						q: "What was Tim Berners-Lee's original aim in proposing the World Wide Web?",
+						options: [
+							"To create a global shopping platform",
+							"To replace the telephone network",
+							"To help physicists share research papers without posting floppy disks",
+							"To hide military research from rival countries"
+						],
+						answer: 2
+					},
+					{
+						q: "What did the Mosaic browser of 1993 add to the web?",
+						options: [
+							"The ability to display pictures as well as text",
+							"A government licensing system",
+							"The first online payment system",
+							"Automatic translation between languages"
+						],
+						answer: 0
+					},
+					{
+						q: "When did the internet reach one billion users?",
+						options: [
+							"In 1995",
+							"Before the year 2000",
+							"A century after its invention",
+							"Within about ten years of 1995"
+						],
+						answer: 3
+					},
+					{
+						q: "According to the passage, how long did the telephone take to reach one billion users?",
+						options: [
+							"About ten years",
+							"More than a century",
+							"About twenty years",
+							"It has not reached that figure yet"
+						],
+						answer: 1
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"Why the internet replaced newspapers",
+							"A biography of Samuel Morse",
+							"From telegraph to internet: the accelerating history of long-distance communication",
+							"The failure of early submarine cables"
+						],
+						answer: 2
+					}
+				]
+			},
+			{
+				title: "The Rise of Plant-Based Diets",
+				passage: "The word 'vegan' did not exist until 1944, when a British woodworker named Donald Watson founded the Vegan Society to distinguish those who avoided all animal products from vegetarians, who continued to consume eggs and dairy. Britain's Vegetarian Society itself had been founded almost a century earlier, in 1847, but for most of the twentieth century avoiding meat remained a small, slightly eccentric minority pursuit. That picture has changed with remarkable speed. Surveys in the United Kingdom suggest the number of people identifying as vegan quadrupled between 2014 and 2019, and large supermarket chains have responded by multiplying their ranges of plant-based products, from oat milk to burgers built from pea protein and soya. The most widely cited argument for reducing meat consumption is environmental. In 2013 the United Nations Food and Agriculture Organisation estimated that livestock generate around 14.5 per cent of the greenhouse gases attributable to human activity — a share larger than every plane, car and ship combined. Beef is by far the most costly common food in climate terms: producing a kilogram of beef generates many times the emissions of the same weight of tofu, and cattle pasture is the single largest driver of deforestation in the Amazon basin. Health arguments run alongside environmental ones. Diets heavy in red and processed meat are linked to heart disease and certain cancers, and doctors increasingly advise patients, in the phrase popularised by campaigners, to make plants the main event rather than the side dish. In 2019, the EAT-Lancet Commission, a panel of thirty-seven scientists, published a 'planetary health diet' recommending that the average person halve their consumption of red meat and sugar while doubling their intake of nuts, pulses, fruit and vegetables. Nutritionists add one important caution. Vitamin B12, essential for nerve function, is found almost exclusively in animal products, so people who exclude them entirely must take a supplement or eat fortified foods. Critics of the modern plant-based industry also note that not all of its products are necessarily healthy: some highly processed meat substitutes contain as much salt and saturated fat as the burgers they imitate, a fact the small print on the packaging sometimes reveals. Food businesses, meanwhile, sense a historic opportunity. The first plant-based burger engineered to 'bleed', using a protein compound derived from soya roots, launched in the United States in 2016, and the market for meat alternatives has since grown into one worth billions of pounds a year. Whether the fashion endures or fades, few industry analysts now expect the menus of the future to look like those of the past.",
+				questions: [
+					{
+						q: "Why did Donald Watson found the Vegan Society in 1944?",
+						options: [
+							"To campaign against rabbit hunting",
+							"To distinguish people avoiding all animal products from vegetarians",
+							"To promote organic vegetable farming",
+							"To protest against rationing of meat"
+						],
+						answer: 1
+					},
+					{
+						q: "When was Britain's Vegetarian Society founded?",
+						options: [
+							"1911",
+							"1944",
+							"1901",
+							"1847"
+						],
+						answer: 3
+					},
+					{
+						q: "What did UK surveys suggest happened between 2014 and 2019?",
+						options: [
+							"The number of vegans quadrupled",
+							"Meat sales collapsed completely",
+							"Supermarkets removed all dairy products",
+							"The Vegetarian Society was relaunched"
+						],
+						answer: 0
+					},
+					{
+						q: "What share of human-caused greenhouse gases did the FAO attribute to livestock?",
+						options: [
+							"Around 5%",
+							"Around 29%",
+							"Around 14.5%",
+							"Around 50%"
+						],
+						answer: 2
+					},
+					{
+						q: "Which common food is described as the most costly in climate terms?",
+						options: [
+							"Beef",
+							"Tofu",
+							"Chicken",
+							"Cheese"
+						],
+						answer: 0
+					},
+					{
+						q: "According to the passage, what is the single largest driver of deforestation in the Amazon basin?",
+						options: [
+							"Road building",
+							"Cattle pasture",
+							"Gold mining",
+							"Coffee planting"
+						],
+						answer: 1
+					},
+					{
+						q: "What did the EAT-Lancet Commission recommend in 2019?",
+						options: [
+							"That everyone become fully vegan immediately",
+							"Vegetarianism only for adults over fifty",
+							"A worldwide ban on beef production",
+							"Halving red meat and sugar while doubling nuts, pulses, fruit and vegetables"
+						],
+						answer: 3
+					},
+					{
+						q: "Why must people who exclude animal products entirely take care?",
+						options: [
+							"Plant foods contain dangerous toxins",
+							"Vegetables are always more expensive",
+							"Vitamin B12 is found almost exclusively in animal products",
+							"They will automatically gain weight"
+						],
+						answer: 2
+					},
+					{
+						q: "What warning do critics give about highly processed meat substitutes?",
+						options: [
+							"They can contain as much salt and saturated fat as the burgers they imitate",
+							"They are banned in most countries",
+							"They always taste worse than meat",
+							"They contain no protein at all"
+						],
+						answer: 0
+					},
+					{
+						q: "When was the first 'bleeding' plant-based burger launched in the United States?",
+						options: [
+							"2019",
+							"2016",
+							"2013",
+							"2006"
+						],
+						answer: 1
+					},
+					{
+						q: "Where does the 'bleeding' compound in that burger come from?",
+						options: [
+							"Beetroot juice",
+							"Artificial food colouring",
+							"Crushed insects",
+							"A protein compound derived from soya roots"
+						],
+						answer: 3
+					},
+					{
+						q: "What do industry analysts now expect about future menus?",
+						options: [
+							"Meat will fall below the price of vegetables",
+							"Restaurants will stop serving vegetables",
+							"They will not look like the menus of the past",
+							"Plant-based products will disappear completely"
+						],
+						answer: 2
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"Why supermarkets are closing their meat counters",
+							"The history of Donald Watson",
+							"The dangers of vegetarian diets",
+							"The rise of plant-based diets: climate, health and opportunity"
+						],
+						answer: 3
+					}
+				]
+			},
+			{
+				title: "The Rediscovery of Pompeii",
+				passage: "When Mount Vesuvius erupted in the autumn of the year 79 AD, it buried the Roman town of Pompeii under a blanket of ash and pumice four to six metres deep, entombing streets, houses, shops and people almost where they stood. The catastrophe is recorded in two remarkable letters by the young lawyer Pliny the Younger, who watched the disaster from across the Bay of Naples; his uncle, the admiral Pliny the Elder, sailed towards the eruption to attempt a rescue and died on the beach. Within a century the town's precise location had been forgotten: new inhabitants farmed the fields above the ruins and marked their maps with only the vague phrase 'the city'. The rediscovery was accidental and slow. In 1599, while cutting a channel to divert the River Sarno, the architect Domenico Fontana uncovered painted walls and inscriptions, but the finds attracted little attention. Serious excavation began at the neighbouring town of Herculaneum in 1738 and at Pompeii itself in 1748, led by the Spanish military engineer Rocque de Alcubierre under the Bourbon king of Naples, Charles III. For fifteen years scholars argued about the identity of the emerging ruins; only in 1763 did excavators unearth an inscription bearing the town's name, confirming beyond doubt that they had found Pompeii. Early digging resembled treasure-hunting, with walls stripped of their finest paintings for the royal museum. The turning point came in 1863, when the archaeologist Giuseppe Fiorelli introduced systematic techniques: he divided the town into regions, numbered its doorways and, most famously, poured plaster into the voids left by decomposed bodies in the hardened ash, producing haunting casts of people and even pets in their final moments. About two-thirds of Pompeii's sixty-six hectares have now been uncovered, and modern policy is deliberately conservative: archaeologists excavate almost no new ground, concentrating instead on preserving what nearly three centuries of exposure to weather and visitors have damaged. The rewards can still be spectacular — the 2020 uncovering of a thermopolium, or hot-food counter, its counter painted with images of the dishes once sold there, made headlines around the world. The whole site was named a UNESCO World Heritage Site in 1997 and receives around two and a half million visitors a year, a level of fame that would have astonished Pliny himself.",
+				questions: [
+					{
+						q: "How deep was the blanket of ash and pumice over Pompeii?",
+						options: [
+							"About one metre",
+							"Four to six metres",
+							"Over twenty metres",
+							"Less than a centimetre"
+						],
+						answer: 1
+					},
+					{
+						q: "Who wrote the two letters recording the eruption?",
+						options: [
+							"Domenico Fontana",
+							"Rocque de Alcubierre",
+							"Giuseppe Fiorelli",
+							"Pliny the Younger"
+						],
+						answer: 3
+					},
+					{
+						q: "What did Pliny the Elder do during the eruption?",
+						options: [
+							"Sailed towards it to attempt a rescue and died",
+							"Hid in a cellar until it finished",
+							"Drew the first map of the ruins",
+							"Ordered the town to be rebuilt immediately"
+						],
+						answer: 0
+					},
+					{
+						q: "How did the town's exact location come to be forgotten?",
+						options: [
+							"All written records were destroyed by fire",
+							"Maps were confiscated by the government",
+							"New inhabitants farmed above the ruins and knew it only as 'the city'",
+							"The coastline moved thirty kilometres inland"
+						],
+						answer: 2
+					},
+					{
+						q: "What was Domenico Fontana doing when he uncovered painted walls in 1599?",
+						options: [
+							"Building a church",
+							"Cutting a channel to divert the River Sarno",
+							"Planting a vineyard",
+							"Digging a well for drinking water"
+						],
+						answer: 1
+					},
+					{
+						q: "Under which king did the first major excavation at Pompeii begin in 1748?",
+						options: [
+							"Napoleon Bonaparte of France",
+							"King George III of Britain",
+							"King Philip II of Spain",
+							"Charles III, the Bourbon king of Naples"
+						],
+						answer: 3
+					},
+					{
+						q: "How was the ruins' identity finally confirmed?",
+						options: [
+							"An inscription bearing the town's name was unearthed in 1763",
+							"A Roman coin was found on the beach",
+							"A visitor recognised the town from a painting",
+							"Satellite photographs revealed the whole street plan"
+						],
+						answer: 0
+					},
+					{
+						q: "What did the earliest phase of excavation resemble?",
+						options: [
+							"A military campaign",
+							"Treasure-hunting for the royal museum",
+							"A university examination",
+							"A religious pilgrimage"
+						],
+						answer: 2
+					},
+					{
+						q: "What is Giuseppe Fiorelli most famous for introducing in 1863?",
+						options: [
+							"Steel scaffolding over the ruins",
+							"A museum of Roman coins",
+							"The first visitor entrance fee",
+							"Pouring plaster into body-shaped voids to make casts"
+						],
+						answer: 3
+					},
+					{
+						q: "Roughly what share of Pompeii has been uncovered?",
+						options: [
+							"About ten per cent",
+							"About two-thirds",
+							"About ninety per cent",
+							"The entire site"
+						],
+						answer: 1
+					},
+					{
+						q: "What is modern archaeological policy at Pompeii?",
+						options: [
+							"Digging the entire site within ten years",
+							"Reburying everything already found",
+							"Preserving exposed areas rather than excavating new ground",
+							"Allowing visitors to take small souvenirs home"
+						],
+						answer: 2
+					},
+					{
+						q: "What discovery in 2020 made headlines around the world?",
+						options: [
+							"A painted hot-food counter known as a thermopolium",
+							"A second, entirely unknown town",
+							"The tomb of Pliny the Elder",
+							"A cargo of Roman gold coins"
+						],
+						answer: 0
+					},
+					{
+						q: "Roughly how many visitors does the site of Pompeii receive each year?",
+						options: [
+							"About twenty-five thousand",
+							"About two and a half million",
+							"About ten million",
+							"About one million"
+						],
+						answer: 1
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The volcanic eruptions of modern Italy",
+							"The buried city: the loss and rediscovery of Pompeii",
+							"A biography of Giuseppe Fiorelli",
+							"Roman architecture in southern Europe"
+						],
+						answer: 3
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A phone call to a travel insurance company",
+				transcript: "Good morning, thank you for calling Horizon Travel Insurance, you're speaking to Priya. I can run through our travel cover options for you today. We sell three levels of policy. The Bronze policy covers medical expenses up to two million pounds, but it doesn't include cover for your baggage or for cancelling your trip, so most travellers find it suitable only for short breaks within the UK. The Silver policy, which is our most popular, covers medical costs up to five million pounds, includes cancellation cover of three thousand pounds, and protects baggage up to one thousand five hundred pounds. The Gold policy raises medical cover to ten million pounds and cancellation to the full cost of the trip, up to eight thousand pounds, and it also includes gadget cover for two items, such as a laptop and a phone. If you're travelling within Europe only, prices are considerably lower: a Silver policy for a single trip of up to ten days costs thirty-two pounds, whereas worldwide cover for the same trip, which you'll need for Thailand, is fifty-eight pounds. One important point: if you take more than three foreign trips a year, an annual multi-trip policy at one hundred and twenty pounds works out cheaper than buying separate policies, and the annual policy covers trips of up to thirty days each. There's an excess of fifty pounds on claims for lost baggage, though no excess at all on medical claims. If you have any existing medical condition, such as asthma, you must declare it before you buy, or the insurer can reject a later claim. Finally, if you change your mind after purchasing, you can cancel for a full refund within fourteen days, provided you haven't travelled. Would you like me to set up the Silver worldwide policy for you now?",
+				questions: [
+					{
+						q: "The caller has rung ___ Travel Insurance.",
+						accepted: ["Horizon", "Horizon Travel Insurance"]
+					},
+					{
+						q: "The Bronze policy doesn't include cover for ___ or for cancelling your trip.",
+						accepted: [
+							"baggage",
+							"your baggage",
+							"luggage"
+						]
+					},
+					{
+						q: "The most popular level of cover is the ___ policy.",
+						accepted: [
+							"Silver",
+							"Silver policy",
+							"the Silver policy"
+						]
+					},
+					{
+						q: "The Silver policy protects baggage up to £___.",
+						accepted: [
+							"1500",
+							"1,500",
+							"1500 pounds",
+							"£1500",
+							"one thousand five hundred",
+							"one thousand five hundred pounds"
+						]
+					},
+					{
+						q: "The Gold policy includes ___ cover for two items.",
+						accepted: ["gadget"]
+					},
+					{
+						q: "Worldwide Silver cover for a trip of up to ten days costs £___.",
+						accepted: [
+							"58",
+							"58 pounds",
+							"£58",
+							"fifty-eight",
+							"fifty eight",
+							"fifty-eight pounds"
+						]
+					},
+					{
+						q: "An annual multi-trip policy works out cheaper if you take more than ___ foreign trips a year.",
+						accepted: ["3", "three"]
+					},
+					{
+						q: "Under the annual policy, each trip can last up to ___ days.",
+						accepted: [
+							"30",
+							"thirty",
+							"30 days",
+							"thirty days"
+						]
+					},
+					{
+						q: "The excess on claims for lost baggage is £___.",
+						accepted: [
+							"50",
+							"50 pounds",
+							"£50",
+							"fifty",
+							"fifty pounds"
+						]
+					},
+					{
+						q: "You can cancel for a full refund within ___ days, provided you haven't travelled.",
+						accepted: [
+							"14",
+							"fourteen",
+							"14 days",
+							"fourteen days"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 2: A talk about a local history festival programme",
+				transcript: "Good evening everyone, and welcome to the launch of this year's King's Meadow History Festival, which will take place over the weekend of the twelfth and thirteenth of July. The festival opens at ten o'clock on the Saturday morning with a talk in the Assembly Halls on George Street, where Dr Margaret Ellis will present some of the Roman coins discovered during last year's excavation of the market car park. Entry to the talk is free, but you will need a ticket from the tourist information office, because the hall seats only a hundred and forty people. On Saturday afternoon, from half past one, a team of re-enactors in period dress will set up a Roman military camp on the playing fields behind the leisure centre. The children particularly enjoyed the weapons display last year, and this time visitors can also try on replica armour, which costs one pound, with the money going to support the restoration fund. The museum on Castle Hill will stay open late on the Saturday, until nine o'clock, with half-price admission after six. Sunday is focused on the town's maritime past: at eleven, historian David Kim leads a guided walk along the old harbour, finishing at the old fish market, which is being opened to the public for one day only. The walk lasts about ninety minutes and sturdy footwear is recommended, as the paths are uneven. Adult tickets for most events cost six pounds and children's tickets three pounds, with under-fives free; a weekend pass, which covers everything including the guided walk, is twelve pounds per adult if bought in advance, or fifteen pounds on the day. Refreshments will be available all weekend at the festival village in the abbey gardens. Please note that all proceeds this year go towards restoring the medieval wall paintings in St Aidan's Church.",
+				questions: [
+					{
+						q: "The festival takes place on the weekend of the twelfth and thirteenth of ___.",
+						accepted: ["July"]
+					},
+					{
+						q: "The opening talk is held in the Assembly Halls on ___ Street.",
+						accepted: ["George", "George Street"]
+					},
+					{
+						q: "Free tickets are needed because the hall seats only ___ people.",
+						accepted: [
+							"140",
+							"a hundred and forty",
+							"one hundred and forty",
+							"hundred and forty",
+							"one hundred forty"
+						]
+					},
+					{
+						q: "This year visitors can try on replica ___ at the Roman camp.",
+						accepted: ["armour"]
+					},
+					{
+						q: "The £1 charge for the armour goes to support the ___ fund.",
+						accepted: ["restoration", "the restoration"]
+					},
+					{
+						q: "On Saturday, the museum offers half-price admission after ___ o'clock.",
+						accepted: [
+							"6",
+							"six",
+							"six o'clock",
+							"6 pm"
+						]
+					},
+					{
+						q: "Sunday's programme focuses on the town's ___ past.",
+						accepted: ["maritime"]
+					},
+					{
+						q: "Sturdy footwear is recommended for the guided walk because the paths are ___.",
+						accepted: ["uneven"]
+					},
+					{
+						q: "A weekend pass bought in advance costs £___ per adult.",
+						accepted: [
+							"12",
+							"12 pounds",
+							"£12",
+							"twelve",
+							"twelve pounds"
+						]
+					},
+					{
+						q: "All proceeds go towards restoring the medieval wall paintings in ___ Church.",
+						accepted: [
+							"St Aidan's",
+							"St Aidan's Church",
+							"St Aidans",
+							"St Aidans Church",
+							"Saint Aidan's",
+							"St Aidan"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 3: Two students planning a psychology experiment with their tutor",
+				transcript: "Tutor: So, you wanted to run your ideas for the practical past me. Remind me of your research question. Student A: We want to test whether background music affects people's ability to remember a list of words — specifically, whether music with lyrics is more distracting than instrumental music. Tutor: Good, that's a nicely focused question. How are you planning to recruit participants? Student B: We thought we'd put a notice up in the psychology department and aim for sixty first-year students — thirty in each condition. Tutor: Sixty is sensible. But be careful about how you allocate people to groups. Student A: We were actually going to let them choose their own group. Tutor: I'd advise against that. If volunteers who like music all choose the music condition, your results will be very hard to interpret. Randomly assign them instead — it takes two minutes with a random number table. Student B: Right. We're planning to use twenty common nouns, shown on a screen for one second each, then a five-minute delay, then written recall. Tutor: Reasonable, but one second per word makes the task quite easy for most students. You may find nearly everyone gets almost top marks and you can't tell the two conditions apart. Student A: We could add a short maths task during the delay to fill their minds. Tutor: That's a classic interference task — much better. Two other things. First, ethics: your proposal must go to the department ethics committee before you collect any data, and the deadline this term is Friday the seventeenth. Student B: Right, got it. Tutor: Second, remember to debrief participants afterwards — tell them the real purpose of the experiment and that they can withdraw their data at any point within a week. And finally, pilot the whole procedure on two friends first. Pilot studies catch problems like words being too long or the screen timing confusing people. Once you've run the pilot, book another slot with me and we'll go through your data sheet together.",
+				questions: [
+					{
+						q: "The students are testing whether music with ___ is more distracting than instrumental music.",
+						accepted: ["lyrics"]
+					},
+					{
+						q: "The students hope to recruit ___ first-year students, thirty in each condition.",
+						accepted: ["60", "sixty"]
+					},
+					{
+						q: "Initially, the students planned to let participants ___ their own group.",
+						accepted: [
+							"choose",
+							"pick",
+							"select"
+						]
+					},
+					{
+						q: "The tutor recommends assigning people randomly using a random number ___.",
+						accepted: ["table"]
+					},
+					{
+						q: "Each word will appear on the screen for one ___ before a five-minute delay.",
+						accepted: ["second"]
+					},
+					{
+						q: "The tutor warns that a too-easy task may leave nearly everyone scoring almost ___ marks.",
+						accepted: ["top"]
+					},
+					{
+						q: "As an interference task, the students will add a short ___ task during the delay.",
+						accepted: [
+							"maths",
+							"math",
+							"mathematics",
+							"maths task"
+						]
+					},
+					{
+						q: "This term's ethics committee deadline is Friday the ___.",
+						accepted: [
+							"17th",
+							"seventeenth",
+							"17"
+						]
+					},
+					{
+						q: "At the debrief, participants must be told they can withdraw their data within a ___.",
+						accepted: [
+							"week",
+							"a week",
+							"one week"
+						]
+					},
+					{
+						q: "The tutor recommends piloting the whole procedure on ___ friends first.",
+						accepted: ["2", "two"]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on earthquake-resistant engineering",
+				transcript: "Today we're looking at how engineers keep buildings standing when the ground itself starts to move. The first principle to grasp is that earthquakes kill surprisingly few people directly; it is almost always the buildings that fall on them. Structural engineers put it bluntly: earthquakes don't kill people, buildings do. Early attempts at earthquake-resistant design concentrated on strength alone, but the Great Kanto earthquake of 1923, which destroyed much of Tokyo and killed more than a hundred thousand people, persuaded Japanese engineers that strength had to be combined with flexibility, because a rigid building simply shatters while a flexible one can sway and survive. Modern design uses three main strategies. The first is base isolation. Instead of fixing a building's foundations rigidly to the ground, engineers place the structure on flexible bearings — typically pads of alternating rubber and steel — which absorb much of the shaking before it reaches the frame, reducing the movement felt in the upper floors by as much as eighty per cent. The second strategy is the damper: think of the shock absorbers in a car. These devices, fitted within the structure itself, convert the earthquake's energy into heat. The third strategy applies to very tall buildings, which need extra help. Taipei 101 in Taiwan, for example, carries a giant steel ball weighing six hundred and sixty tonnes, suspended between its eighty-seventh and ninety-second floors; as the tower sways one way, the pendulum swings the other, actively pulling the structure back towards stability. In California, older concrete buildings pose a particular problem. So-called 'soft-storey' buildings, with open parking areas on the ground floor, lack walls exactly where they most need them, and can pancake downwards in a major shock, as happened tragically in the 1994 Northridge earthquake. The city of Los Angeles has since required the retrofitting of thousands of such buildings, often by inserting steel braces around the ground storey. The lesson of a century of earthquake engineering is elegantly simple: we cannot stop the ground moving, but we can design buildings that move with it.",
+				questions: [
+					{
+						q: "Engineers put it bluntly: earthquakes don't kill people, ___ do.",
+						accepted: ["buildings"]
+					},
+					{
+						q: "The Great Kanto earthquake destroyed much of Tokyo in ___.",
+						accepted: ["1923"]
+					},
+					{
+						q: "Japanese engineers learnt that strength had to be combined with ___.",
+						accepted: ["flexibility"]
+					},
+					{
+						q: "Base-isolation bearings are typically pads of alternating rubber and ___.",
+						accepted: ["steel"]
+					},
+					{
+						q: "Base isolation can reduce movement in the upper floors by as much as ___ per cent.",
+						accepted: [
+							"80",
+							"eighty",
+							"80 per cent",
+							"80%",
+							"eighty per cent"
+						]
+					},
+					{
+						q: "Dampers convert the earthquake's energy into ___.",
+						accepted: ["heat"]
+					},
+					{
+						q: "Taipei 101 carries a suspended steel ball weighing ___ tonnes.",
+						accepted: [
+							"660",
+							"six hundred and sixty",
+							"six hundred sixty",
+							"660 tonnes"
+						]
+					},
+					{
+						q: "Soft-storey buildings have open ___ areas on the ground floor.",
+						accepted: ["parking", "car parking"]
+					},
+					{
+						q: "Soft-storey buildings pancaked tragically in the 1994 ___ earthquake.",
+						accepted: ["Northridge", "the Northridge"]
+					},
+					{
+						q: "Los Angeles has since required the ___ of thousands of such buildings.",
+						accepted: ["retrofitting", "retrofit"]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The chart below shows the percentage of clothes bought online rather than in shops by UK adults in different age groups in 2014 and 2024.\n\n18-24: 38%, 71%\n25-44: 31%, 66%\n45-64: 19%, 51%\n65 and over: 7%, 24%\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "The fashion industry produces more clothing than ever before, yet much of it is worn only a few times and then discarded, causing severe environmental damage. Some people believe that governments should regulate or heavily tax the fast fashion industry, while others think responsibility lies mainly with consumers, who should change their buying habits. Discuss both views and give your own opinion. Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"Let's talk about clothes. Do you enjoy shopping for clothes?",
+				"Do you prefer comfortable clothes or fashionable ones?",
+				"Has your taste in clothing changed since you were younger?"
+			]),
+			speakingPart2("Describe a memorable meal you have had. You should say: what the meal was, who you shared it with, why it was so memorable, and explain how it made you feel."),
+			...speakingPart3([
+				"How has globalisation changed the food people eat in your country?",
+				"Do you think traditional dishes will survive the spread of international fast food?",
+				"Why do you think sharing meals is important in so many cultures?"
+			])
+		]
+	},
+	{
+		id: "mock-9",
+		order: 9,
+		title: "IELTS Mock Test 9",
+		reading: { passages: [
+			{
+				title: "A Brief History of Anaesthesia",
+				passage: "Until the middle of the nineteenth century, surgery was a horror that patients endured fully conscious, held down by muscular assistants while the surgeon worked at terrifying speed; the Scottish surgeon Robert Liston was famously credited with amputating a leg in under thirty seconds. The first hint of a different future came from the young English chemist Humphry Davy, who in 1800 published his experiments with nitrous oxide — 'laughing gas' — and suggested, almost in a footnote, that the gas might be used with advantage in surgical operations. For more than forty years nobody acted on the suggestion. In Hartford, Connecticut, the American dentist Horace Wells attended a laughing-gas exhibition in 1844 and, after using the gas successfully for a painless tooth extraction, attempted a public demonstration in Boston that failed embarrassingly when the patient cried out. Wells's former partner, William Morton, had better luck. On 16 October 1846, at the Massachusetts General Hospital, he administered diethyl ether to a young printer named Edward Gilbert Abbott, and the surgeon John Collins Warren removed a tumour from the patient's neck with no sign of pain, announcing afterwards, 'Gentlemen, this is no humbug.' News of the 'Ether Dome' demonstration travelled around the world within months. In Scotland, James Young Simpson sought a less unpleasant agent than ether, and in November 1847 he tested chloroform by inhaling it with two colleagues at his dinner table; they awoke under their chairs, and within a week Simpson was using the drug in maternity wards. The greatest advertisement came in 1853, when the physician John Snow administered chloroform to Queen Victoria during the birth of her eighth child, Prince Leopold, after which most religious objections to painless childbirth faded away. The final piece arrived in 1884, when the Viennese ophthalmologist Carl Koller discovered that a solution of cocaine could numb the surface of the eye, inaugurating the era of local anaesthesia. Early anaesthesia remained dangerous — chloroform in particular could stop the heart, and roughly one patient in several thousand died from the drug itself — but the twentieth century replaced improvised cloths with precise vaporisers, added muscle relaxants from the 1930s, and introduced continuous monitoring of oxygen levels, so that death from anaesthesia in a healthy patient is now extraordinarily rare. From agony and thirty-second amputations to today's blend of general, regional and local techniques, anaesthesia has arguably contributed more to human welfare than any other single discovery of the nineteenth century.",
+				questions: [
+					{
+						q: "What was the Scottish surgeon Robert Liston famous for?",
+						options: [
+							"Inventing the stethoscope",
+							"Administering the first anaesthetic",
+							"Amputating a leg in under thirty seconds",
+							"Founding the Royal Society"
+						],
+						answer: 2
+					},
+					{
+						q: "What did Humphry Davy suggest in 1800?",
+						options: [
+							"Nitrous oxide might be useful in surgical operations",
+							"Ether should be banned entirely",
+							"Chloroform was too dangerous to test",
+							"Surgery should be performed only at night"
+						],
+						answer: 0
+					},
+					{
+						q: "How long did it take before anyone acted on Davy's suggestion?",
+						options: [
+							"About five years",
+							"More than forty years",
+							"Exactly one year",
+							"Two centuries"
+						],
+						answer: 1
+					},
+					{
+						q: "Why did Horace Wells's public demonstration in Boston fail?",
+						options: [
+							"The theatre lost all its lighting",
+							"He ran out of laughing gas",
+							"The patient died during it",
+							"The patient cried out in pain"
+						],
+						answer: 3
+					},
+					{
+						q: "Where did William Morton's successful 1846 demonstration take place?",
+						options: [
+							"The Edinburgh Royal Infirmary",
+							"The Massachusetts General Hospital",
+							"St Thomas's Hospital in London",
+							"A private clinic in Vienna"
+						],
+						answer: 1
+					},
+					{
+						q: "What did surgeon John Collins Warren announce after Morton's demonstration?",
+						options: [
+							"'Gentlemen, this is no humbug.'",
+							"'This can never work again.'",
+							"'Ether is too dangerous.'",
+							"'The patient felt everything.'"
+						],
+						answer: 0
+					},
+					{
+						q: "Which drug did James Young Simpson first test at his dinner table in November 1847?",
+						options: [
+							"Nitrous oxide",
+							"Diethyl ether",
+							"Chloroform",
+							"Cocaine"
+						],
+						answer: 2
+					},
+					{
+						q: "What finally quietened religious objections to painless childbirth?",
+						options: [
+							"A law passed by parliament",
+							"The invention of the syringe",
+							"Simpson's textbook on midwifery",
+							"Queen Victoria receiving chloroform in 1853"
+						],
+						answer: 3
+					},
+					{
+						q: "Which physician gave chloroform to Queen Victoria?",
+						options: [
+							"Joseph Lister",
+							"John Snow",
+							"James Simpson",
+							"William Morton"
+						],
+						answer: 1
+					},
+					{
+						q: "What did Carl Koller discover in 1884?",
+						options: [
+							"A cocaine solution could numb the surface of the eye",
+							"Ethyl ether prevented infections",
+							"Morphine could be safely inhaled",
+							"Nitrous oxide could replace blood transfusions"
+						],
+						answer: 0
+					},
+					{
+						q: "Why was chloroform particularly dangerous?",
+						options: [
+							"It left permanent scars",
+							"It was extremely expensive",
+							"It could stop the patient's heart",
+							"It caught fire too easily"
+						],
+						answer: 2
+					},
+					{
+						q: "What made twentieth-century anaesthesia much safer?",
+						options: [
+							"Using only homeopathic remedies",
+							"Removing every hospital from cities",
+							"Performing operations more quickly",
+							"Precise vaporisers, muscle relaxants and continuous monitoring"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The dangers of modern surgery",
+							"From agony to anaesthesia: how surgery lost its pain",
+							"A biography of Queen Victoria",
+							"The discovery of radioactivity"
+						],
+						answer: 1
+					}
+				]
+			},
+			{
+				title: "Smart Cities and Urban Data",
+				passage: "The United Nations projects that by 2050 nearly seventy per cent of humanity will live in cities, and that prospect has driven enormous investment in 'smart city' technology — the attempt to run urban environments using data collected in real time. The poster child of the movement is Songdo, a purpose-built business district near Seoul in South Korea, where sensors are embedded in roads, electricity grids and even in a pneumatic waste-disposal system that sucks household rubbish through underground pipes, allowing the city to dispense with most refuse lorries. Barcelona, by contrast, has grafted digital management onto an old city of bright stone: its street lights brighten when pedestrians approach and dim again when they leave, its parking bays report empty spaces to a driver app, and thousands of wireless sensors track air quality and the watering needs of its parks. In Copenhagen, the most carefully measured traffic is on two wheels: dozens of bicycle counters across the city log every rider, and planners use the numbers to decide where to widen the cycle lanes. Some cities take the idea further by building a single control room. Rio de Janeiro's Operations Centre, opened in 2010, gathers feeds from around five hundred traffic cameras and some thirty municipal agencies; officials there once compared their job to flying the city like an aeroplane. The justification for all this instrumentation is efficiency. Smart traffic lights that adapt instantly to congestion, water pipes that report their own leaks, and rubbish bins that call for collection when full can cut costs and emissions at the same time; Barcelona claims its smart water, lighting and parking systems save it more than forty million euros a year. Yet the smart city raises awkward questions about who watches the watchers. The most famous cautionary tale unfolded in Toronto, where Sidewalk Labs, a sister company of Google, won approval in 2017 to build a sensor-filled neighbourhood called Quayside, whose pavement tiles would have logged almost everything people did. After fierce criticism of its data-collection plans, the company cancelled the project in May 2020, citing economic uncertainty. Critics such as the writer Evgeny Morozov argued that the smart city too often uses technical fixes to dodge genuinely political problems. Supporters reply that anonymised, openly published data need not compromise privacy, and that the alternative — flying blind in cities of ten million people — is far worse. The debate over the smart city is, in the end, a debate over how much information a community can trust its authorities to hold.",
+				questions: [
+					{
+						q: "According to the United Nations, what share of humanity will live in cities by 2050?",
+						options: [
+							"About 30%",
+							"About 50%",
+							"Nearly 70%",
+							"About 90%"
+						],
+						answer: 2
+					},
+					{
+						q: "How does Songdo remove much of its household rubbish?",
+						options: [
+							"Pneumatic pipes suck it away underground",
+							"It is carried out by bicycle couriers",
+							"Residents burn it at home",
+							"Drones collect it from rooftops"
+						],
+						answer: 0
+					},
+					{
+						q: "How do Barcelona's street lights work?",
+						options: [
+							"They stay at full brightness all night",
+							"They are switched off to save money",
+							"They change colour to signal air quality",
+							"They brighten when pedestrians approach and dim when they leave"
+						],
+						answer: 3
+					},
+					{
+						q: "Which kind of traffic does Copenhagen measure most carefully?",
+						options: [
+							"Delivery vans",
+							"Tourist buses",
+							"Bicycles",
+							"Electric cars"
+						],
+						answer: 2
+					},
+					{
+						q: "What did Rio de Janeiro open in 2010?",
+						options: [
+							"An Operations Centre combining cameras and municipal agencies",
+							"The world's first underground city",
+							"A museum of surveillance",
+							"South America's first smart airport"
+						],
+						answer: 0
+					},
+					{
+						q: "To what did Rio officials compare their job?",
+						options: [
+							"Conducting an orchestra",
+							"Running a restaurant kitchen",
+							"Fighting medieval battles",
+							"Flying the city like an aeroplane"
+						],
+						answer: 3
+					},
+					{
+						q: "What double benefit do self-reporting water pipes and bins promise?",
+						options: [
+							"Lower costs and lower emissions at the same time",
+							"Higher taxes and better views",
+							"Faster broadband and cheaper rent",
+							"Less crime and more parking"
+						],
+						answer: 1
+					},
+					{
+						q: "How much does Barcelona claim its smart systems save it annually?",
+						options: [
+							"About four million euros",
+							"Fifty thousand euros",
+							"More than forty million euros",
+							"Half a billion euros"
+						],
+						answer: 2
+					},
+					{
+						q: "What was Sidewalk Labs' proposal for Toronto's Quayside district?",
+						options: [
+							"A sensor-filled neighbourhood whose tiles logged people's movements",
+							"A car-free national park in the harbour",
+							"A new airport on the waterfront",
+							"A data-free gated community"
+						],
+						answer: 0
+					},
+					{
+						q: "Why was the Quayside project cancelled in May 2020?",
+						options: [
+							"The sensors proved technically impossible to build",
+							"Toronto ran out of electricity",
+							"Fierce criticism over data collection, with economic uncertainty cited",
+							"A rival company bought the land first"
+						],
+						answer: 3
+					},
+					{
+						q: "What did critics such as Evgeny Morozov argue?",
+						options: [
+							"Sensors are too expensive to install",
+							"The smart city uses technical fixes to dodge genuinely political problems",
+							"Cities should ban all new technology",
+							"Only Google should run modern cities"
+						],
+						answer: 1
+					},
+					{
+						q: "What do supporters of smart cities reply about anonymised, openly published data?",
+						options: [
+							"It is always easy to identify individuals from it",
+							"It need not compromise privacy, and flying blind is worse",
+							"It should be sold exclusively to advertisers",
+							"It removes the need for elections"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"Smart cities: urban efficiency versus personal privacy",
+							"Why everyone should move to the countryside",
+							"A short history of street lighting",
+							"The bicycle revolution in Copenhagen"
+						],
+						answer: 0
+					}
+				]
+			},
+			{
+				title: "How Trees Communicate",
+				passage: "In 1997 the journal Nature published an experiment that quietly upended botany. The Canadian ecologist Suzanne Simard had planted Douglas fir and paper birch seedlings in a forest in British Columbia, sealed them inside plastic bags containing tracer forms of carbon, and tracked where that carbon flowed. She found that the two species were trading food: in summer, when the birch stood in full leaf and the young fir in shade, the birch passed carbon to the fir, and in autumn, when the birch dropped its leaves, the fir paid some of the carbon back. The carbon was not travelling through the air. It moved along a web of fungal threads — mycorrhizal fungi, the name literally meaning 'fungus-root' — linking tree to tree underground. Around ninety per cent of land plants live in partnership with these fungi, exchanging sugars made in their leaves for phosphorus and other minerals the fungi draw from the soil, a trade that began some four hundred and fifty million years ago, when the first plants crept onto land and lacked true roots at all. Simard and her colleagues went on to show that forests are networked in non-random ways. The oldest, largest trees — she calls them 'mother trees' — act as hubs: a single old Douglas fir may be linked by fungi to dozens of neighbours, including its own seedlings, to which it funnels extra sugar and even chemical warning signals. Trees also send messages through the air. Acacia trees browsed by giraffes pump bitter tannins into their leaves, and, crucially, their neighbours downwind begin making tannins within minutes, leading researchers to conclude that the browsed tree releases ethylene gas as an airborne alarm. Laboratory studies have shown a related effect underground: an aphid-attacked bean plant sharing fungal links with unattacked plants causes those neighbours to raise their own chemical defences before the insects arrive. Critics caution against romantic metaphors of endless generosity. The ecologist David George Haskell warns that the image of a forest of reciprocal gifts oversimplifies things: trees also compete fiercely, stealing each other's light and water, and laboratory pot experiments may exaggerate what happens among wild giants of the forest. Still, the practical implications are serious. If clear-felling removes the hub trees, newly planted seedlings may inherit woodland without its underground infrastructure — which may help explain why some replanted forests grow so slowly compared with ancient woodland.",
+				questions: [
+					{
+						q: "What did the journal Nature publish in 1997?",
+						options: [
+							"A study of giraffe feeding habits",
+							"Simard's experiment tracing carbon moving between tree species",
+							"The first photograph of a fungal spore",
+							"A map of the Amazon forest"
+						],
+						answer: 1
+					},
+					{
+						q: "Which two tree species featured in Simard's experiment?",
+						options: [
+							"Douglas fir and paper birch",
+							"Oak and beech",
+							"Redwood and ash",
+							"Acacia and eucalyptus"
+						],
+						answer: 0
+					},
+					{
+						q: "What did the experiment show happening in summer?",
+						options: [
+							"The fir shaded the birch to death",
+							"Both species stopped exchanging carbon entirely",
+							"The fir's roots ate the birch",
+							"The leafy birch passed carbon to the shaded young fir"
+						],
+						answer: 3
+					},
+					{
+						q: "Through what did the carbon travel between the trees?",
+						options: [
+							"Birds carrying it in their beaks",
+							"The wind",
+							"A web of mycorrhizal fungal threads underground",
+							"Rainwater channels"
+						],
+						answer: 2
+					},
+					{
+						q: "Roughly what share of land plants live in partnership with these fungi?",
+						options: [
+							"Around 30%",
+							"Around 90%",
+							"Around 50%",
+							"Around 10%"
+						],
+						answer: 1
+					},
+					{
+						q: "How old, approximately, is the trade between plants and fungi?",
+						options: [
+							"Two hundred years",
+							"Three million years",
+							"Four hundred and fifty million years",
+							"Fifty thousand years"
+						],
+						answer: 2
+					},
+					{
+						q: "Why did the very first land plants rely on fungi?",
+						options: [
+							"They lacked true roots",
+							"They had no leaves",
+							"They lived entirely underwater",
+							"They were poisonous to the fungi"
+						],
+						answer: 0
+					},
+					{
+						q: "What does Simard call the oldest, largest trees that act as network hubs?",
+						options: [
+							"Elder trees",
+							"Harvest trees",
+							"Signal trees",
+							"Mother trees"
+						],
+						answer: 3
+					},
+					{
+						q: "What do acacia trees produce when browsed by giraffes?",
+						options: [
+							"Extra sweet nectar",
+							"Thicker bark immediately",
+							"Bitter tannins in their leaves",
+							"Brighter flowers"
+						],
+						answer: 2
+					},
+					{
+						q: "What do acacias downwind of a browsed tree do within minutes?",
+						options: [
+							"Begin making tannins themselves",
+							"Drop all their leaves at once",
+							"Stop producing water",
+							"Release giraffe repellent into the soil"
+						],
+						answer: 0
+					},
+					{
+						q: "What does the ecologist David George Haskell caution against?",
+						options: [
+							"Planting any new forests",
+							"Romantic metaphors that ignore how fiercely trees also compete",
+							"Using fungicides in laboratories",
+							"Breeding giraffes in captivity"
+						],
+						answer: 1
+					},
+					{
+						q: "Why might replanted forests grow slowly, according to the passage?",
+						options: [
+							"The soil is always contaminated with salt",
+							"New seedlings receive too much sunlight",
+							"Rainfall has declined worldwide",
+							"Clear-felling removes hub trees and their underground network"
+						],
+						answer: 3
+					},
+					{
+						q: "What airborne alarm do browsed acacia trees release to warn their neighbours?",
+						options: [
+							"Oxygen",
+							"Carbon dioxide",
+							"Ethylene gas",
+							"Methane"
+						],
+						answer: 2
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The hidden conversation of the forest",
+							"How to protect acacias from giraffes",
+							"The life cycle of a Douglas fir",
+							"Why fungi destroy woodland"
+						],
+						answer: 0
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A phone call to a dental surgery",
+				transcript: "Good morning, Mill Road Dental Surgery, you're speaking to Karen. How can I help you? ... I can see from your record that your last check-up was in February, so you're due one now. The dentist you usually see, Dr Shah, is on holiday until the middle of next month, but Dr Kemp has some availability sooner. We actually have a short-notice appointment tomorrow, Tuesday, at half past four, which another patient has just cancelled — would that suit you? If not, Dr Kemp's next routine slot is a week on Friday at ten past ten in the morning. The check-up itself costs twenty-six pounds; if you would also like a clean and polish with the hygienist, that's an additional forty-two pounds, and we normally book that directly after the examination so you only need to attend once. You'll need to arrive about ten minutes early tomorrow, because we ask all patients to confirm their contact details on a tablet at reception. If you're exempt from NHS charges — for instance if you're pregnant or receiving certain benefits — please bring proof, either your exemption certificate or a recent official letter, because we're required to keep that on file. One thing I should mention is that we operate a missed-appointment policy: if you cancel with less than twenty-four hours' notice, or simply don't attend, there's a charge of twenty-five pounds before we can rebook you. If you ever have a dental emergency, the emergency line opens at eight-thirty on weekday mornings, and those slots go very quickly. We do send a text reminder two days before your appointment, so please make sure the mobile number on your record is still current. Parking is available behind the surgery, but spaces are limited; the on-street bays nearby stop charging after six in the evening. Shall I book you in for tomorrow at half past four, then?",
+				questions: [
+					{
+						q: "The caller's usual dentist, Dr ___, is on holiday until the middle of next month.",
+						accepted: ["Shah", "Dr Shah"]
+					},
+					{
+						q: "Tomorrow's short-notice appointment is free because another patient has just ___ it.",
+						accepted: ["cancelled", "canceled"]
+					},
+					{
+						q: "Dr Kemp's next routine slot is a week on Friday at ___ in the morning.",
+						accepted: [
+							"ten past ten",
+							"10 past ten",
+							"10:10",
+							"10.10"
+						]
+					},
+					{
+						q: "A clean and polish with the hygienist costs an additional £___.",
+						accepted: [
+							"42",
+							"42 pounds",
+							"£42",
+							"forty-two",
+							"forty two",
+							"forty-two pounds"
+						]
+					},
+					{
+						q: "Patients confirm their contact details on a ___ at reception.",
+						accepted: ["tablet"]
+					},
+					{
+						q: "Exempt patients must bring proof, such as an exemption ___ or a recent official letter.",
+						accepted: ["certificate"]
+					},
+					{
+						q: "Cancelling with less than 24 hours' notice means a charge of £___ before rebooking.",
+						accepted: [
+							"25",
+							"25 pounds",
+							"£25",
+							"twenty-five",
+							"twenty five",
+							"twenty-five pounds"
+						]
+					},
+					{
+						q: "The emergency line opens at ___ on weekday mornings.",
+						accepted: [
+							"eight-thirty",
+							"8:30",
+							"8.30",
+							"half past eight",
+							"8:30 am"
+						]
+					},
+					{
+						q: "The surgery sends a text reminder ___ days before each appointment.",
+						accepted: [
+							"2",
+							"two",
+							"2 days",
+							"two days"
+						]
+					},
+					{
+						q: "On-street parking bays stop charging after ___ in the evening.",
+						accepted: [
+							"6",
+							"six",
+							"6 pm",
+							"six o'clock"
+						]
+					}
+				]
+			},
+			{
+				title: "Section 2: A park ranger's talk on hiking trails and safety",
+				transcript: "Good morning and welcome to Kestrel Valley Country Park. I'm Dave, one of the rangers, and before you set off I'll run you through the trails and a few important points on safety. We have three waymarked routes. The Riverside Walk follows the valley floor for three kilometres; it's flat, pushchair-friendly and takes about forty minutes at a gentle pace. The Woodland Loop is a six-kilometre circuit through the beech wood, waymarked with red discs; it includes one short steep climb, so allow about an hour and a half. The longest route is the Ridge Trail, a twelve-kilometre loop up onto the moor top, marked with yellow arrows. That one takes a good four hours and should not be attempted after two in the afternoon, because sections of it are very exposed and you don't want to be caught up there as darkness falls. A few safety notes. Mobile phone coverage in the park is extremely patchy: you'll pick up a signal at the visitor centre and on top of the ridge, but the valley floor is essentially a dead zone, so please don't rely on your phone if you get into difficulty. There is an emergency shelter beside the stile at Ling Gate, which you'll find marked on the free map. On water: none of the streams in the park is guaranteed safe to drink, so carry at least a litre per person, and more on a warm day like today. The weather on the moor changes fast — the forecast this morning has rain arriving from three o'clock, so waterproofs are advisable even if it looks fine right now. Dogs must be kept on leads until the end of July, because ground-nesting birds are raising their chicks out on the moor. Finally, please tell us your route at the visitor centre desk by filling in the white trip sheet, and call the ranger office number printed on your map if you haven't returned by closing time — which tonight is six o'clock.",
+				questions: [
+					{
+						q: "The talk is given by Dave, one of the park ___.",
+						accepted: ["rangers", "ranger"]
+					},
+					{
+						q: "The pushchair-friendly route is the ___ Walk.",
+						accepted: ["Riverside", "Riverside Walk"]
+					},
+					{
+						q: "The Woodland Loop is a circuit of ___ kilometres through the beech wood.",
+						accepted: [
+							"6",
+							"six",
+							"6 kilometres",
+							"6 km",
+							"six kilometres"
+						]
+					},
+					{
+						q: "The Ridge Trail is waymarked with ___ arrows.",
+						accepted: ["yellow"]
+					},
+					{
+						q: "The Ridge Trail should not be attempted after ___ in the afternoon.",
+						accepted: [
+							"2",
+							"two",
+							"2 pm",
+							"two o'clock"
+						]
+					},
+					{
+						q: "Walkers can get a mobile signal at the visitor centre and on top of the ___.",
+						accepted: ["ridge", "the ridge"]
+					},
+					{
+						q: "An emergency shelter stands beside the stile at ___ Gate.",
+						accepted: ["Ling", "Ling Gate"]
+					},
+					{
+						q: "Walkers should carry at least one ___ of water per person.",
+						accepted: [
+							"litre",
+							"liter",
+							"1 litre",
+							"a litre"
+						]
+					},
+					{
+						q: "Dogs must be kept on leads until the end of ___.",
+						accepted: ["July"]
+					},
+					{
+						q: "Walkers register their route by filling in the white ___ sheet.",
+						accepted: ["trip"]
+					}
+				]
+			},
+			{
+				title: "Section 3: Students discussing a robotics project with their professor",
+				transcript: "Professor: Come in, both of you. So, the recycling-sorting robot — how are we doing with three weeks to the demonstration? Student A: The good news is the arm is finally picking up objects reliably. The trigger we were missing was a loose cable on the gripper sensor, which we replaced on Monday, and it's been fine ever since. Student B: Sorting accuracy is the remaining problem. The robot recognises cans almost perfectly — about ninety-four per cent — but it's labelling around a third of the plastic bottles as glass, which is obviously no good for recycling. Professor: Interesting. Is the camera at fault, or the training data? Student B: We think the problem is the training images. We downloaded them from an online dataset, and they were all photographed on white backgrounds. Our test bench is under fluorescent lighting and casts dark shadows, so the model is learning the wrong cues. Professor: Very plausible diagnosis. Rather than spending days rephotographing everything, try data augmentation — programmatically vary the background in your existing images. It will take maybe a day to implement and usually fixes that kind of lighting dependence. Student A: Brilliant, we'll do that today. There's also the budget question. The new camera mount we need costs a hundred and sixty pounds, but our remaining budget is only two hundred, and we promised to keep fifty pounds in reserve for spare parts. Professor: Then submit a small funding request to the department by Thursday. They'll usually release up to a hundred pounds for final-year project consumables, provided you attach receipts. One more point: in your demonstration, plan to show a failure case and how you handled it. The marking panel gives explicit credit for honest treatment of errors — a flawless-looking demo that hides mistakes scores lower than a real one. Student B: Good to know. Professor: And do book the robotics lab for the Friday before the demonstration for a full rehearsal — the lab gets extremely busy in the final week.",
+				questions: [
+					{
+						q: "The robot demonstration takes place in ___ weeks' time.",
+						accepted: ["3", "three"]
+					},
+					{
+						q: "The gripper problem was caused by a loose ___ on the sensor.",
+						accepted: ["cable"]
+					},
+					{
+						q: "The robot recognises cans with about ___ per cent accuracy.",
+						accepted: [
+							"94",
+							"ninety-four",
+							"ninety four",
+							"94%"
+						]
+					},
+					{
+						q: "Around a third of the plastic bottles are being labelled as ___.",
+						accepted: ["glass"]
+					},
+					{
+						q: "The training images were all photographed on ___ backgrounds.",
+						accepted: ["white"]
+					},
+					{
+						q: "The professor recommends fixing the problem with data ___.",
+						accepted: ["augmentation"]
+					},
+					{
+						q: "The new camera mount costs £___.",
+						accepted: [
+							"160",
+							"160 pounds",
+							"£160",
+							"one hundred and sixty",
+							"a hundred and sixty",
+							"one hundred and sixty pounds"
+						]
+					},
+					{
+						q: "The students promised to keep £___ in reserve for spare parts.",
+						accepted: [
+							"50",
+							"50 pounds",
+							"£50",
+							"fifty",
+							"fifty pounds"
+						]
+					},
+					{
+						q: "The department usually releases up to £___ for final-year project consumables.",
+						accepted: [
+							"100",
+							"100 pounds",
+							"£100",
+							"one hundred",
+							"a hundred",
+							"one hundred pounds"
+						]
+					},
+					{
+						q: "The professor advises showing a ___ case and how the students handled it in the demo.",
+						accepted: ["failure"]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on the economics of ageing populations",
+				transcript: "In 1950, barely eight per cent of the world's population was over the age of sixty-five. Today the figure is approaching ten per cent, and by 2050 the United Nations expects it to reach sixteen per cent — one person in six. Nowhere is the shift more visible than in Japan, where almost thirty per cent of people are now aged sixty-five or over, and where, famously, adult nappies have outsold baby nappies since 2011. Economists describe the resulting pressure using the 'dependency ratio' — the number of non-working people supported by every hundred workers. In the European Union that ratio stood at roughly fifty in the early 1990s and is projected to pass seventy-five by the middle of this century. Fewer workers per pensioner strains the classic pay-as-you-go pension system, in which the contributions of today's workers pay the pensions of today's retired. Governments respond in three broad ways. First, they raise the retirement age: France's 2023 reform moving the minimum age from sixty-two to sixty-four triggered months of protest, because few policies are less popular politically. Second, they attempt to increase the birth rate: Hungary spends a larger share of its national income on family benefits than almost any other country, though with mixed results. Third, they substitute machines for missing workers. Japan leads here too, deploying robots in care homes to lift patients, and even furry robotic seals to comfort people with dementia. The economist's deeper worry, however, is healthcare. Medical spending rises steeply with age: in most developed countries, roughly half of all the money a person will spend on healthcare in their lifetime is spent after they turn sixty-five. Some economists are more optimistic, pointing out that it is health, not age alone, that predicts spending, and highlighting the 'silver economy' — the enormous market formed by active, affluent older consumers. The lesson of the data, in my view, is that ageing populations are not a disaster to be feared so much as a success to be managed: longevity is the consequence of nearly everything else getting better.",
+				questions: [
+					{
+						q: "In 1950, barely ___ per cent of the world's population was over sixty-five.",
+						accepted: [
+							"8",
+							"eight",
+							"8%",
+							"eight per cent"
+						]
+					},
+					{
+						q: "The United Nations expects the figure to reach ___ per cent by 2050.",
+						accepted: [
+							"16",
+							"sixteen",
+							"16%",
+							"sixteen per cent"
+						]
+					},
+					{
+						q: "Almost ___ per cent of Japan's population is now aged sixty-five or over.",
+						accepted: [
+							"30",
+							"thirty",
+							"30%",
+							"thirty per cent"
+						]
+					},
+					{
+						q: "In Japan, adult nappies have outsold ___ nappies since 2011.",
+						accepted: ["baby"]
+					},
+					{
+						q: "The dependency ratio is the number of non-working people supported by every ___ workers.",
+						accepted: [
+							"100",
+							"hundred",
+							"one hundred",
+							"a hundred"
+						]
+					},
+					{
+						q: "The EU dependency ratio is projected to pass ___ by the middle of this century.",
+						accepted: [
+							"75",
+							"seventy-five",
+							"seventy five"
+						]
+					},
+					{
+						q: "France's 2023 reform moved the minimum retirement age from sixty-two to ___.",
+						accepted: [
+							"64",
+							"sixty-four",
+							"sixty four"
+						]
+					},
+					{
+						q: "Hungary spends a huge share of national income on ___ benefits.",
+						accepted: ["family"]
+					},
+					{
+						q: "Japanese care homes deploy robots to ___ patients.",
+						accepted: ["lift"]
+					},
+					{
+						q: "Roughly ___ of a person's lifetime healthcare spending occurs after they turn sixty-five.",
+						accepted: [
+							"half",
+							"50%",
+							"50 per cent",
+							"fifty per cent",
+							"a half"
+						]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The chart below shows the percentage of GDP spent on healthcare in three countries in 2000 and 2020.\n\nUnited States: 13.3%, 16.9%\nGermany: 9.8%, 11.3%\nUnited Kingdom: 6.6%, 10.0%\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "Some people believe that all healthcare should be free for everyone and funded entirely by the government through taxation, while others argue that individuals should pay at least part of the cost of their own medical treatment. Discuss both views and give your own opinion. Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"Do you do any regular exercise? What kind, and how often?",
+				"Do you think people in your country are healthier than they used to be?",
+				"What do you do to relax and look after your health after a busy day?"
+			]),
+			speakingPart2("Describe a time when you helped someone. You should say: who you helped, what you did, why they needed help, and explain how you felt about it."),
+			...speakingPart3([
+				"Why do you think some people choose to volunteer in their communities while others do not?",
+				"Do you think volunteering should be a compulsory part of school education?",
+				"How have communities changed compared with the past, and what effect has this had on volunteering?"
+			])
+		]
+	},
+	{
+		id: "mock-10",
+		order: 10,
+		title: "IELTS Mock Test 10",
+		reading: { passages: [
+			{
+				title: "The Wright Brothers and the Birth of Flight",
+				passage: "On 17 December 1903, on the wind-swept sand dunes of Kitty Hawk, North Carolina, two bicycle mechanics from Dayton, Ohio, achieved what many learned men had declared impossible. At half past ten in the morning, Orville Wright left the ground aboard their wood-and-fabric Flyer and remained airborne for twelve seconds, covering one hundred and twenty feet — a flight so brief it would have fitted inside a modern airliner. The brothers flew three more times that morning, alternating at the controls, and on the final flight Wilbur stayed up for fifty-nine seconds and travelled eight hundred and fifty-two feet before a gust flipped the machine and damaged it beyond quick repair. Their success was no lucky accident. Self-taught and without formal engineering training, the Wrights attacked flight's real problem, which was not power but control: while rivals bolted ever-larger engines onto unstable machines, the brothers developed 'wing-warping' to roll the aircraft, a movable rudder for turning and a forward elevator for climbing, giving their pilot authority over all three axes of movement at once. Their Dayton bicycle shop served as both factory and laboratory, and a homemade wind tunnel, built from a wooden box and a fan, let them test two hundred wing shapes and expose the published lift tables of the era as dangerously wrong. Kitty Hawk itself had been chosen with care: the brothers wrote to the US Weather Bureau, which recommended the site for its reliable breezes and soft, forgiving sand. Frustratingly, the world took years to believe them. The US Army rejected their offer of an aircraft in 1905, and it was only in 1908, when Wilbur flew graceful circles near Le Mans in France while Orville conducted trials at Fort Myer in Virginia, that scepticism collapsed and fame finally arrived. Ironically, the brothers' obsessively guarded patents then embroiled them in lawsuits with rival aviators, notably Glenn Curtiss, and when Wilbur died of typhoid fever in 1912, aged just forty-five, the Wright brothers' company was already losing its technical lead. A final injustice cast its shadow for decades: the Smithsonian Institution claimed, falsely, that the machine of its former secretary Samuel Langley had been the first 'capable' of flight, and only in 1948 was the record formally corrected, when the original Flyer at last took its place in the Smithsonian as the first powered aeroplane to carry a human being.",
+				questions: [
+					{
+						q: "On what date did the first powered flight take place?",
+						options: [
+							"17 December 1901",
+							"17 December 1903",
+							"3 July 1905",
+							"17 November 1908"
+						],
+						answer: 1
+					},
+					{
+						q: "How long did Orville Wright's first flight last?",
+						options: [
+							"Two minutes",
+							"Fifty-nine seconds",
+							"Twelve seconds",
+							"One hour"
+						],
+						answer: 2
+					},
+					{
+						q: "What happened at the end of the fourth and final flight of the day?",
+						options: [
+							"A gust flipped the machine and damaged it beyond quick repair",
+							"The Flyer landed smoothly for the night",
+							"Wilbur sold the machine to the army",
+							"Orville set a world altitude record"
+						],
+						answer: 0
+					},
+					{
+						q: "According to the Wright brothers, what was flight's real problem?",
+						options: [
+							"Fuel was too expensive",
+							"Propellers were too weak",
+							"Engines were too heavy",
+							"Control, not power"
+						],
+						answer: 3
+					},
+					{
+						q: "What was the purpose of the Wrights' 'wing-warping' technique?",
+						options: [
+							"Increasing engine speed",
+							"Rolling the aircraft",
+							"Softening the landing",
+							"Cooling the pilot"
+						],
+						answer: 1
+					},
+					{
+						q: "Where did the brothers test their two hundred wing shapes?",
+						options: [
+							"A professional wind tunnel in New York",
+							"The Kitty Hawk dunes at night",
+							"A homemade wind tunnel in their Dayton bicycle shop",
+							"A borrowed university laboratory"
+						],
+						answer: 2
+					},
+					{
+						q: "Why was Kitty Hawk chosen as the flying site?",
+						options: [
+							"The US Weather Bureau recommended it for breezes and soft sand",
+							"It was the Wrights' home town",
+							"The army demanded a coastal base",
+							"It had the tallest hills in America"
+						],
+						answer: 0
+					},
+					{
+						q: "How did the US Army respond to the brothers' offer in 1905?",
+						options: [
+							"It ordered forty aircraft immediately",
+							"It sent financial advisers to Dayton",
+							"It arrested the brothers",
+							"It rejected the offer"
+						],
+						answer: 3
+					},
+					{
+						q: "What finally broke public scepticism in 1908?",
+						options: [
+							"Wilbur's demonstrations in France and Orville's trials at Fort Myer",
+							"A Hollywood film about the brothers",
+							"Lindbergh's solo Atlantic crossing",
+							"A letter of apology from the army"
+						],
+						answer: 1
+					},
+					{
+						q: "What followed the brothers' rise to fame?",
+						options: [
+							"They retired to France",
+							"Lawsuits over their patents against rivals such as Glenn Curtiss",
+							"A second first flight at Kitty Hawk",
+							"Complete rejection of powered flight"
+						],
+						answer: 2
+					},
+					{
+						q: "How did Wilbur Wright die?",
+						options: [
+							"Typhoid fever in 1912, aged forty-five",
+							"In a crash over France",
+							"Of old age in 1948",
+							"In a factory explosion in Dayton"
+						],
+						answer: 0
+					},
+					{
+						q: "What did the Smithsonian Institution wrongly claim for decades?",
+						options: [
+							"That flight was impossible before 1914",
+							"That balloons were safer than aeroplanes",
+							"That it had financed the Flyer",
+							"That Samuel Langley's machine was the first 'capable' of flight"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The Wright brothers and the birth of flight",
+							"A history of the US Weather Bureau",
+							"Typhoid fever in early America",
+							"Balloons and bicycles of the 1890s"
+						],
+						answer: 0
+					}
+				]
+			},
+			{
+				title: "The Growth of the Gig Economy",
+				passage: "The journalist Tina Brown is generally credited with coining the phrase 'gig economy' in a 2009 essay for The New Yorker magazine, describing workers stitching together 'a bunch of free-floating projects, consultancies, and part-time bits and pieces' after the financial crisis had shredded full-time jobs. Since then the phenomenon has ballooned. The ride-hailing firm Uber, founded in San Francisco in that same year, became its emblem, and by the mid-2010s platforms such as Deliveroo in Britain and TaskRabbit in the United States were matching hundreds of thousands of workers to short jobs — 'gigs' — without ever employing them. Estimates vary wildly by definition, but a survey conducted in the United States in 2022 found that roughly one in six adults had earned money through an online gig platform, often for a few hours a week on top of other work. Defenders of the model emphasise autonomy. Riders and drivers can choose their own hours, combine several platforms, and fit work around study or caring for children; academic surveys consistently find that most gig workers value that flexibility. Critics reply that the flexibility is largely an illusion: platform algorithms set pay rates unilaterally, can deactivate workers without appeal, and the whole framework depends on classifying everyone as an 'independent contractor', which in most countries means no sick pay, no holiday entitlement, no minimum wage and no pension. That classification has become the great legal battleground. In February 2021 the UK Supreme Court ruled that Uber drivers were not self-employed contractors but 'workers' — an intermediate category entitled to the minimum wage and paid holiday — noting that Uber fixed the fares and penalised drivers who declined too many rides. Two months later Spain went further, passing Europe's first law presuming all food-delivery riders to be employees. California moved in the opposite direction: after a 2019 state law would have reclassified drivers as employees, voters passed Proposition 22 in November 2020, keeping app-based drivers as contractors. The financial stakes are not trivial, since converting contractors into employees typically raises a platform's labour costs by twenty to thirty per cent — one reason platforms spend so heavily on lawyers and lobbying. Researchers add a quieter warning: the line between a gig and a career can be dangerously thin, because years of piecemeal work rarely build the skills, pension contributions or references that a salaried job provides almost by accident.",
+				questions: [
+					{
+						q: "Who is generally credited with coining the term 'gig economy'?",
+						options: [
+							"A government committee in 2015",
+							"The journalist Tina Brown, in a 2009 essay",
+							"The founders of Uber",
+							"A British employment judge"
+						],
+						answer: 1
+					},
+					{
+						q: "When and where was Uber founded?",
+						options: [
+							"1999 in New York",
+							"2014 in London",
+							"2003 in Seattle",
+							"2009 in San Francisco"
+						],
+						answer: 3
+					},
+					{
+						q: "What did the 2022 US survey find?",
+						options: [
+							"Roughly one in six adults had earned money via an online gig platform",
+							"Half of all adults drove for Uber",
+							"Gig work had completely disappeared by 2022",
+							"Only students ever used gig platforms"
+						],
+						answer: 0
+					},
+					{
+						q: "What do defenders of the gig model emphasise?",
+						options: [
+							"Its superior long-term pensions",
+							"The shortness of the average ride",
+							"The autonomy to choose hours and combine platforms",
+							"The company car provided to every driver"
+						],
+						answer: 2
+					},
+					{
+						q: "How do critics characterise gig work's famous flexibility?",
+						options: [
+							"Superior to salaried work in every way",
+							"Largely an illusion, since algorithms set pay and deactivate workers",
+							"Guaranteed by international law",
+							"Available only on public holidays"
+						],
+						answer: 1
+					},
+					{
+						q: "Which rights does 'independent contractor' status generally deny in most countries?",
+						options: [
+							"Free speech and voting rights",
+							"The right to choose platforms",
+							"Access to smartphones",
+							"Sick pay, holiday entitlement, the minimum wage and a pension"
+						],
+						answer: 3
+					},
+					{
+						q: "What did the UK Supreme Court decide in February 2021?",
+						options: [
+							"Uber drivers were banned from London",
+							"Gig work was unconstitutional",
+							"Uber drivers were 'workers' entitled to minimum wage and paid holiday",
+							"All platforms had to merge into one"
+						],
+						answer: 2
+					},
+					{
+						q: "What evidence did the UK court note in reaching its verdict?",
+						options: [
+							"Uber fixed the fares and penalised drivers who declined too many rides",
+							"Drivers set their own wages weekly",
+							"Drivers could ignore all ride requests",
+							"Uber had never published its algorithm"
+						],
+						answer: 0
+					},
+					{
+						q: "What did Spain pass two months after the UK ruling?",
+						options: [
+							"A total ban on food delivery",
+							"Europe's biggest petrol subsidy",
+							"A new motorcycle licence for couriers",
+							"Europe's first law presuming all food-delivery riders to be employees"
+						],
+						answer: 3
+					},
+					{
+						q: "What did California voters pass in November 2020?",
+						options: [
+							"A law taxing every gig journey",
+							"Proposition 22, keeping app-based drivers as contractors",
+							"A bill granting drivers free fuel",
+							"A complete takeover of ride-hailing by the state"
+						],
+						answer: 1
+					},
+					{
+						q: "By how much does conversion from contractor to employee typically raise a platform's labour costs?",
+						options: [
+							"Five to ten per cent",
+							"Over ninety per cent",
+							"Twenty to thirty per cent",
+							"Nothing at all"
+						],
+						answer: 2
+					},
+					{
+						q: "What 'quiet warning' do researchers add about gig work?",
+						options: [
+							"It does not build the skills, pensions or references a salaried job provides",
+							"It is always more pay than factory work",
+							"Smartphones cannot survive delivery bags",
+							"Algorithms always favour older workers"
+						],
+						answer: 0
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"Why delivery apps are closing down",
+							"A travel guide to San Francisco",
+							"The growth of the gig economy: flexibility and its discontents",
+							"How to become a taxi driver"
+						],
+						answer: 2
+					}
+				]
+			},
+			{
+				title: "The Exploration of the Amazon",
+				passage: "The Amazon river system carries a fifth of all the fresh water that flows into the world's oceans — more than the next seven largest rivers combined — yet for centuries the interior of its basin, an expanse roughly the size of Australia, remained almost unknown to outsiders. The first European journey along its length was unintended. In 1541 Gonzalo Pizarro led an expedition east from Peru in search of the mythical gold land of El Dorado, and when supplies ran out he sent a party of fifty-seven men under Francisco de Orellana ahead by boat to find food. Unable to row back against the powerful current, Orellana instead drifted and fought his way down the full length of the river, finally reaching the Atlantic in August 1542 after eight months. His chaplain's account described densely settled riverbank villages and, most memorably, attacks by warriors led by women, prompting Orellana to name the river after the Amazons of Greek legend. For centuries the chaplain's description of populous riverbank cities was dismissed as fantasy, although modern archaeologists now believe it was substantially true — the populations having been destroyed by smallpox carried up the tributaries by later visitors. Three centuries passed before science returned. The English naturalist Henry Walter Bates arrived at Belém in 1848 and spent eleven years collecting insects in the forests, gathering more than fourteen thousand species, around eight thousand of them new to science. The rubber boom of the late 1800s made the river port of Manaus briefly astonishingly rich — it installed electric trams before most European capitals — but the boom collapsed after seeds smuggled out by Henry Wickham in 1876 allowed plantations in Asia to produce rubber far more cheaply. Exploration still ended in mystery. Colonel Percy Fawcett, an experienced surveyor, walked into the Mato Grosso jungle in 1925 with his son Jack and his son's best friend Raleigh Rimell, searching for a lost city he called simply 'Z', and was never seen again. More than a dozen expeditions have subsequently gone in search of him, and it has been estimated that a hundred people may have died in the attempt. Modern exploration is conducted largely from above: airborne lidar surveys reveal hundreds of geometric earthworks beneath the forest canopy, the footprints of the civilisation Orellana described. The Amazon basin today contains some five and a half million square kilometres of forest and an estimated sixteen thousand native tree species — and scientists believe roughly half of its plant species have yet even to be named.",
+				questions: [
+					{
+						q: "What share of the world's fresh water flowing into the oceans does the Amazon carry?",
+						options: [
+							"A tenth",
+							"A fifth",
+							"A half",
+							"All of it"
+						],
+						answer: 1
+					},
+					{
+						q: "How does the passage describe the size of the Amazon basin's expanse?",
+						options: [
+							"Roughly the size of Australia",
+							"Bigger than Europe and Asia together",
+							"About the size of Great Britain",
+							"Smaller than Peru"
+						],
+						answer: 0
+					},
+					{
+						q: "Why did Gonzalo Pizarro's expedition enter the Amazon region?",
+						options: [
+							"To photograph rare birds",
+							"To escape from the Portuguese navy",
+							"To build the first bridge across the river",
+							"To hunt for the mythical gold land of El Dorado"
+						],
+						answer: 3
+					},
+					{
+						q: "Why did Orellana continue down the river instead of returning?",
+						options: [
+							"His maps were stolen",
+							"He had been ordered never to return",
+							"He could not row back against the powerful current",
+							"His entire crew had deserted"
+						],
+						answer: 2
+					},
+					{
+						q: "When did Orellana's journey reach the Atlantic?",
+						options: [
+							"May 1540",
+							"August 1542",
+							"January 1545",
+							"December 1550"
+						],
+						answer: 1
+					},
+					{
+						q: "Where does the river's name come from?",
+						options: [
+							"A local word for 'great water'",
+							"Orellana's own family name",
+							"A Spanish king's mistress",
+							"Warriors led by women, recalling the Amazons of Greek legend"
+						],
+						answer: 3
+					},
+					{
+						q: "What do modern archaeologists believe about the chaplain's account of riverbank cities?",
+						options: [
+							"It was substantially true, with populations later destroyed by smallpox",
+							"It was a deliberate fictional story",
+							"It described a different continent entirely",
+							"It was translated wrongly and never checked"
+						],
+						answer: 0
+					},
+					{
+						q: "How long did Henry Walter Bates spend collecting in the Amazon?",
+						options: [
+							"Two months",
+							"Three years",
+							"Eleven years",
+							"Forty years"
+						],
+						answer: 2
+					},
+					{
+						q: "Why did the rubber boom in Manaus collapse?",
+						options: [
+							"Seeds smuggled out by Henry Wickham let Asian plantations produce rubber more cheaply",
+							"Rubber was replaced by plastic almost overnight",
+							"A flood destroyed every plantation in Brazil",
+							"Customers suddenly preferred leather"
+						],
+						answer: 1
+					},
+					{
+						q: "What was Percy Fawcett searching for in 1925?",
+						options: [
+							"The source of the Nile",
+							"Gold coins left by the Spanish crown",
+							"The annual tree-ring records",
+							"A lost city he called 'Z'"
+						],
+						answer: 3
+					},
+					{
+						q: "What does the passage say about later searches for Fawcett?",
+						options: [
+							"His son survived and returned home",
+							"Perhaps a hundred people have died in the attempt",
+							"The jungle was searched only once",
+							"He was discovered alive in 1930"
+						],
+						answer: 1
+					},
+					{
+						q: "What have airborne lidar surveys revealed?",
+						options: [
+							"A lost pyramid near Belém",
+							"Orellana's own gravestone",
+							"Hundreds of geometric earthworks beneath the forest canopy",
+							"A second river beneath the Amazon"
+						],
+						answer: 2
+					},
+					{
+						q: "What did Manaus install during the rubber boom, ahead of most European capitals?",
+						options: [
+							"Underground railways",
+							"Public libraries",
+							"Telephone exchanges",
+							"Electric trams"
+						],
+						answer: 3
+					},
+					{
+						q: "What would be the best title for this passage?",
+						options: [
+							"The exploration of the Amazon: from Orellana to lidar",
+							"The rubber barons of Manaus",
+							"Birds and insects of South America",
+							"How the Aztecs used smallpox"
+						],
+						answer: 0
+					}
+				]
+			}
+		] },
+		listening: { sections: [
+			{
+				title: "Section 1: A phone call to a removals company about moving house",
+				transcript: "Good afternoon, Strongbox Removals, you're speaking to Tony. ... Right, so a two-bedroom flat, moving on Saturday the twelfth of March. Just a heads-up: Saturdays are our busiest and most expensive day, so if you can possibly move on a weekday, you'll save money — the same move on a Wednesday would come to four hundred and eighty pounds instead of six hundred. Now, about access. You said you're on the third floor with no lift? That adds a surcharge of sixty pounds, I'm afraid, because it means carrying everything down the stairs and the crew needs longer. If you want us to pack up your kitchen for you, the full packing service works out at a hundred and twenty pounds and includes boxes, paper and tape. If you'd rather pack yourself, the materials alone are sixty pounds for a two-bedroom kit, which we'd drop off about a week before the move. All moves include basic insurance covering loss or damage up to ten thousand pounds, but individual items worth more than five hundred pounds each need to be listed separately, and extending to full-cover insurance is an extra thirty pounds. Glad to hear there's no piano — that would have been another charge entirely. On the day, the crew will arrive around half past eight and we'd expect to be loaded by half past eleven, traffic permitting. We take a fifty-pound deposit when you book, which is refundable up to seven days before the move, and the balance is due on the day by card or bank transfer — we no longer take cash, I'm afraid. If you need storage between properties, our warehouse charges twenty-two pounds per container per week, with the first week free. Shall I pencil you in for the Wednesday, then, and email you the quote?",
+				questions: [
+					{
+						q: "The caller wants to arrange the removal of a two-bedroom ___.",
+						accepted: ["flat"]
+					},
+					{
+						q: "The company's busiest and most expensive moving day is ___.",
+						accepted: ["Saturday", "Saturdays"]
+					},
+					{
+						q: "The same move on a Wednesday would cost £___.",
+						accepted: [
+							"480",
+							"480 pounds",
+							"£480",
+							"four hundred and eighty",
+							"four hundred and eighty pounds",
+							"four hundred eighty"
+						]
+					},
+					{
+						q: "There is a £60 surcharge because the flat is on the third floor with no ___.",
+						accepted: ["lift", "elevator"]
+					},
+					{
+						q: "The full packing service, including boxes, paper and tape, costs £___.",
+						accepted: [
+							"120",
+							"120 pounds",
+							"£120",
+							"one hundred and twenty",
+							"a hundred and twenty",
+							"one hundred and twenty pounds"
+						]
+					},
+					{
+						q: "Basic insurance covers loss or damage up to a value of £___.",
+						accepted: [
+							"10000",
+							"10,000",
+							"£10,000",
+							"ten thousand",
+							"10000 pounds",
+							"ten thousand pounds"
+						]
+					},
+					{
+						q: "Individual items worth more than £___ each must be listed separately.",
+						accepted: [
+							"500",
+							"500 pounds",
+							"£500",
+							"five hundred",
+							"five hundred pounds"
+						]
+					},
+					{
+						q: "The crew expects to be fully loaded by ___ past eleven.",
+						accepted: [
+							"half",
+							"half past",
+							"30",
+							"thirty"
+						]
+					},
+					{
+						q: "The £50 deposit is refundable up to ___ days before the move.",
+						accepted: [
+							"7",
+							"seven",
+							"7 days",
+							"seven days"
+						]
+					},
+					{
+						q: "The company no longer accepts payment by ___.",
+						accepted: ["cash"]
+					}
+				]
+			},
+			{
+				title: "Section 2: A talk giving information about a careers fair",
+				transcript: "Can I have your attention please, everyone? A few crucial announcements before the doors of this year's Careers Fair open at ten o'clock. This year we have sixty employers here — the largest fair this university has ever hosted — filling both halls of the Sports Centre. The main sports hall holds the engineering and technology employers, while the smaller hall next door, just past the swimming pool, is where you'll find banking, consulting and the public sector. A few practical points. You must wear your student ID card at all times: employers will scan it when you hand over a CV, which is how you will hear later about interview invitations, so please make sure the email address on your student record is current. The university print shop has set up a pop-up stand by the main entrance where you can print ten free copies of your CV; after that it's ten pence a page. Workshops begin at eleven o'clock in the seminar rooms upstairs. Two sessions to highlight: at eleven-thirty there's a thirty-minute crash course, 'What employers actually look for in a CV', run by a recruiter from Vantage Bank; and at two-thirty, a session on handling video interviews, which includes a chance to record yourself and receive instant feedback. Mock interviews with careers advisers run all day, but they must be booked in advance at the yellow desk in the lobby — last year all forty slots went in the first hour, so book the moment you walk in. On refreshments: there is no full canteen near the Sports Centre, but a sandwich van will be outside from midday and water dispensers are available in both halls. The fair closes at four o'clock, though please note that the Vantage Bank stand itself closes an hour early, at three, for packing. Finally, pick up a purple feedback card on your way out — completed cards go into a prize draw for a pair of wireless headphones.",
+				questions: [
+					{
+						q: "The Careers Fair fills both halls of the university ___ Centre.",
+						accepted: ["Sports", "Sport"]
+					},
+					{
+						q: "This year's fair is hosting ___ employers.",
+						accepted: ["60", "sixty"]
+					},
+					{
+						q: "Banking employers are in the smaller hall, just past the swimming ___.",
+						accepted: ["pool", "swimming pool"]
+					},
+					{
+						q: "Employers scan a student's ___ card when a CV is handed over.",
+						accepted: [
+							"ID",
+							"id",
+							"student ID"
+						]
+					},
+					{
+						q: "After ten free copies, extra CV printing costs ___ pence a page.",
+						accepted: [
+							"10",
+							"ten",
+							"10p",
+							"ten pence"
+						]
+					},
+					{
+						q: "The two-thirty workshop covers handling ___ interviews.",
+						accepted: ["video"]
+					},
+					{
+						q: "Mock interviews must be booked in advance at the ___ desk in the lobby.",
+						accepted: ["yellow"]
+					},
+					{
+						q: "Last year all ___ mock-interview slots went in the first hour.",
+						accepted: ["40", "forty"]
+					},
+					{
+						q: "The ___ Bank stand closes an hour early, at three o'clock.",
+						accepted: ["Vantage"]
+					},
+					{
+						q: "Completed feedback cards go into a prize draw for wireless ___.",
+						accepted: ["headphones", "a pair of wireless headphones"]
+					}
+				]
+			},
+			{
+				title: "Section 3: Students and tutor reflecting on a completed group project",
+				transcript: "Tutor: Right, marks for the group consultancy project are out — you got sixty-eight per cent, a strong 2:1, and I wanted to talk through the feedback with you all. Student A: We're pleased, though honestly we hoped for seventy. Tutor: Understandable. Your written final report was the strongest piece of assessment; the panel lost you marks mainly on the live pitch, where you overran by four minutes and had to rush the recommendations slide. Student B: We knew the timing was a risk. We rehearsed the full pitch just once, the night before, because scheduling everyone's part-time shifts was really difficult. Student A: Honestly, our best decision was swapping roles in week three. Once Marcus took over the financial model and I moved onto client liaison, everything fell into place. Tutor: I noticed — role clarity was one of the assessors' compliments. What about your research process? Student B: We'd planned to survey sixty local businesses and we ended up with twenty-three, which felt like a failure at the time. Student A: But the feedback said the follow-up interviews with five of them added the depth that the survey lacked. Tutor: Exactly — pivots like that show research maturity. If you could start the project again, what would you do differently? Student A: Start the client brief earlier. We spent the first two weeks reading theory, and in hindsight we could have done that alongside the client meetings rather than before them. Student B: And I'd write the reflection log weekly instead of reconstructing it at the end from old emails. We promised ourselves we would and we didn't. Tutor: Both fair observations. One last thing: the peer-review forms are confidential, but I can tell you the collaboration scores for your group were among the highest in the cohort. That matters — employers ask specifically about teamwork when they ring for references.",
+				questions: [
+					{
+						q: "The group received ___ per cent for the group consultancy project.",
+						accepted: [
+							"68",
+							"sixty-eight",
+							"sixty eight",
+							"68%"
+						]
+					},
+					{
+						q: "The strongest piece of assessment was the written final ___.",
+						accepted: ["report"]
+					},
+					{
+						q: "The live pitch overran by ___ minutes.",
+						accepted: ["4", "four"]
+					},
+					{
+						q: "The group rehearsed the full pitch just ___, the night before.",
+						accepted: [
+							"once",
+							"one time",
+							"1 time"
+						]
+					},
+					{
+						q: "The group's best decision was swapping roles in week ___.",
+						accepted: ["3", "three"]
+					},
+					{
+						q: "___ took over the financial model after the role swap.",
+						accepted: ["Marcus"]
+					},
+					{
+						q: "Out of the sixty businesses planned, ___ actually responded to the survey.",
+						accepted: [
+							"23",
+							"twenty-three",
+							"twenty three"
+						]
+					},
+					{
+						q: "The follow-up interviews with ___ businesses added the depth the survey lacked.",
+						accepted: ["5", "five"]
+					},
+					{
+						q: "The group spent the first ___ weeks reading theory instead of starting the client brief.",
+						accepted: ["2", "two"]
+					},
+					{
+						q: "The group's collaboration scores were among the highest in the ___.",
+						accepted: ["cohort"]
+					}
+				]
+			},
+			{
+				title: "Section 4: A lecture on artificial intelligence and the future of work",
+				transcript: "In 2013, two Oxford economists, Carl Benedikt Frey and Michael Osborne, published a study estimating that forty-seven per cent of jobs in the United States were at high risk of computerisation — a single number splashed across newspapers worldwide, frightening readers everywhere. It is worth remembering what the study actually claimed, though: a probability, not a timetable, and risk does not mean certainty. Three years later, economists at the OECD revisited the question using a task-based approach, arguing that jobs are bundles of tasks and very few can be automated entire; their recalculation for the most advanced economies produced a far lower figure, around nine per cent. History offers perspective. The Luddites of 1811 smashed the mechanical looms they believed would destroy their livelihoods. In the long run those looms created new and better-paid kinds of factory work, although the displaced weavers themselves gained little: it took roughly fifty years for average wages to recover their former purchasing power — a sobering lesson for us today, because technology enriches society eventually, but 'eventually' can last a lifetime. Today's debate hinges on a technical distinction. Analyses that assume AI merely substitutes for workers predict mass unemployment; analyses that allow AI to complement workers — a doctor given better diagnostic software sees more patients and offloads the drudgery — predict something different: higher output, growing demand and entirely new job titles we haven't invented yet. The World Economic Forum, in a 2020 estimate that is much quoted and much disputed, forecast that ninety-seven million new roles would emerge even as eighty-five million disappeared. What nearly all economists do agree on is the premium on adaptability. Routine jobs, whether manual or clerical, are the most exposed, while roles combining technical judgement with human contact — the nurse, the plumber, the teacher — remain remarkably safe. As one economist drily put it: it's not AI that will take your job; it's someone who is better at using AI.",
+				questions: [
+					{
+						q: "Frey and Osborne estimated that ___ per cent of US jobs were at high risk of computerisation.",
+						accepted: [
+							"47",
+							"forty-seven",
+							"forty seven",
+							"47%"
+						]
+					},
+					{
+						q: "The 47% figure describes a ___, not a timetable.",
+						accepted: ["probability"]
+					},
+					{
+						q: "The OECD's task-based recalculation produced a figure of around ___ per cent.",
+						accepted: [
+							"9",
+							"nine",
+							"9%",
+							"nine per cent"
+						]
+					},
+					{
+						q: "The OECD argued that jobs are bundles of ___, few of which can be automated entire.",
+						accepted: ["tasks"]
+					},
+					{
+						q: "The Luddites of 1811 smashed mechanical ___.",
+						accepted: ["looms"]
+					},
+					{
+						q: "Average wages took roughly ___ years to recover their former purchasing power.",
+						accepted: ["50", "fifty"]
+					},
+					{
+						q: "The debate hinges on whether AI substitutes for workers or ___ them.",
+						accepted: ["complements"]
+					},
+					{
+						q: "The World Economic Forum forecast that ___ million new roles would emerge.",
+						accepted: [
+							"97",
+							"ninety-seven",
+							"ninety seven"
+						]
+					},
+					{
+						q: "___ jobs, whether manual or clerical, are the most exposed to automation.",
+						accepted: ["Routine", "routine"]
+					},
+					{
+						q: "Roles combining technical judgement with human ___ remain remarkably safe.",
+						accepted: ["contact"]
+					}
+				]
+			}
+		] },
+		writing: {
+			task1: "The chart below shows the percentage of employees working from home at least once a week in four US industry sectors in 2015 and 2025.\n\nInformation technology: 18%, 47%\nFinance and insurance: 12%, 38%\nEducation: 6%, 22%\nRetail: 3%, 9%\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+			task2: "Some people believe that success in life depends mainly on hard work and determination. Others, however, argue that luck and circumstances — such as family background or being in the right place at the right time — play a greater role. In your opinion, which matters more for success in life? Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words."
+		},
+		speaking: [
+			...speakingPart1([
+				"What are your plans for the next few years — work, study or travel?",
+				"Do you prefer to plan things in detail or take them as they come?",
+				"What kind of job would you like to be doing in ten years' time?"
+			]),
+			speakingPart2("Describe an achievement you are proud of. You should say: what the achievement was, how you achieved it, what difficulties you faced, and explain why you are proud of it."),
+			...speakingPart3([
+				"Do you think it is better to be ambitious or to be content with what you have?",
+				"Do you think society measures success mainly by money? Is that healthy?",
+				"How do definitions of success differ between older and younger generations?"
+			])
+		]
+	}
+];
+/** Very simple heuristic band estimate for typed or transcribed responses. */
+function estimateWritten(text, target) {
+	const words = text.trim().split(/\s+/).filter(Boolean).length;
+	if (words === 0) return 0;
+	const ratio = Math.min(words / target, 1);
+	const unique = new Set(text.toLowerCase().match(/[a-z']+/g) ?? []).size;
+	const variety = Math.min(unique / Math.max(words * .45, 1), 1);
+	return Math.round((3 + ratio * 4 + variety * 2) * 2) / 2;
+}
+var LISTENING_BAND_TABLE = [
+	[39, 9],
+	[37, 8.5],
+	[35, 8],
+	[32, 7.5],
+	[30, 7],
+	[26, 6.5],
+	[23, 6],
+	[18, 5.5],
+	[16, 5],
+	[13, 4.5],
+	[10, 4],
+	[8, 3.5],
+	[6, 3],
+	[4, 2.5],
+	[0, 2]
+];
+var READING_BAND_TABLE = [
+	[39, 9],
+	[37, 8.5],
+	[35, 8],
+	[33, 7.5],
+	[30, 7],
+	[27, 6.5],
+	[23, 6],
+	[19, 5.5],
+	[15, 5],
+	[13, 4.5],
+	[10, 4],
+	[8, 3.5],
+	[6, 3],
+	[4, 2.5],
+	[0, 2]
+];
+function bandFromTable(correct, table) {
+	for (const [min, band] of table) if (correct >= min) return band;
+	return 0;
+}
+function listeningBand(correct) {
+	return bandFromTable(correct, LISTENING_BAND_TABLE);
+}
+function readingBand(correct) {
+	return bandFromTable(correct, READING_BAND_TABLE);
+}
+//#endregion
+export { readingBand as i, listeningBand as n, mockTests as r, estimateWritten as t };
