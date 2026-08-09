@@ -41,6 +41,7 @@ import {
   saveBonusLesson,
   updateBonusLesson,
   updatePlacementQuestion,
+  uploadLessonVideo,
 } from "@/lib/db";
 import type { Level } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -168,9 +169,17 @@ function AdminPage() {
   );
 
   const [video, setVideo] = useState({ title: "", description: "", url: "", thumbnail: "" });
+  const [videoMode, setVideoMode] = useState<"youtube" | "file">("youtube");
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoCompressRatio, setVideoCompressRatio] = useState<number | null>(null);
   const [bonusForm, setBonusForm] = useState({ title: "", description: "", url: "" });
   const [bonus_item, setBonus_item] = useState({ title: "", description: "", url: "" });
   const [editingBonusId, setEditingBonusId] = useState<string | null>(null);
+  const [bonusMode, setBonusMode] = useState<"youtube" | "file">("youtube");
+  const [bonusFile, setBonusFile] = useState<File | null>(null);
+  const [uploadingBonus, setUploadingBonus] = useState(false);
+  const [bonusCompressRatio, setBonusCompressRatio] = useState<number | null>(null);
 
   useEffect(() => {
     if (bonus) setBonusForm(bonus);
@@ -189,21 +198,45 @@ function AdminPage() {
   }
 
   async function submitVideo() {
-    if (!video.title.trim() || !video.url.trim()) {
-      toast.error("Title and video URL are required");
+    if (!video.title.trim()) {
+      toast.error("Title is required");
       return;
     }
-    await addVideo({
-      title: video.title.trim(),
-      description: video.description.trim(),
-      url: video.url.trim(),
-      thumbnail:
-        video.thumbnail.trim() ||
-        "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=60",
-    });
-    setVideo({ title: "", description: "", url: "", thumbnail: "" });
-    queryClient.invalidateQueries({ queryKey: ["videos"] });
-    toast.success("Video added");
+    if (videoMode === "youtube" && !video.url.trim()) {
+      toast.error("Video URL is required");
+      return;
+    }
+    if (videoMode === "file" && !videoFile) {
+      toast.error("Choose a video file to upload");
+      return;
+    }
+
+    setUploadingVideo(true);
+    setVideoCompressRatio(null);
+    try {
+      const url =
+        videoMode === "file"
+          ? await uploadLessonVideo(videoFile!, "videos", setVideoCompressRatio)
+          : video.url.trim();
+      await addVideo({
+        title: video.title.trim(),
+        description: video.description.trim(),
+        url,
+        sourceType: videoMode,
+        thumbnail:
+          video.thumbnail.trim() ||
+          "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=60",
+      });
+      setVideo({ title: "", description: "", url: "", thumbnail: "" });
+      setVideoFile(null);
+      queryClient.invalidateQueries({ queryKey: ["videos"] });
+      toast.success("Video added");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Video upload failed");
+    } finally {
+      setUploadingVideo(false);
+      setVideoCompressRatio(null);
+    }
   }
 
   return (
@@ -377,9 +410,14 @@ function AdminPage() {
                   variant="ghost"
                   size="sm"
                   onClick={async () => {
-                    await deleteUserProfile(student.uid);
+                    const authDeleted = await deleteUserProfile(student.uid);
                     queryClient.invalidateQueries({ queryKey: ["users"] });
                     toast.success("Student removed");
+                    if (!authDeleted) {
+                      toast.warning(
+                        "The Firebase Auth account could not be removed (server key not configured). The student may still log in.",
+                      );
+                    }
                   }}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
@@ -416,16 +454,53 @@ function AdminPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="v-url">Video URL</Label>
-                  <Input
-                    id="v-url"
-                    value={video.url}
-                    maxLength={500}
-                    placeholder="https://youtube.com/watch?v=…"
-                    onChange={(e) => setVideo({ ...video, url: e.target.value })}
-                    className="mt-1.5"
-                  />
+                  <Label>Source</Label>
+                  <div className="mt-1.5 flex gap-2">
+                    <Button
+                      type="button"
+                      variant={videoMode === "youtube" ? "hero" : "soft"}
+                      size="pill"
+                      className="flex-1"
+                      onClick={() => setVideoMode("youtube")}
+                    >
+                      Link
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={videoMode === "file" ? "hero" : "soft"}
+                      size="pill"
+                      className="flex-1"
+                      onClick={() => setVideoMode("file")}
+                    >
+                      Upload file
+                    </Button>
+                  </div>
                 </div>
+                {videoMode === "youtube" ? (
+                  <div>
+                    <Label htmlFor="v-url">Video URL</Label>
+                    <Input
+                      id="v-url"
+                      value={video.url}
+                      maxLength={500}
+                      placeholder="https://youtube.com/watch?v=…"
+                      onChange={(e) => setVideo({ ...video, url: e.target.value })}
+                      className="mt-1.5"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <Label htmlFor="v-file">Video file</Label>
+                    <Input
+                      id="v-file"
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
+                      className="mt-1.5"
+                    />
+                    <p className="mt-1.5 text-xs text-muted-foreground">Larger files are compressed in your browser first, then uploaded.</p>
+                  </div>
+                )}
                 <div>
                   <Label htmlFor="v-thumb">Thumbnail URL (optional)</Label>
                   <Input
@@ -436,8 +511,18 @@ function AdminPage() {
                     className="mt-1.5"
                   />
                 </div>
-                <Button variant="hero" size="pill" className="w-full" onClick={submitVideo}>
-                  Add video
+                <Button
+                  variant="hero"
+                  size="pill"
+                  className="w-full"
+                  onClick={submitVideo}
+                  disabled={uploadingVideo}
+                >
+                  {uploadingVideo
+                    ? videoCompressRatio !== null
+                      ? `Compressing… ${Math.round(videoCompressRatio * 100)}%`
+                      : "Uploading…"
+                    : "Add video"}
                 </Button>
               </div>
             </div>
@@ -639,38 +724,107 @@ function AdminPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bonus-url">Video URL</Label>
-                  <Input
-                    id="bonus-url"
-                    value={bonus_item.url}
-                    maxLength={500}
-                    onChange={(e) => setBonus_item({ ...bonus_item, url: e.target.value })}
-                    className="mt-1.5"
-                  />
+                  <Label>Source</Label>
+                  <div className="mt-1.5 flex gap-2">
+                    <Button
+                      type="button"
+                      variant={bonusMode === "youtube" ? "hero" : "soft"}
+                      size="pill"
+                      className="flex-1"
+                      onClick={() => setBonusMode("youtube")}
+                    >
+                      Link
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={bonusMode === "file" ? "hero" : "soft"}
+                      size="pill"
+                      className="flex-1"
+                      onClick={() => setBonusMode("file")}
+                    >
+                      Upload file
+                    </Button>
+                  </div>
                 </div>
+                {bonusMode === "youtube" ? (
+                  <div>
+                    <Label htmlFor="bonus-url">Video URL</Label>
+                    <Input
+                      id="bonus-url"
+                      value={bonus_item.url}
+                      maxLength={500}
+                      onChange={(e) => setBonus_item({ ...bonus_item, url: e.target.value })}
+                      className="mt-1.5"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <Label htmlFor="bonus-file">Video file</Label>
+                    <Input
+                      id="bonus-file"
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => setBonusFile(e.target.files?.[0] ?? null)}
+                      className="mt-1.5"
+                    />
+                    <p className="mt-1.5 text-xs text-muted-foreground">Larger files are compressed in your browser first, then uploaded.</p>
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <Button
                     variant="hero"
                     size="pill"
                     className="flex-1"
+                    disabled={uploadingBonus}
                     onClick={async () => {
-                      if (!bonus_item.title.trim() || !bonus_item.url.trim()) {
-                        toast.error("Title and URL are required");
+                      if (!bonus_item.title.trim()) {
+                        toast.error("Title is required");
                         return;
                       }
-                      if (editingBonusId) {
-                        await updateBonusLesson(editingBonusId, bonus_item);
-                        toast.success("Bonus lesson updated");
-                      } else {
-                        await addBonusLesson(bonus_item);
-                        toast.success("Bonus lesson added");
+                      if (bonusMode === "youtube" && !bonus_item.url.trim()) {
+                        toast.error("Video URL is required");
+                        return;
                       }
-                      setBonus_item({ title: "", description: "", url: "" });
-                      setEditingBonusId(null);
-                      queryClient.invalidateQueries({ queryKey: ["bonus-lessons"] });
+                      if (bonusMode === "file" && !bonusFile && !editingBonusId) {
+                        toast.error("Choose a video file to upload");
+                        return;
+                      }
+
+                      setUploadingBonus(true);
+                      setBonusCompressRatio(null);
+                      try {
+                        const url =
+                          bonusMode === "file" && bonusFile
+                            ? await uploadLessonVideo(bonusFile, "bonus", setBonusCompressRatio)
+                            : bonus_item.url.trim();
+                        const payload = { ...bonus_item, url, sourceType: bonusMode };
+                        if (editingBonusId) {
+                          await updateBonusLesson(editingBonusId, payload);
+                          toast.success("Bonus lesson updated");
+                        } else {
+                          await addBonusLesson(payload);
+                          toast.success("Bonus lesson added");
+                        }
+                        setBonus_item({ title: "", description: "", url: "" });
+                        setBonusFile(null);
+                        setBonusMode("youtube");
+                        setEditingBonusId(null);
+                        queryClient.invalidateQueries({ queryKey: ["bonus-lessons"] });
+                      } catch (error) {
+                        toast.error(error instanceof Error ? error.message : "Video upload failed");
+                      } finally {
+                        setUploadingBonus(false);
+                        setBonusCompressRatio(null);
+                      }
                     }}
                   >
-                    {editingBonusId ? "Save changes" : "Add bonus"}
+                    {uploadingBonus
+                      ? bonusCompressRatio !== null
+                        ? `Compressing… ${Math.round(bonusCompressRatio * 100)}%`
+                        : "Uploading…"
+                      : editingBonusId
+                        ? "Save changes"
+                        : "Add bonus"}
                   </Button>
                   {editingBonusId && (
                     <Button
@@ -678,6 +832,8 @@ function AdminPage() {
                       size="pill"
                       onClick={() => {
                         setBonus_item({ title: "", description: "", url: "" });
+                        setBonusFile(null);
+                        setBonusMode("youtube");
                         setEditingBonusId(null);
                       }}
                     >
@@ -708,6 +864,8 @@ function AdminPage() {
                         onClick={() => {
                           setEditingBonusId(item.id);
                           setBonus_item(item);
+                          setBonusMode(item.sourceType === "file" ? "file" : "youtube");
+                          setBonusFile(null);
                         }}
                       >
                         <Pencil className="h-4 w-4" />

@@ -1,235 +1,230 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, Gift, Lock, PlayCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import {
+  CheckCircle2,
+  ClipboardCheck,
+  Flame,
+  Gamepad2,
+  Gift,
+  Lock,
+  PlayCircle,
+  Star,
+  Trophy,
+  type LucideIcon,
+} from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { DailyGoalRing } from "@/components/dashboard/DailyGoalRing";
+import { MockProgressChart } from "@/components/dashboard/MockProgressChart";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { getBonusLesson, listBonusLessons, listVideos, markVideoWatched } from "@/lib/db";
+import { BADGES } from "@/data/badges";
 import { useAuth } from "@/lib/auth";
+import { listMockResults, setDailyGoal } from "@/lib/db";
+import {
+  computeXpLevel,
+  DAILY_GOAL_PRESETS,
+  DEFAULT_DAILY_GOAL,
+  nextXpLevel,
+} from "@/lib/gamification";
 import { cn } from "@/lib/utils";
-
-
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Video lessons — IEA Dashboard" },
+      { title: "Dashboard — IEA" },
       {
         name: "description",
-        content: "Watch IEA video lessons, track what you've completed and unlock bonus content.",
+        content: "Track your streak, XP, daily goal, mock test progress and unlocked badges.",
       },
-      { property: "og:title", content: "Video lessons — IEA Dashboard" },
-      { property: "og:description", content: "Your personal IELTS and English lesson library." },
+      { property: "og:title", content: "Dashboard — IEA" },
+      { property: "og:description", content: "Your learning progress at a glance." },
     ],
   }),
   component: DashboardPage,
 });
 
+const ICONS: Record<string, LucideIcon> = {
+  CheckCircle2,
+  Flame,
+  Gift,
+  PlayCircle,
+  ClipboardCheck,
+  Gamepad2,
+  Star,
+  Trophy,
+};
+
+function initials(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
+function StatTile({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-2xl bg-secondary p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 text-2xl font-extrabold text-secondary-foreground">{value}</p>
+    </div>
+  );
+}
+
 function DashboardPage() {
   const { user, refresh } = useAuth();
-  const queryClient = useQueryClient();
-  const { data: videos = [] } = useQuery({ queryKey: ["videos"], queryFn: listVideos });
-  const { data: bonus } = useQuery({ queryKey: ["bonus"], queryFn: getBonusLesson });
-  const { data: bonusLessons = [] } = useQuery({
-    queryKey: ["bonus-lessons"],
-    queryFn: listBonusLessons,
+  const { data: mockResults = [] } = useQuery({
+    queryKey: ["mock-results"],
+    queryFn: listMockResults,
   });
 
-  const watched = user?.videosWatched ?? [];
-  const progress = videos.length ? (watched.length / videos.length) * 100 : 0;
-  const bonusUnlocked = watched.length >= 5;
+  if (!user) return null;
 
+  const myMockResults = mockResults.filter((r) => r.userId === user.uid);
 
-  async function watch(id: string, url: string) {
-    window.open(url, "_blank", "noopener,noreferrer");
-    if (!user || watched.includes(id)) return;
-    await markVideoWatched(user.uid, id);
+  const xp = user.xp ?? 0;
+  const streak = user.streak ?? 0;
+  const longestStreak = user.longestStreak ?? 0;
+  const todayXp = user.todayXp ?? 0;
+  const dailyGoal = user.dailyGoal ?? DEFAULT_DAILY_GOAL;
+  const unlockedBadges = new Set(user.badges ?? []);
+
+  const currentLevel = computeXpLevel(xp);
+  const next = nextXpLevel(xp);
+  const levelProgress = next
+    ? ((xp - currentLevel.minXp) / (next.minXp - currentLevel.minXp)) * 100
+    : 100;
+
+  async function pickGoal(goal: number) {
+    if (!user) return;
+    await setDailyGoal(user.uid, goal);
     await refresh();
-    queryClient.invalidateQueries({ queryKey: ["videos"] });
-    const total = watched.length + 1;
-    toast.success(
-      total === 5
-        ? "5 lessons watched — your free IELTS bonus lesson is unlocked!"
-        : "Marked as watched",
-    );
+    toast.success(`Daily goal set to ${goal} XP`);
   }
 
   return (
-    <DashboardShell title="Video lessons" subtitle="Watch, learn and track your progress">
-      <section className="rounded-3xl bg-card p-6 shadow-card">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-bold text-foreground">Your progress</p>
-            <p className="text-xs text-muted-foreground">
-              {watched.length} of {videos.length} lessons watched ·{" "}
-              {Math.max(0, 5 - watched.length)} more to unlock the bonus IELTS lesson
-            </p>
-          </div>
-          <span className="rounded-full bg-secondary px-4 py-1.5 text-xs font-bold text-secondary-foreground">
-            {Math.round(progress)}%
-          </span>
-        </div>
-        <Progress value={progress} className="mt-4 h-2" />
-      </section>
-
-      {bonusLessons.length > 0 && (
-        <section className="mt-6">
-          <h2 className="text-sm font-bold text-foreground">Bonus lessons</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {bonusLessons.map((item) => (
-              <div
-                key={item.id}
-                className={cn(
-                  "flex flex-wrap items-center gap-4 rounded-3xl p-6 shadow-card",
-                  bonusUnlocked ? "bg-gradient-primary" : "bg-card",
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
-                    bonusUnlocked ? "bg-primary-foreground/20" : "bg-secondary",
-                  )}
-                >
-                  {bonusUnlocked ? (
-                    <Gift className="h-5 w-5 text-primary-foreground" />
-                  ) : (
-                    <Lock className="h-5 w-5 text-muted-foreground" />
-                  )}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={cn(
-                      "text-sm font-extrabold",
-                      bonusUnlocked ? "text-primary-foreground" : "text-foreground",
-                    )}
-                  >
-                    {item.title}
-                  </p>
-                  <p
-                    className={cn(
-                      "mt-1 text-xs line-clamp-2",
-                      bonusUnlocked ? "text-primary-foreground/80" : "text-muted-foreground",
-                    )}
-                  >
-                    {bonusUnlocked
-                      ? item.description
-                      : `Locked — watch ${5 - watched.length} more lesson(s) to unlock.`}
-                  </p>
-                </div>
-                {bonusUnlocked && (
-                  <Button
-                    variant="soft"
-                    size="pill"
-                    className="shrink-0"
-                    onClick={() => window.open(item.url, "_blank", "noopener,noreferrer")}
-                  >
-                    <PlayCircle className="h-4 w-4" /> Watch
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {bonus && (
-        <section
-          className={cn(
-            "mt-6 flex flex-wrap items-center gap-4 rounded-3xl p-6 shadow-card",
-            bonusUnlocked ? "bg-gradient-primary" : "bg-card",
-          )}
-        >
-          <span
-            className={cn(
-              "flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
-              bonusUnlocked ? "bg-primary-foreground/20" : "bg-secondary",
-            )}
-          >
-            {bonusUnlocked ? (
-              <Gift className="h-5 w-5 text-primary-foreground" />
-            ) : (
-              <Lock className="h-5 w-5 text-muted-foreground" />
-            )}
-          </span>
+    <DashboardShell title="Dashboard" subtitle="Streak, XP, daily goal and badges">
+      <div className="space-y-6">
+        <section className="flex flex-wrap items-center gap-5 rounded-3xl bg-card p-6 shadow-card">
+          <Avatar className="h-16 w-16">
+            <AvatarFallback className="bg-gradient-primary text-lg font-extrabold text-primary-foreground">
+              {initials(user.name)}
+            </AvatarFallback>
+          </Avatar>
           <div className="min-w-0 flex-1">
-            <p
-              className={cn(
-                "text-sm font-extrabold",
-                bonusUnlocked ? "text-primary-foreground" : "text-foreground",
-              )}
-            >
-              {bonus.title}
+            <h2 className="truncate text-lg font-extrabold text-foreground">{user.name}</h2>
+            <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Badge variant="secondary">{user.level}</Badge>
+              <Badge className="bg-gradient-primary text-primary-foreground">
+                {currentLevel.title}
+              </Badge>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-5 sm:grid-cols-2">
+          <div className="rounded-3xl bg-card p-6 shadow-card">
+            <p className="flex items-center gap-2 text-sm font-bold text-foreground">
+              <Flame className="h-4 w-4 text-primary" /> Streak
             </p>
-            <p
-              className={cn(
-                "mt-1 text-xs",
-                bonusUnlocked ? "text-primary-foreground/80" : "text-muted-foreground",
-              )}
-            >
-              {bonusUnlocked
-                ? bonus.description
-                : `Locked — watch ${5 - watched.length} more lesson(s) to unlock this free bonus.`}
+            <p className="mt-2 text-3xl font-extrabold text-foreground">{streak} days</p>
+            <p className="mt-1 text-xs text-muted-foreground">Best streak: {longestStreak} days</p>
+          </div>
+          <div className="rounded-3xl bg-card p-6 shadow-card">
+            <p className="text-sm font-bold text-foreground">Experience</p>
+            <p className="mt-2 text-3xl font-extrabold text-foreground">{xp} XP</p>
+            <Progress value={levelProgress} className="mt-3 h-2" />
+            <p className="mt-1 text-xs text-muted-foreground">
+              {next ? `${next.minXp - xp} XP to ${next.title}` : "Max level reached"}
             </p>
           </div>
-          {bonusUnlocked && (
-            <Button
-              variant="soft"
-              size="pill"
-              onClick={() => window.open(bonus.url, "_blank", "noopener,noreferrer")}
-            >
-              <PlayCircle className="h-4 w-4" /> Watch bonus
-            </Button>
-          )}
         </section>
-      )}
 
+        <MockProgressChart results={myMockResults} />
 
-
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {videos.map((video) => {
-          const done = watched.includes(video.id);
-          return (
-            <article key={video.id} className="overflow-hidden rounded-3xl bg-card shadow-card">
-              <div className="relative">
-                <img
-                  src={video.thumbnail}
-                  alt={video.title}
-                  loading="lazy"
-                  className="aspect-video w-full object-cover"
-                />
-                {done && (
-                  <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-success px-3 py-1 text-[11px] font-bold text-success-foreground">
-                    <CheckCircle2 className="h-3 w-3" /> Watched
-                  </span>
-                )}
-              </div>
-              <div className="p-5">
-                <h2 className="text-sm font-bold text-foreground">{video.title}</h2>
-                <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                  {video.description}
-                </p>
+        <section className="rounded-3xl bg-card p-6 shadow-card">
+          <p className="text-sm font-bold text-foreground">Daily goal</p>
+          <div className="mt-4 flex flex-wrap items-center gap-6">
+            <DailyGoalRing todayXp={todayXp} dailyGoal={dailyGoal} />
+            <div className="flex flex-wrap gap-2">
+              {DAILY_GOAL_PRESETS.map((preset) => (
                 <Button
-                  variant={done ? "soft" : "hero"}
+                  key={preset}
+                  variant={dailyGoal === preset ? "hero" : "soft"}
                   size="pill"
-                  className="mt-4 w-full"
-                  onClick={() => watch(video.id, video.url)}
+                  onClick={() => pickGoal(preset)}
                 >
-                  <PlayCircle className="h-4 w-4" />
-                  {done ? "Watch again" : "Watch lesson"}
+                  {preset} XP
                 </Button>
-              </div>
-            </article>
-          );
-        })}
-      </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      {videos.length === 0 && (
-        <p className="mt-10 text-center text-sm text-muted-foreground">
-          No lessons published yet. Check back soon.
-        </p>
-      )}
+        <section>
+          <h3 className="text-sm font-bold text-foreground">Badges</h3>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {BADGES.map((badge) => {
+              const unlocked = unlockedBadges.has(badge.id);
+              const Icon = ICONS[badge.icon] ?? Star;
+              return (
+                <div
+                  key={badge.id}
+                  className={cn(
+                    "flex items-center gap-3 rounded-2xl p-4 shadow-card transition-all",
+                    unlocked ? "bg-gradient-primary" : "bg-secondary opacity-70",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+                      unlocked ? "bg-primary-foreground/20" : "bg-card",
+                    )}
+                  >
+                    {unlocked ? (
+                      <Icon className="h-5 w-5 text-primary-foreground" />
+                    ) : (
+                      <Lock className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </span>
+                  <div className="min-w-0">
+                    <p
+                      className={cn(
+                        "text-sm font-bold",
+                        unlocked ? "text-primary-foreground" : "text-foreground",
+                      )}
+                    >
+                      {badge.name}
+                    </p>
+                    <p
+                      className={cn(
+                        "text-xs",
+                        unlocked ? "text-primary-foreground/80" : "text-muted-foreground",
+                      )}
+                    >
+                      {badge.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <StatTile label="Videos watched" value={user.videosWatched?.length ?? 0} />
+          <StatTile label="Mock tests" value={user.mockResults?.length ?? 0} />
+          <StatTile label="Games played" value={user.gamesPlayed ?? 0} />
+        </section>
+      </div>
     </DashboardShell>
   );
 }

@@ -7,6 +7,7 @@ import {
   Menu,
   Trophy,
   ClipboardCheck,
+  Video,
   X,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
@@ -17,7 +18,8 @@ import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { to: "/dashboard", label: "Videos", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/videos", label: "Videos", icon: Video },
   { to: "/bonuses", label: "Bonuses", icon: Gift },
   { to: "/games", label: "Games", icon: Gamepad2 },
   { to: "/mock-test", label: "Mock Test", icon: ClipboardCheck },
@@ -89,6 +91,7 @@ export function DashboardShell({
           <p className="mt-2 text-xs text-muted-foreground">
             {user.videosWatched?.length ?? 0} lessons watched
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">🔥 {user.streak ?? 0}-day streak</p>
         </div>
 
         <Button

@@ -1,77 +1,39 @@
-export interface McQuestion {
-  q: string;
-  options: string[];
-  answer: number;
-}
+export type {
+  FillQuestion,
+  ListeningSection,
+  McQuestion,
+  MockTestSet,
+  ReadingPassage,
+  SpeakingQuestion,
+  WritingTasks,
+} from "./mockTests/types";
 
-export const listeningQuestions: McQuestion[] = [
-  {
-    q: "Transcript: 'The library closes at half past eight on weekdays.' — When does the library close?",
-    options: ["7:30", "8:00", "8:30", "9:30"],
-    answer: 2,
-  },
-  {
-    q: "Transcript: 'Book the room online; phone bookings cost £5 extra.' — What is cheaper?",
-    options: ["Phone booking", "Online booking", "Both the same", "Walk-in"],
-    answer: 1,
-  },
-  {
-    q: "Transcript: 'Meet at platform nine, not platform five.' — Which platform?",
-    options: ["Five", "Nine", "Nineteen", "Fifteen"],
-    answer: 1,
-  },
-  {
-    q: "Transcript: 'The tour lasts about two and a half hours.' — Duration?",
-    options: ["2 hours", "2.5 hours", "3 hours", "1.5 hours"],
-    answer: 1,
-  },
-  {
-    q: "Transcript: 'Bring photo ID; the membership card is optional.' — What is required?",
-    options: ["Membership card", "Photo ID", "Passport photo", "Nothing"],
-    answer: 1,
-  },
+import { mock1 } from "./mockTests/mock-1";
+import { mock2 } from "./mockTests/mock-2";
+import { mock3 } from "./mockTests/mock-3";
+import { mock4 } from "./mockTests/mock-4";
+import { mock5 } from "./mockTests/mock-5";
+import { mock6 } from "./mockTests/mock-6";
+import { mock7 } from "./mockTests/mock-7";
+import { mock8 } from "./mockTests/mock-8";
+import { mock9 } from "./mockTests/mock-9";
+import { mock10 } from "./mockTests/mock-10";
+import type { MockTestSet } from "./mockTests/types";
+
+export const mockTests: MockTestSet[] = [
+  mock1,
+  mock2,
+  mock3,
+  mock4,
+  mock5,
+  mock6,
+  mock7,
+  mock8,
+  mock9,
+  mock10,
 ];
 
-export const readingQuestions: McQuestion[] = [
-  {
-    q: "Passage: 'Urban beekeeping has grown rapidly, though city hives yield less honey than rural ones.' — City hives produce…",
-    options: ["More honey", "Less honey", "The same", "No honey"],
-    answer: 1,
-  },
-  {
-    q: "The word 'yield' in the passage is closest in meaning to:",
-    options: ["Produce", "Refuse", "Store", "Waste"],
-    answer: 0,
-  },
-  {
-    q: "Passage: 'Researchers suspect, but have not proven, a link to pesticide use.' — The link is:",
-    options: ["Proven", "Disproven", "Suspected", "Irrelevant"],
-    answer: 2,
-  },
-  {
-    q: "Passage: 'Few councils fund the scheme; most rely on volunteers.' — Funding mainly comes from:",
-    options: ["Councils", "Volunteers", "Government", "Companies"],
-    answer: 1,
-  },
-  {
-    q: "The best title for the passage would be:",
-    options: [
-      "The economics of rural farming",
-      "Bees in the city: growth and limits",
-      "A history of pesticides",
-      "How to make honey at home",
-    ],
-    answer: 1,
-  },
-];
-
-export const writingPrompt =
-  "Some people believe that studying online is as effective as attending classes in person. To what extent do you agree or disagree? Write at least 250 words.";
-
-export const speakingPrompt =
-  "Describe a skill you would like to learn. You should say: what it is, why you want to learn it, how you would learn it, and explain how it would change your life. Speak for 1–2 minutes (type your response).";
-
-/** Very simple heuristic band estimate for typed responses. */
+/** Very simple heuristic band estimate for typed or transcribed responses. */
 export function estimateWritten(text: string, target: number): number {
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   if (words === 0) return 0;
@@ -81,7 +43,58 @@ export function estimateWritten(text: string, target: number): number {
   return Math.round((3 + ratio * 4 + variety * 2) * 2) / 2;
 }
 
-export function bandFromCorrect(correct: number, total: number): number {
-  const pct = correct / total;
-  return Math.round((3 + pct * 6) * 2) / 2;
+/* ------------------------------------------------------------------ *
+ * Real IELTS-style raw-score-to-band conversion tables (out of 40).
+ * These mirror the commonly published approximate official tables.
+ * ------------------------------------------------------------------ */
+
+const LISTENING_BAND_TABLE: Array<[minCorrect: number, band: number]> = [
+  [39, 9],
+  [37, 8.5],
+  [35, 8],
+  [32, 7.5],
+  [30, 7],
+  [26, 6.5],
+  [23, 6],
+  [18, 5.5],
+  [16, 5],
+  [13, 4.5],
+  [10, 4],
+  [8, 3.5],
+  [6, 3],
+  [4, 2.5],
+  [0, 2],
+];
+
+const READING_BAND_TABLE: Array<[minCorrect: number, band: number]> = [
+  [39, 9],
+  [37, 8.5],
+  [35, 8],
+  [33, 7.5],
+  [30, 7],
+  [27, 6.5],
+  [23, 6],
+  [19, 5.5],
+  [15, 5],
+  [13, 4.5],
+  [10, 4],
+  [8, 3.5],
+  [6, 3],
+  [4, 2.5],
+  [0, 2],
+];
+
+function bandFromTable(correct: number, table: Array<[number, number]>): number {
+  for (const [min, band] of table) {
+    if (correct >= min) return band;
+  }
+  return 0;
+}
+
+export function listeningBand(correct: number): number {
+  return bandFromTable(correct, LISTENING_BAND_TABLE);
+}
+
+export function readingBand(correct: number): number {
+  return bandFromTable(correct, READING_BAND_TABLE);
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Flame, RotateCcw, Timer, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,22 +13,35 @@ function shuffle<T>(items: T[]): T[] {
 
 /* --------------------------- Timed vocabulary quiz --------------------------- */
 
-export function TimedQuizGame() {
+export function TimedQuizGame({
+  onComplete,
+}: {
+  onComplete?: (score: number, max: number) => void;
+}) {
   const [items, setItems] = useState(() => shuffle(vocabularyQuiz).slice(0, 8));
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(45);
   const [running, setRunning] = useState(false);
   const [picked, setPicked] = useState<number | null>(null);
+  const reportedRef = useRef(false);
+
+  function reportComplete(finalScore: number) {
+    if (reportedRef.current) return;
+    reportedRef.current = true;
+    onComplete?.(finalScore, items.length);
+  }
 
   useEffect(() => {
     if (!running) return;
     if (timeLeft <= 0) {
       setRunning(false);
+      reportComplete(score);
       return;
     }
     const id = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reportComplete/score read via closure, re-created every render like running/timeLeft already do
   }, [running, timeLeft]);
 
   const finished = !running && (timeLeft <= 0 || index >= items.length);
@@ -41,17 +54,20 @@ export function TimedQuizGame() {
     setTimeLeft(45);
     setPicked(null);
     setRunning(true);
+    reportedRef.current = false;
   }
 
   function answer(option: number) {
     if (!current || picked !== null) return;
     setPicked(option);
-    if (option === current.answer) setScore((s) => s + 1);
+    const nextScore = option === current.answer ? score + 1 : score;
+    if (option === current.answer) setScore(nextScore);
     setTimeout(() => {
       setPicked(null);
       if (index + 1 >= items.length) {
         setRunning(false);
         setIndex(items.length);
+        reportComplete(nextScore);
       } else {
         setIndex((i) => i + 1);
       }
@@ -128,18 +144,30 @@ export function TimedQuizGame() {
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz".split("");
 
-export function HangmanGame() {
-  const [target, setTarget] = useState(() => gameWords[Math.floor(Math.random() * gameWords.length)]!);
+export function HangmanGame({ onComplete }: { onComplete?: (score: number, max: number) => void }) {
+  const [target, setTarget] = useState(
+    () => gameWords[Math.floor(Math.random() * gameWords.length)]!,
+  );
   const [guessed, setGuessed] = useState<string[]>([]);
+  const reportedRef = useRef(false);
 
   const wrong = guessed.filter((letter) => !target.word.includes(letter));
   const lives = 6 - wrong.length;
   const won = target.word.split("").every((letter) => guessed.includes(letter));
   const lost = lives <= 0;
 
+  useEffect(() => {
+    if (!won && !lost) return;
+    if (reportedRef.current) return;
+    reportedRef.current = true;
+    onComplete?.(won ? 1 : 0, 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- guarded by reportedRef, safe to skip re-run on onComplete identity change
+  }, [won, lost]);
+
   function reset() {
     setTarget(gameWords[Math.floor(Math.random() * gameWords.length)]!);
     setGuessed([]);
+    reportedRef.current = false;
   }
 
   return (
@@ -207,8 +235,14 @@ export function HangmanGame() {
 
 /* ------------------------------ Word scramble ------------------------------ */
 
-export function ScrambleGame() {
-  const [word, setWord] = useState(() => scrambleWords[Math.floor(Math.random() * scrambleWords.length)]!);
+export function ScrambleGame({
+  onComplete,
+}: {
+  onComplete?: (score: number, max: number) => void;
+}) {
+  const [word, setWord] = useState(
+    () => scrambleWords[Math.floor(Math.random() * scrambleWords.length)]!,
+  );
   const [value, setValue] = useState("");
   const [streak, setStreak] = useState(0);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
@@ -219,6 +253,7 @@ export function ScrambleGame() {
     if (value.trim().toLowerCase() === word) {
       setStatus("correct");
       setStreak((s) => s + 1);
+      onComplete?.(1, 1);
       setTimeout(() => {
         setWord(scrambleWords[Math.floor(Math.random() * scrambleWords.length)]!);
         setValue("");

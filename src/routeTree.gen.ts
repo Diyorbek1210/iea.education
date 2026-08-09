@@ -17,8 +17,11 @@ import { Route as GamesRouteImport } from './routes/games'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MockTestRouteImport } from './routes/mock-test'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as TestRouteImport } from './routes/test'
+import { Route as VideosRouteImport } from './routes/videos'
+import { Route as MockTestMockIdRouteImport } from './routes/mock-test_.$mockId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -60,6 +63,11 @@ const MockTestRoute = MockTestRouteImport.update({
   path: '/mock-test',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -68,6 +76,16 @@ const RegisterRoute = RegisterRouteImport.update({
 const TestRoute = TestRouteImport.update({
   id: '/test',
   path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VideosRoute = VideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MockTestMockIdRoute = MockTestMockIdRouteImport.update({
+  id: '/mock-test_/$mockId',
+  path: '/mock-test/$mockId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -80,8 +98,11 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
+  '/videos': typeof VideosRoute
+  '/mock-test/$mockId': typeof MockTestMockIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -92,8 +113,11 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
+  '/videos': typeof VideosRoute
+  '/mock-test/$mockId': typeof MockTestMockIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -105,8 +129,11 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
+  '/videos': typeof VideosRoute
+  '/mock-test_/$mockId': typeof MockTestMockIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -119,8 +146,11 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/mock-test'
+    | '/profile'
     | '/register'
     | '/test'
+    | '/videos'
+    | '/mock-test/$mockId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -131,8 +161,11 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/mock-test'
+    | '/profile'
     | '/register'
     | '/test'
+    | '/videos'
+    | '/mock-test/$mockId'
   id:
     | '__root__'
     | '/'
@@ -143,8 +176,11 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/mock-test'
+    | '/profile'
     | '/register'
     | '/test'
+    | '/videos'
+    | '/mock-test_/$mockId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -156,8 +192,11 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MockTestRoute: typeof MockTestRoute
+  ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   TestRoute: typeof TestRoute
+  VideosRoute: typeof VideosRoute
+  MockTestMockIdRoute: typeof MockTestMockIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -218,6 +257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MockTestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -232,6 +278,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/videos': {
+      id: '/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mock-test_/$mockId': {
+      id: '/mock-test_/$mockId'
+      path: '/mock-test/$mockId'
+      fullPath: '/mock-test/$mockId'
+      preLoaderRoute: typeof MockTestMockIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -244,8 +304,11 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MockTestRoute: MockTestRoute,
+  ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   TestRoute: TestRoute,
+  VideosRoute: VideosRoute,
+  MockTestMockIdRoute: MockTestMockIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -9,8 +9,8 @@ export function Footer() {
         <div className="sm:col-span-2">
           <Logo />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-            IEA gives free, structured access to IELTS preparation and general English for
-            learners at every level.
+            IEA gives free, structured access to IELTS preparation and general English for learners
+            at every level.
           </p>
         </div>
 
@@ -23,7 +23,7 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/register" className="hover:text-primary">
+              <Link to="/register" search={{ level: "", score: 0 }} className="hover:text-primary">
                 Register
               </Link>
             </li>

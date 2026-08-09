@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Gift, Lock, PlayCircle } from "lucide-react";
+import { useState } from "react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { VideoPlayerDialog } from "@/components/VideoPlayerDialog";
 import { Button } from "@/components/ui/button";
 import { listBonusLessons } from "@/lib/db";
 import { useAuth } from "@/lib/auth";
+import { BONUS_UNLOCK_VIDEOS } from "@/lib/gamification";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/bonuses")({
@@ -29,14 +32,15 @@ function BonusesPage() {
     queryKey: ["bonus-lessons"],
     queryFn: listBonusLessons,
   });
+  const [playing, setPlaying] = useState<{ title: string; url: string } | null>(null);
 
   const watched = user?.videosWatched ?? [];
-  const bonusUnlocked = watched.length >= 5;
+  const bonusUnlocked = watched.length >= BONUS_UNLOCK_VIDEOS;
 
   return (
     <DashboardShell
       title="Bonus lessons"
-      subtitle="Exclusive content unlocked after watching 5 lessons"
+      subtitle={`Exclusive content unlocked after watching ${BONUS_UNLOCK_VIDEOS} lessons`}
     >
       {!bonusUnlocked && (
         <section className="rounded-3xl bg-secondary p-6 shadow-card">
@@ -45,7 +49,8 @@ function BonusesPage() {
             <div>
               <p className="text-sm font-bold text-foreground">Bonuses locked</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Watch {5 - watched.length} more lesson(s) to unlock all bonus content.
+                Watch {BONUS_UNLOCK_VIDEOS - watched.length} more lesson(s) to unlock all bonus
+                content.
               </p>
             </div>
           </div>
@@ -84,25 +89,22 @@ function BonusesPage() {
                 </div>
               </div>
               <div className="p-5">
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {bonus.description}
-                </p>
+                <p className="text-xs leading-relaxed text-muted-foreground">{bonus.description}</p>
                 {bonusUnlocked ? (
                   <Button
                     variant="hero"
                     size="pill"
                     className="mt-5 w-full"
-                    onClick={() => window.open(bonus.url, "_blank", "noopener,noreferrer")}
+                    onClick={() =>
+                      bonus.sourceType === "file"
+                        ? setPlaying(bonus)
+                        : window.open(bonus.url, "_blank", "noopener,noreferrer")
+                    }
                   >
                     <PlayCircle className="h-4 w-4" /> Watch now
                   </Button>
                 ) : (
-                  <Button
-                    variant="soft"
-                    size="pill"
-                    disabled
-                    className="mt-5 w-full"
-                  >
+                  <Button variant="soft" size="pill" disabled className="mt-5 w-full">
                     <Lock className="h-4 w-4" /> Locked
                   </Button>
                 )}
@@ -111,6 +113,8 @@ function BonusesPage() {
           ))}
         </div>
       )}
+
+      <VideoPlayerDialog video={playing} onOpenChange={(open) => !open && setPlaying(null)} />
     </DashboardShell>
   );
 }

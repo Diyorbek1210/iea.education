@@ -15,7 +15,8 @@ import {
 } from "firebase/auth";
 
 import { ADMIN_EMAIL, ADMIN_PASSWORD, auth, isFirebaseConfigured } from "@/firebaseConfig";
-import { createUserProfile, getUserProfile } from "./db";
+import { createUserProfile, getUserProfile, recordActivity } from "./db";
+import { DEFAULT_DAILY_GOAL, weekStartKey } from "./gamification";
 import type { UserProfile } from "./types";
 
 interface AuthContextValue {
@@ -110,59 +111,79 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         window.localStorage.setItem(ADMIN_KEY, "false");
       }
 
+      const placementCompleted = Boolean(level);
       const profile: UserProfile = {
         uid,
         name,
         email,
-        level,
+        level: level || "Beginner",
         createdAt: new Date().toISOString(),
         videosWatched: [],
         mockResults: [],
+        xp: 0,
+        streak: 0,
+        longestStreak: 0,
+        todayXp: 0,
+        weeklyXp: 0,
+        weekStartDate: weekStartKey(),
+        dailyGoal: DEFAULT_DAILY_GOAL,
+        badges: [],
+        gamesPlayed: 0,
+        placementCompleted: false,
       };
       await createUserProfile(profile);
-      setUser(profile);
+
+      let finalProfile = profile;
+      if (placementCompleted) {
+        await recordActivity(profile, "placementTest");
+        finalProfile = (await getUserProfile(uid)) ?? profile;
+      }
+      setUser(finalProfile);
       setIsAdmin(email === ADMIN_EMAIL);
     },
     [],
   );
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const admin = email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD;
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      const admin = email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD;
 
-    if (isFirebaseConfigured && auth) {
-      if (admin) {
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-        } catch {
-          /* admin may not exist in Auth — front-end admin access is still granted */
+      if (isFirebaseConfigured && auth) {
+        if (admin) {
+          try {
+            await signInWithEmailAndPassword(auth, email, password);
+          } catch {
+            /* admin may not exist in Auth — front-end admin access is still granted */
+          }
+          setIsAdmin(true);
+          window.localStorage.setItem(ADMIN_KEY, "true");
+          return { isAdmin: true };
         }
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        await loadProfile(cred.user.uid);
+        setIsAdmin(false);
+        return { isAdmin: false };
+      }
+
+      if (admin) {
         setIsAdmin(true);
         window.localStorage.setItem(ADMIN_KEY, "true");
         return { isAdmin: true };
       }
-      const cred = await signInWithEmailAndPassword(auth, email, password);
-      await loadProfile(cred.user.uid);
+
+      const creds = readCreds();
+      const entry = creds[email.trim().toLowerCase()];
+      if (!entry || entry.password !== password) {
+        throw new Error("Incorrect email or password.");
+      }
+      window.localStorage.setItem(SESSION_KEY, entry.uid);
+      window.localStorage.setItem(ADMIN_KEY, "false");
       setIsAdmin(false);
+      await loadProfile(entry.uid);
       return { isAdmin: false };
-    }
-
-    if (admin) {
-      setIsAdmin(true);
-      window.localStorage.setItem(ADMIN_KEY, "true");
-      return { isAdmin: true };
-    }
-
-    const creds = readCreds();
-    const entry = creds[email.trim().toLowerCase()];
-    if (!entry || entry.password !== password) {
-      throw new Error("Incorrect email or password.");
-    }
-    window.localStorage.setItem(SESSION_KEY, entry.uid);
-    window.localStorage.setItem(ADMIN_KEY, "false");
-    setIsAdmin(false);
-    await loadProfile(entry.uid);
-    return { isAdmin: false };
-  }, [loadProfile]);
+    },
+    [loadProfile],
+  );
 
   const signOut = useCallback(async () => {
     if (isFirebaseConfigured && auth) {

@@ -19,7 +19,6 @@ export const Route = createFileRoute("/register")({
   validateSearch: (search: Record<string, unknown>) => ({
     level: typeof search["level"] === "string" ? (search["level"] as string) : "",
     score: Number(search["score"]) || 0,
-
   }),
   head: () => ({
     meta: [
@@ -58,12 +57,7 @@ function RegisterPage() {
     }
     setBusy(true);
     try {
-      await signUp(
-        parsed.data.name,
-        parsed.data.email,
-        parsed.data.password,
-        level || "Beginner",
-      );
+      await signUp(parsed.data.name, parsed.data.email, parsed.data.password, level);
       toast.success("Welcome to IEA!");
       navigate({ to: "/dashboard" });
     } catch (error) {
@@ -137,13 +131,7 @@ function RegisterPage() {
                 className="mt-1.5"
               />
             </div>
-            <Button
-              type="submit"
-              variant="hero"
-              size="pill-lg"
-              className="w-full"
-              disabled={busy}
-            >
+            <Button type="submit" variant="hero" size="pill-lg" className="w-full" disabled={busy}>
               {busy ? "Creating account…" : "Register"}
             </Button>
           </form>

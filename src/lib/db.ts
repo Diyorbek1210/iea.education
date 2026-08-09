@@ -12,9 +12,26 @@ import {
   query,
 } from "firebase/firestore";
 
-import { db, isFirebaseConfigured } from "@/firebaseConfig";
+import { auth, db, isFirebaseConfigured } from "@/firebaseConfig";
+import { deleteAuthUser } from "./authAdmin";
 import { placementQuestions as staticPlacementQuestions } from "@/data/placement";
-import type { BonusLesson, MockResult, PlacementQuestion, UserProfile, VideoDoc } from "./types";
+import { BADGES, type BadgeDef } from "@/data/badges";
+import {
+  applyStreak,
+  applyWeeklyReset,
+  evaluateBadges,
+  todayKey,
+  withGamificationDefaults,
+  xpForActivity,
+} from "./gamification";
+import type {
+  ActivityType,
+  BonusLesson,
+  MockResult,
+  PlacementQuestion,
+  UserProfile,
+  VideoDoc,
+} from "./types";
 
 /* ------------------------------------------------------------------ *
  * Local demo store — used automatically until firebaseConfig.ts holds
@@ -130,21 +147,92 @@ function localPlacementQuestions(): PlacementQuestion[] {
 }
 
 /* ------------------------------------------------------------------ *
+ * Video file uploads (admin-uploaded lessons, as opposed to YouTube links)
+ * Hosted on Cloudinary's free tier via an unsigned upload preset — see
+ * .env.example for setup. Firebase Storage isn't used here because it now
+ * requires the paid Blaze plan just to enable it.
+ * ------------------------------------------------------------------ */
+
+const CLOUDINARY_CLOUD_NAME = import.meta.env["VITE_CLOUDINARY_CLOUD_NAME"] as string | undefined;
+const CLOUDINARY_UPLOAD_PRESET = import.meta.env["VITE_CLOUDINARY_UPLOAD_PRESET"] as
+  | string
+  | undefined;
+
+/** Cloudinary's free-plan cap for a single video file. */
+export const MAX_LESSON_VIDEO_BYTES = 100 * 1024 * 1024;
+
+/**
+ * Uploads a video file for a lesson/bonus and returns its playable URL.
+ * Files over Cloudinary's free-plan cap are compressed in the browser first
+ * (see videoCompress.ts). `onCompressProgress` receives a 0–1 ratio while
+ * the browser is transcoding.
+ */
+export async function uploadLessonVideo(
+  file: File,
+  folder: "videos" | "bonus",
+  onCompressProgress?: (ratio: number) => void,
+): Promise<string> {
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+    throw new Error(
+      "Video upload isn't configured yet. Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET — see .env.example.",
+    );
+  }
+  if (file.size > MAX_LESSON_VIDEO_BYTES) {
+    const originalMb = Math.round(file.size / (1024 * 1024));
+    const { compressVideo } = await import("./videoCompress");
+    file = await compressVideo(file, onCompressProgress);
+    if (file.size > MAX_LESSON_VIDEO_BYTES) {
+      const mb = Math.round(file.size / (1024 * 1024));
+      throw new Error(
+        `Video is ${originalMb}MB and still ${mb}MB after compression — the free Cloudinary plan allows up to 100MB per file.`,
+      );
+    }
+  }
+
+  const body = new FormData();
+  body.append("file", file);
+  body.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  body.append("folder", folder);
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`,
+    { method: "POST", body },
+  );
+  if (!res.ok) {
+    if (res.status === 413) {
+      throw new Error(
+        "The video is too large for Cloudinary's free plan (over 100MB even after compression). Trim it or compress it further before uploading.",
+      );
+    }
+    const message = await res.text().catch(() => res.statusText);
+    throw new Error(`Video upload failed: ${message}`);
+  }
+  const data = (await res.json()) as { secure_url: string };
+  return data.secure_url;
+}
+
+/* ------------------------------------------------------------------ *
  * Users
  * ------------------------------------------------------------------ */
 
 export async function listUsers(): Promise<UserProfile[]> {
-  if (!isFirebaseConfigured || !db) return read<UserProfile[]>(KEYS.users, []);
+  if (!isFirebaseConfigured || !db)
+    return read<UserProfile[]>(KEYS.users, []).map(withGamificationDefaults);
   const snap = await getDocs(collection(db, "users"));
-  return snap.docs.map((d) => ({ uid: d.id, ...(d.data() as Omit<UserProfile, "uid">) }));
+  return snap.docs.map((d) =>
+    withGamificationDefaults({ uid: d.id, ...(d.data() as Omit<UserProfile, "uid">) }),
+  );
 }
 
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   if (!isFirebaseConfigured || !db) {
-    return read<UserProfile[]>(KEYS.users, []).find((u) => u.uid === uid) ?? null;
+    const found = read<UserProfile[]>(KEYS.users, []).find((u) => u.uid === uid) ?? null;
+    return found ? withGamificationDefaults(found) : null;
   }
   const snap = await getDoc(doc(db, "users", uid));
-  return snap.exists() ? ({ uid, ...(snap.data() as Omit<UserProfile, "uid">) }) : null;
+  return snap.exists()
+    ? withGamificationDefaults({ uid, ...(snap.data() as Omit<UserProfile, "uid">) })
+    : null;
 }
 
 export async function createUserProfile(profile: UserProfile): Promise<void> {
@@ -157,10 +245,7 @@ export async function createUserProfile(profile: UserProfile): Promise<void> {
   await setDoc(doc(db, "users", uid), rest);
 }
 
-export async function updateUserProfile(
-  uid: string,
-  data: Partial<UserProfile>,
-): Promise<void> {
+export async function updateUserProfile(uid: string, data: Partial<UserProfile>): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     const users = read<UserProfile[]>(KEYS.users, []);
     write(
@@ -172,15 +257,35 @@ export async function updateUserProfile(
   await updateDoc(doc(db, "users", uid), data);
 }
 
-export async function deleteUserProfile(uid: string): Promise<void> {
+/**
+ * Deletes a student's Firestore profile AND their Firebase Auth account.
+ * Auth deletion runs through a server function (the client SDK can only
+ * delete the current user's own account). Returns whether the Auth account
+ * was removed too — false means the server key isn't configured, the Auth
+ * account still exists, and the student could still log in.
+ */
+export async function deleteUserProfile(uid: string): Promise<boolean> {
   if (!isFirebaseConfigured || !db) {
     write(
       KEYS.users,
       read<UserProfile[]>(KEYS.users, []).filter((u) => u.uid !== uid),
     );
-    return;
+    return true;
+  }
+
+  let authDeleted = false;
+  const current = auth?.currentUser;
+  if (current) {
+    try {
+      const idToken = await current.getIdToken();
+      await deleteAuthUser({ data: { uid, idToken } });
+      authDeleted = true;
+    } catch (error) {
+      console.warn("Firebase Auth account removal failed:", error);
+    }
   }
   await deleteDoc(doc(db, "users", uid));
+  return authDeleted;
 }
 
 export async function markVideoWatched(uid: string, videoId: string): Promise<void> {
@@ -197,6 +302,73 @@ export async function markVideoWatched(uid: string, videoId: string): Promise<vo
     return;
   }
   await updateDoc(doc(db, "users", uid), { videosWatched: arrayUnion(videoId) });
+}
+
+export async function markMockTestCompleted(uid: string, mockTestId: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const users = read<UserProfile[]>(KEYS.users, []);
+    write(
+      KEYS.users,
+      users.map((u) =>
+        u.uid === uid
+          ? {
+              ...u,
+              completedMockTests: Array.from(
+                new Set([...(u.completedMockTests ?? []), mockTestId]),
+              ),
+            }
+          : u,
+      ),
+    );
+    return;
+  }
+  await updateDoc(doc(db, "users", uid), { completedMockTests: arrayUnion(mockTestId) });
+}
+
+/* ------------------------------------------------------------------ *
+ * Gamification
+ * ------------------------------------------------------------------ */
+
+export async function recordActivity(
+  profile: UserProfile,
+  activity: ActivityType,
+  opts?: { gameScore?: number },
+): Promise<{ xpGained: number; newBadges: BadgeDef[] }> {
+  const today = todayKey();
+  const streakPatch = applyStreak(profile, today);
+  const weekPatch = applyWeeklyReset(profile, today);
+  const xpGained = xpForActivity(activity, opts);
+
+  const merged = {
+    ...profile,
+    ...streakPatch,
+    ...weekPatch,
+    xp: (profile.xp ?? 0) + xpGained,
+    todayXp: streakPatch.todayXp + xpGained,
+    weeklyXp: weekPatch.weeklyXp + xpGained,
+    gamesPlayed: (profile.gamesPlayed ?? 0) + (activity === "game" ? 1 : 0),
+    placementCompleted: profile.placementCompleted || activity === "placementTest",
+  };
+  const newBadgeIds = evaluateBadges(merged);
+
+  const patch: Partial<UserProfile> = {
+    xp: merged.xp,
+    streak: merged.streak,
+    longestStreak: merged.longestStreak,
+    lastActivityDate: merged.lastActivityDate,
+    todayXp: merged.todayXp,
+    weeklyXp: merged.weeklyXp,
+    weekStartDate: merged.weekStartDate,
+    gamesPlayed: merged.gamesPlayed,
+    badges: [...(profile.badges ?? []), ...newBadgeIds],
+    ...(activity === "placementTest" ? { placementCompleted: true } : {}),
+  };
+  await updateUserProfile(profile.uid, patch);
+  return { xpGained, newBadges: BADGES.filter((b) => newBadgeIds.includes(b.id)) };
+}
+
+export async function setDailyGoal(uid: string, goalXp: number): Promise<void> {
+  await updateUserProfile(uid, { dailyGoal: goalXp });
 }
 
 /* ------------------------------------------------------------------ *
@@ -299,15 +471,11 @@ function localBonusLessons(): BonusItem[] {
 
 export async function listBonusLessons(): Promise<BonusItem[]> {
   if (!isFirebaseConfigured || !db) return localBonusLessons();
-  const snap = await getDocs(
-    query(collection(db, "bonusLessons"), orderBy("createdAt", "desc")),
-  );
+  const snap = await getDocs(query(collection(db, "bonusLessons"), orderBy("createdAt", "desc")));
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<BonusItem, "id">) }));
 }
 
-export async function addBonusLesson(
-  lesson: Omit<BonusItem, "id" | "createdAt">,
-): Promise<void> {
+export async function addBonusLesson(lesson: Omit<BonusItem, "id" | "createdAt">): Promise<void> {
   const payload = { ...lesson, createdAt: new Date().toISOString() };
   if (!isFirebaseConfigured || !db) {
     write(KEYS_BONUS_LESSONS, [{ id: crypto.randomUUID(), ...payload }, ...localBonusLessons()]);
