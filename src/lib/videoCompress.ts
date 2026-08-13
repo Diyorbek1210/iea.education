@@ -3,7 +3,7 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
 /**
  * Client-side video compression so admins can upload longer/bigger lesson
- * videos while staying under Cloudinary's free-plan 100MB-per-file cap.
+ * videos while staying within upload size limits.
  * Runs entirely in the browser via ffmpeg.wasm — core files are self-hosted
  * under /public/ffmpeg so this doesn't depend on an external CDN.
  */

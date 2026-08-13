@@ -45,7 +45,7 @@ export function Footer() {
             </li>
             <li>
               <a href="#teachers" className="hover:text-primary">
-                Teachers
+                Founders
               </a>
             </li>
             <li>

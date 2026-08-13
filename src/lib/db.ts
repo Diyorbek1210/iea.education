@@ -7,6 +7,7 @@ import {
   updateDoc,
   deleteDoc,
   addDoc,
+  arrayRemove,
   arrayUnion,
   orderBy,
   query,
@@ -27,11 +28,24 @@ import {
 import type {
   ActivityType,
   BonusLesson,
+  Level,
   MockResult,
   PlacementQuestion,
   UserProfile,
   VideoDoc,
 } from "./types";
+
+/* ------------------------------------------------------------------ *
+ * Level calculation based on IELTS overall band score
+ * ------------------------------------------------------------------ */
+
+export function levelForBand(overall: number): Level {
+  if (overall >= 6.5) return "Advanced";
+  if (overall >= 5.5) return "Upper-Intermediate";
+  if (overall >= 4.5) return "Intermediate";
+  if (overall >= 3.5) return "Elementary";
+  return "Beginner";
+}
 
 /* ------------------------------------------------------------------ *
  * Local demo store — used automatically until firebaseConfig.ts holds
@@ -148,67 +162,61 @@ function localPlacementQuestions(): PlacementQuestion[] {
 
 /* ------------------------------------------------------------------ *
  * Video file uploads (admin-uploaded lessons, as opposed to YouTube links)
- * Hosted on Cloudinary's free tier via an unsigned upload preset — see
- * .env.example for setup. Firebase Storage isn't used here because it now
- * requires the paid Blaze plan just to enable it.
+ * Hosted on Cloudflare R2 via the S3-compatible API. A server function
+ * handles the upload directly — credentials stay server-side, no CORS
+ * configuration needed. Firebase Storage isn't used here because it
+ * requires the paid Blaze plan.
  * ------------------------------------------------------------------ */
 
-const CLOUDINARY_CLOUD_NAME = import.meta.env["VITE_CLOUDINARY_CLOUD_NAME"] as string | undefined;
-const CLOUDINARY_UPLOAD_PRESET = import.meta.env["VITE_CLOUDINARY_UPLOAD_PRESET"] as
-  | string
-  | undefined;
+import { uploadToR2 } from "./r2Server";
 
-/** Cloudinary's free-plan cap for a single video file. */
-export const MAX_LESSON_VIDEO_BYTES = 100 * 1024 * 1024;
+export const MAX_LESSON_VIDEO_BYTES = 200 * 1024 * 1024;
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(",")[1] || "");
+    };
+    reader.onerror = () => reject(new Error("Failed to read file"));
+    reader.readAsDataURL(file);
+  });
+}
 
 /**
- * Uploads a video file for a lesson/bonus and returns its playable URL.
- * Files over Cloudinary's free-plan cap are compressed in the browser first
- * (see videoCompress.ts). `onCompressProgress` receives a 0–1 ratio while
- * the browser is transcoding.
+ * Uploads a video file for a lesson/bonus and returns its public URL.
+ * Large files are compressed in the browser first (see videoCompress.ts).
+ * `onCompressProgress` receives a 0–1 ratio while transcoding.
  */
 export async function uploadLessonVideo(
   file: File,
   folder: "videos" | "bonus",
   onCompressProgress?: (ratio: number) => void,
 ): Promise<string> {
-  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-    throw new Error(
-      "Video upload isn't configured yet. Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET — see .env.example.",
-    );
-  }
   if (file.size > MAX_LESSON_VIDEO_BYTES) {
-    const originalMb = Math.round(file.size / (1024 * 1024));
     const { compressVideo } = await import("./videoCompress");
     file = await compressVideo(file, onCompressProgress);
     if (file.size > MAX_LESSON_VIDEO_BYTES) {
       const mb = Math.round(file.size / (1024 * 1024));
       throw new Error(
-        `Video is ${originalMb}MB and still ${mb}MB after compression — the free Cloudinary plan allows up to 100MB per file.`,
+        `Video is still ${mb}MB after compression — the limit is ${Math.round(MAX_LESSON_VIDEO_BYTES / (1024 * 1024))}MB.`,
       );
     }
   }
 
-  const body = new FormData();
-  body.append("file", file);
-  body.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-  body.append("folder", folder);
+  const fileBase64 = await fileToBase64(file);
 
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`,
-    { method: "POST", body },
-  );
-  if (!res.ok) {
-    if (res.status === 413) {
-      throw new Error(
-        "The video is too large for Cloudinary's free plan (over 100MB even after compression). Trim it or compress it further before uploading.",
-      );
-    }
-    const message = await res.text().catch(() => res.statusText);
-    throw new Error(`Video upload failed: ${message}`);
-  }
-  const data = (await res.json()) as { secure_url: string };
-  return data.secure_url;
+  const { objectUrl } = await uploadToR2({
+    data: {
+      fileBase64,
+      fileName: file.name,
+      contentType: file.type || "video/mp4",
+      folder,
+    },
+  });
+
+  return objectUrl;
 }
 
 /* ------------------------------------------------------------------ *
@@ -437,6 +445,42 @@ export async function addMockResult(result: Omit<MockResult, "id">): Promise<voi
   }
   const created = await addDoc(collection(db, "mockResults"), result);
   await updateDoc(doc(db, "users", result.userId), { mockResults: arrayUnion(created.id) });
+}
+
+export async function deleteMockResult(id: string, userId: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const mocks = read<MockResult[]>(KEYS.mocks, []);
+    const target = mocks.find((r) => r.id === id);
+    write(
+      KEYS.mocks,
+      mocks.filter((r) => r.id !== id),
+    );
+    const users = read<UserProfile[]>(KEYS.users, []);
+    write(
+      KEYS.users,
+      users.map((u) => {
+        if (u.uid !== userId) return u;
+        const patch: Partial<UserProfile> = {
+          mockResults: (u.mockResults ?? []).filter((rId) => rId !== id),
+        };
+        if (target?.mockTestId) {
+          patch.completedMockTests = (u.completedMockTests ?? []).filter(
+            (t) => t !== target.mockTestId,
+          );
+        }
+        return { ...u, ...patch };
+      }),
+    );
+    return;
+  }
+  const snap = await getDoc(doc(db, "mockResults", id));
+  const mockTestId = snap.exists() ? (snap.data() as MockResult).mockTestId : undefined;
+  await deleteDoc(doc(db, "mockResults", id));
+  const patch: Record<string, unknown> = { mockResults: arrayRemove(id) };
+  if (mockTestId) {
+    patch["completedMockTests"] = arrayRemove(mockTestId);
+  }
+  await updateDoc(doc(db, "users", userId), patch);
 }
 
 /* ------------------------------------------------------------------ *

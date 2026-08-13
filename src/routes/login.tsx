@@ -86,13 +86,7 @@ function LoginPage() {
                 className="mt-1"
               />
             </div>
-            <Button
-              type="submit"
-              variant="hero"
-              size="pill"
-              className="w-full"
-              disabled={busy}
-            >
+            <Button type="submit" variant="hero" size="pill" className="w-full" disabled={busy}>
               {busy ? "Signing in…" : "Log in"}
             </Button>
           </form>

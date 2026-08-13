@@ -29,6 +29,7 @@ import {
   addPlacementQuestion,
   addVideo,
   deleteBonusLesson,
+  deleteMockResult,
   deletePlacementQuestion,
   deleteUserProfile,
   deleteVideo,
@@ -337,7 +338,10 @@ function AdminPage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     How many registered students fall into each placement level.
                   </p>
-                  <ChartContainer config={levelChartConfig} className="mt-4 aspect-auto h-64 w-full">
+                  <ChartContainer
+                    config={levelChartConfig}
+                    className="mt-4 aspect-auto h-64 w-full"
+                  >
                     <BarChart data={studentsByLevel} margin={{ left: -20 }}>
                       <CartesianGrid vertical={false} />
                       <XAxis
@@ -347,7 +351,12 @@ function AdminPage() {
                         tickMargin={8}
                         fontSize={11}
                       />
-                      <YAxis tickLine={false} axisLine={false} allowDecimals={false} fontSize={11} />
+                      <YAxis
+                        tickLine={false}
+                        axisLine={false}
+                        allowDecimals={false}
+                        fontSize={11}
+                      />
                       <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                       <Bar dataKey="value" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
                     </BarChart>
@@ -359,7 +368,10 @@ function AdminPage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     Average score across every saved mock test attempt.
                   </p>
-                  <ChartContainer config={skillChartConfig} className="mt-4 aspect-auto h-64 w-full">
+                  <ChartContainer
+                    config={skillChartConfig}
+                    className="mt-4 aspect-auto h-64 w-full"
+                  >
                     <BarChart data={averageBySkill} margin={{ left: -20 }}>
                       <CartesianGrid vertical={false} />
                       <XAxis
@@ -369,12 +381,7 @@ function AdminPage() {
                         tickMargin={8}
                         fontSize={11}
                       />
-                      <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        domain={[0, 9]}
-                        fontSize={11}
-                      />
+                      <YAxis tickLine={false} axisLine={false} domain={[0, 9]} fontSize={11} />
                       <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                       <Bar dataKey="value" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
                     </BarChart>
@@ -385,509 +392,539 @@ function AdminPage() {
           )}
 
           {tab === "students" && (
-          <section className="mt-6 overflow-hidden rounded-3xl bg-card shadow-card">
-            {users.length === 0 && (
-              <p className="p-8 text-center text-sm text-muted-foreground">
-                No students registered yet.
-              </p>
-            )}
-            {users.map((student) => (
-              <div
-                key={student.uid}
-                className="flex flex-wrap items-center gap-3 border-b border-border px-5 py-4 last:border-0"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-foreground">{student.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">{student.email}</p>
-                </div>
-                <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
-                  {student.level}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {student.videosWatched?.length ?? 0} lessons
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={async () => {
-                    const authDeleted = await deleteUserProfile(student.uid);
-                    queryClient.invalidateQueries({ queryKey: ["users"] });
-                    toast.success("Student removed");
-                    if (!authDeleted) {
-                      toast.warning(
-                        "The Firebase Auth account could not be removed (server key not configured). The student may still log in.",
-                      );
-                    }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ))}
-          </section>
-        )}
-
-        {tab === "videos" && (
-          <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
-            <div className="rounded-3xl bg-card p-6 shadow-card">
-              <h2 className="text-base font-bold text-foreground">Add a video lesson</h2>
-              <div className="mt-4 space-y-3">
-                <div>
-                  <Label htmlFor="v-title">Title</Label>
-                  <Input
-                    id="v-title"
-                    value={video.title}
-                    maxLength={120}
-                    onChange={(e) => setVideo({ ...video, title: e.target.value })}
-                    className="mt-1.5"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="v-desc">Description</Label>
-                  <Textarea
-                    id="v-desc"
-                    value={video.description}
-                    maxLength={400}
-                    rows={3}
-                    onChange={(e) => setVideo({ ...video, description: e.target.value })}
-                    className="mt-1.5"
-                  />
-                </div>
-                <div>
-                  <Label>Source</Label>
-                  <div className="mt-1.5 flex gap-2">
-                    <Button
-                      type="button"
-                      variant={videoMode === "youtube" ? "hero" : "soft"}
-                      size="pill"
-                      className="flex-1"
-                      onClick={() => setVideoMode("youtube")}
-                    >
-                      Link
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={videoMode === "file" ? "hero" : "soft"}
-                      size="pill"
-                      className="flex-1"
-                      onClick={() => setVideoMode("file")}
-                    >
-                      Upload file
-                    </Button>
-                  </div>
-                </div>
-                {videoMode === "youtube" ? (
-                  <div>
-                    <Label htmlFor="v-url">Video URL</Label>
-                    <Input
-                      id="v-url"
-                      value={video.url}
-                      maxLength={500}
-                      placeholder="https://youtube.com/watch?v=…"
-                      onChange={(e) => setVideo({ ...video, url: e.target.value })}
-                      className="mt-1.5"
-                    />
-                  </div>
-                ) : (
-                  <div>
-                    <Label htmlFor="v-file">Video file</Label>
-                    <Input
-                      id="v-file"
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
-                      className="mt-1.5"
-                    />
-                    <p className="mt-1.5 text-xs text-muted-foreground">Larger files are compressed in your browser first, then uploaded.</p>
-                  </div>
-                )}
-                <div>
-                  <Label htmlFor="v-thumb">Thumbnail URL (optional)</Label>
-                  <Input
-                    id="v-thumb"
-                    value={video.thumbnail}
-                    maxLength={500}
-                    onChange={(e) => setVideo({ ...video, thumbnail: e.target.value })}
-                    className="mt-1.5"
-                  />
-                </div>
-                <Button
-                  variant="hero"
-                  size="pill"
-                  className="w-full"
-                  onClick={submitVideo}
-                  disabled={uploadingVideo}
-                >
-                  {uploadingVideo
-                    ? videoCompressRatio !== null
-                      ? `Compressing… ${Math.round(videoCompressRatio * 100)}%`
-                      : "Uploading…"
-                    : "Add video"}
-                </Button>
-              </div>
-            </div>
-
-            <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-              {videos.map((item) => (
+            <section className="mt-6 overflow-hidden rounded-3xl bg-card shadow-card">
+              {users.length === 0 && (
+                <p className="p-8 text-center text-sm text-muted-foreground">
+                  No students registered yet.
+                </p>
+              )}
+              {users.map((student) => (
                 <div
-                  key={item.id}
-                  className="flex items-center gap-4 border-b border-border p-4 last:border-0"
+                  key={student.uid}
+                  className="flex flex-wrap items-center gap-3 border-b border-border px-5 py-4 last:border-0"
                 >
-                  <img
-                    src={item.thumbnail}
-                    alt={item.title}
-                    loading="lazy"
-                    className="h-14 w-24 shrink-0 rounded-xl object-cover"
-                  />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
-                    <p className="truncate text-xs text-muted-foreground">{item.description}</p>
+                    <p className="truncate text-sm font-bold text-foreground">{student.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{student.email}</p>
                   </div>
+                  <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
+                    {student.level}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {student.videosWatched?.length ?? 0} lessons
+                  </span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={async () => {
-                      await deleteVideo(item.id);
-                      queryClient.invalidateQueries({ queryKey: ["videos"] });
-                      toast.success("Video deleted");
+                      const authDeleted = await deleteUserProfile(student.uid);
+                      queryClient.invalidateQueries({ queryKey: ["users"] });
+                      toast.success("Student removed");
+                      if (!authDeleted) {
+                        toast.warning(
+                          "The Firebase Auth account could not be removed (server key not configured). The student may still log in.",
+                        );
+                      }
                     }}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
               ))}
-            </div>
-          </section>
-        )}
+            </section>
+          )}
 
-        {tab === "placement" && (
-          <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
-            <div className="rounded-3xl bg-card p-6 shadow-card">
-              <h2 className="text-base font-bold text-foreground">
-                {editingQuestionId ? "Edit question" : "Add a placement question"}
-              </h2>
-              <div className="mt-4 space-y-3">
-                <div>
-                  <Label htmlFor="q-text">Question</Label>
-                  <Textarea
-                    id="q-text"
-                    value={questionForm.q}
-                    maxLength={300}
-                    rows={2}
-                    onChange={(e) => setQuestionForm({ ...questionForm, q: e.target.value })}
-                    className="mt-1.5"
-                  />
-                </div>
-
-                <div>
-                  <Label>Options — click the letter to mark the correct one</Label>
-                  <div className="mt-1.5 space-y-2">
-                    {questionForm.options.map((option, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setQuestionForm({ ...questionForm, answer: i })}
-                          aria-label={`Mark option ${String.fromCharCode(65 + i)} as correct`}
-                          className={cn(
-                            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-2 text-xs font-bold transition-colors",
-                            questionForm.answer === i
-                              ? "border-primary bg-secondary text-primary"
-                              : "border-border text-muted-foreground hover:border-primary/40",
-                          )}
-                        >
-                          {String.fromCharCode(65 + i)}
-                        </button>
-                        <Input
-                          value={option}
-                          maxLength={200}
-                          placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                          onChange={(e) => {
-                            const next = [...questionForm.options];
-                            next[i] = e.target.value;
-                            setQuestionForm({ ...questionForm, options: next });
-                          }}
-                        />
-                      </div>
-                    ))}
+          {tab === "videos" && (
+            <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
+              <div className="rounded-3xl bg-card p-6 shadow-card">
+                <h2 className="text-base font-bold text-foreground">Add a video lesson</h2>
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <Label htmlFor="v-title">Title</Label>
+                    <Input
+                      id="v-title"
+                      value={video.title}
+                      maxLength={120}
+                      onChange={(e) => setVideo({ ...video, title: e.target.value })}
+                      className="mt-1.5"
+                    />
                   </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button variant="hero" size="pill" className="flex-1" onClick={submitQuestion}>
-                    {editingQuestionId ? "Save changes" : "Add question"}
-                  </Button>
-                  {editingQuestionId && (
-                    <Button variant="ghost" size="pill" onClick={resetQuestionForm}>
-                      Cancel
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-              {placementQuestions.length === 0 && (
-                <p className="p-8 text-center text-sm text-muted-foreground">
-                  No placement questions yet.
-                </p>
-              )}
-              {placementQuestions.map((question, i) => (
-                <div key={question.id} className="border-b border-border p-4 last:border-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-bold text-foreground">
-                      {i + 1}. {question.q}
-                    </p>
-                    <div className="flex shrink-0 gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => editQuestion(question)}>
-                        <Pencil className="h-4 w-4" />
+                  <div>
+                    <Label htmlFor="v-desc">Description</Label>
+                    <Textarea
+                      id="v-desc"
+                      value={video.description}
+                      maxLength={400}
+                      rows={3}
+                      onChange={(e) => setVideo({ ...video, description: e.target.value })}
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label>Source</Label>
+                    <div className="mt-1.5 flex gap-2">
+                      <Button
+                        type="button"
+                        variant={videoMode === "youtube" ? "hero" : "soft"}
+                        size="pill"
+                        className="flex-1"
+                        onClick={() => setVideoMode("youtube")}
+                      >
+                        Link
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => removeQuestion(question.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                      <Button
+                        type="button"
+                        variant={videoMode === "file" ? "hero" : "soft"}
+                        size="pill"
+                        className="flex-1"
+                        onClick={() => setVideoMode("file")}
+                      >
+                        Upload file
                       </Button>
                     </div>
                   </div>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {question.options.map((option, oi) => (
-                      <span
-                        key={oi}
-                        className={cn(
-                          "rounded-full px-2.5 py-1 text-[11px] font-medium",
-                          oi === question.answer
-                            ? "bg-success/15 text-success"
-                            : "bg-secondary text-secondary-foreground",
-                        )}
-                      >
-                        {option}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {tab === "results" && (
-          <section className="mt-6 overflow-hidden rounded-3xl bg-card shadow-card">
-            {results.length === 0 && (
-              <p className="p-8 text-center text-sm text-muted-foreground">No mock results yet.</p>
-            )}
-            {results.map((result) => (
-              <div
-                key={result.id}
-                className="flex flex-wrap items-center gap-4 border-b border-border px-5 py-4 last:border-0"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-foreground">{result.userName}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(result.date).toLocaleDateString()}
-                  </p>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  L {result.listening} · R {result.reading} · W {result.writing} · S{" "}
-                  {result.speaking}
-                </p>
-                <span className="text-lg font-extrabold text-foreground">
-                  {result.overall.toFixed(1)}
-                </span>
-              </div>
-            ))}
-          </section>
-        )}
-
-        {tab === "bonus" && (
-          <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
-            <div className="rounded-3xl bg-card p-6 shadow-card">
-              <h2 className="text-base font-bold text-foreground">
-                {editingBonusId ? "Edit bonus" : "Add bonus lesson"}
-              </h2>
-              <div className="mt-4 space-y-3">
-                <div>
-                  <Label htmlFor="bonus-title">Title</Label>
-                  <Input
-                    id="bonus-title"
-                    value={bonus_item.title}
-                    maxLength={120}
-                    onChange={(e) => setBonus_item({ ...bonus_item, title: e.target.value })}
-                    className="mt-1.5"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="bonus-desc">Description</Label>
-                  <Textarea
-                    id="bonus-desc"
-                    value={bonus_item.description}
-                    maxLength={400}
-                    rows={3}
-                    onChange={(e) => setBonus_item({ ...bonus_item, description: e.target.value })}
-                    className="mt-1.5"
-                  />
-                </div>
-                <div>
-                  <Label>Source</Label>
-                  <div className="mt-1.5 flex gap-2">
-                    <Button
-                      type="button"
-                      variant={bonusMode === "youtube" ? "hero" : "soft"}
-                      size="pill"
-                      className="flex-1"
-                      onClick={() => setBonusMode("youtube")}
-                    >
-                      Link
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={bonusMode === "file" ? "hero" : "soft"}
-                      size="pill"
-                      className="flex-1"
-                      onClick={() => setBonusMode("file")}
-                    >
-                      Upload file
-                    </Button>
-                  </div>
-                </div>
-                {bonusMode === "youtube" ? (
+                  {videoMode === "youtube" ? (
+                    <div>
+                      <Label htmlFor="v-url">Video URL</Label>
+                      <Input
+                        id="v-url"
+                        value={video.url}
+                        maxLength={500}
+                        placeholder="https://youtube.com/watch?v=…"
+                        onChange={(e) => setVideo({ ...video, url: e.target.value })}
+                        className="mt-1.5"
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <Label htmlFor="v-file">Video file</Label>
+                      <Input
+                        id="v-file"
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
+                        className="mt-1.5"
+                      />
+                      <p className="mt-1.5 text-xs text-muted-foreground">
+                        Larger files are compressed in your browser first, then uploaded.
+                      </p>
+                    </div>
+                  )}
                   <div>
-                    <Label htmlFor="bonus-url">Video URL</Label>
+                    <Label htmlFor="v-thumb">Thumbnail URL (optional)</Label>
                     <Input
-                      id="bonus-url"
-                      value={bonus_item.url}
+                      id="v-thumb"
+                      value={video.thumbnail}
                       maxLength={500}
-                      onChange={(e) => setBonus_item({ ...bonus_item, url: e.target.value })}
+                      onChange={(e) => setVideo({ ...video, thumbnail: e.target.value })}
                       className="mt-1.5"
                     />
                   </div>
-                ) : (
-                  <div>
-                    <Label htmlFor="bonus-file">Video file</Label>
-                    <Input
-                      id="bonus-file"
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) => setBonusFile(e.target.files?.[0] ?? null)}
-                      className="mt-1.5"
-                    />
-                    <p className="mt-1.5 text-xs text-muted-foreground">Larger files are compressed in your browser first, then uploaded.</p>
-                  </div>
-                )}
-                <div className="flex gap-2">
                   <Button
                     variant="hero"
                     size="pill"
-                    className="flex-1"
-                    disabled={uploadingBonus}
-                    onClick={async () => {
-                      if (!bonus_item.title.trim()) {
-                        toast.error("Title is required");
-                        return;
-                      }
-                      if (bonusMode === "youtube" && !bonus_item.url.trim()) {
-                        toast.error("Video URL is required");
-                        return;
-                      }
-                      if (bonusMode === "file" && !bonusFile && !editingBonusId) {
-                        toast.error("Choose a video file to upload");
-                        return;
-                      }
-
-                      setUploadingBonus(true);
-                      setBonusCompressRatio(null);
-                      try {
-                        const url =
-                          bonusMode === "file" && bonusFile
-                            ? await uploadLessonVideo(bonusFile, "bonus", setBonusCompressRatio)
-                            : bonus_item.url.trim();
-                        const payload = { ...bonus_item, url, sourceType: bonusMode };
-                        if (editingBonusId) {
-                          await updateBonusLesson(editingBonusId, payload);
-                          toast.success("Bonus lesson updated");
-                        } else {
-                          await addBonusLesson(payload);
-                          toast.success("Bonus lesson added");
-                        }
-                        setBonus_item({ title: "", description: "", url: "" });
-                        setBonusFile(null);
-                        setBonusMode("youtube");
-                        setEditingBonusId(null);
-                        queryClient.invalidateQueries({ queryKey: ["bonus-lessons"] });
-                      } catch (error) {
-                        toast.error(error instanceof Error ? error.message : "Video upload failed");
-                      } finally {
-                        setUploadingBonus(false);
-                        setBonusCompressRatio(null);
-                      }
-                    }}
+                    className="w-full"
+                    onClick={submitVideo}
+                    disabled={uploadingVideo}
                   >
-                    {uploadingBonus
-                      ? bonusCompressRatio !== null
-                        ? `Compressing… ${Math.round(bonusCompressRatio * 100)}%`
+                    {uploadingVideo
+                      ? videoCompressRatio !== null
+                        ? `Compressing… ${Math.round(videoCompressRatio * 100)}%`
                         : "Uploading…"
-                      : editingBonusId
-                        ? "Save changes"
-                        : "Add bonus"}
+                      : "Add video"}
                   </Button>
-                  {editingBonusId && (
-                    <Button
-                      variant="ghost"
-                      size="pill"
-                      onClick={() => {
-                        setBonus_item({ title: "", description: "", url: "" });
-                        setBonusFile(null);
-                        setBonusMode("youtube");
-                        setEditingBonusId(null);
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  )}
                 </div>
               </div>
-            </div>
 
-            <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-              {bonusLessons.length === 0 && (
-                <p className="p-8 text-center text-sm text-muted-foreground">
-                  No bonus lessons yet.
-                </p>
-              )}
-              {bonusLessons.map((item) => (
-                <div key={item.id} className="border-b border-border p-4 last:border-0">
-                  <div className="flex items-start justify-between gap-3">
+              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                {videos.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-4 border-b border-border p-4 last:border-0"
+                  >
+                    <img
+                      src={item.thumbnail}
+                      alt={item.title}
+                      loading="lazy"
+                      className="h-14 w-24 shrink-0 rounded-xl object-cover"
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
                       <p className="truncate text-xs text-muted-foreground">{item.description}</p>
                     </div>
-                    <div className="flex shrink-0 gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        await deleteVideo(item.id);
+                        queryClient.invalidateQueries({ queryKey: ["videos"] });
+                        toast.success("Video deleted");
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {tab === "placement" && (
+            <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
+              <div className="rounded-3xl bg-card p-6 shadow-card">
+                <h2 className="text-base font-bold text-foreground">
+                  {editingQuestionId ? "Edit question" : "Add a placement question"}
+                </h2>
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <Label htmlFor="q-text">Question</Label>
+                    <Textarea
+                      id="q-text"
+                      value={questionForm.q}
+                      maxLength={300}
+                      rows={2}
+                      onChange={(e) => setQuestionForm({ ...questionForm, q: e.target.value })}
+                      className="mt-1.5"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Options — click the letter to mark the correct one</Label>
+                    <div className="mt-1.5 space-y-2">
+                      {questionForm.options.map((option, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setQuestionForm({ ...questionForm, answer: i })}
+                            aria-label={`Mark option ${String.fromCharCode(65 + i)} as correct`}
+                            className={cn(
+                              "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-2 text-xs font-bold transition-colors",
+                              questionForm.answer === i
+                                ? "border-primary bg-secondary text-primary"
+                                : "border-border text-muted-foreground hover:border-primary/40",
+                            )}
+                          >
+                            {String.fromCharCode(65 + i)}
+                          </button>
+                          <Input
+                            value={option}
+                            maxLength={200}
+                            placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                            onChange={(e) => {
+                              const next = [...questionForm.options];
+                              next[i] = e.target.value;
+                              setQuestionForm({ ...questionForm, options: next });
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button variant="hero" size="pill" className="flex-1" onClick={submitQuestion}>
+                      {editingQuestionId ? "Save changes" : "Add question"}
+                    </Button>
+                    {editingQuestionId && (
+                      <Button variant="ghost" size="pill" onClick={resetQuestionForm}>
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                {placementQuestions.length === 0 && (
+                  <p className="p-8 text-center text-sm text-muted-foreground">
+                    No placement questions yet.
+                  </p>
+                )}
+                {placementQuestions.map((question, i) => (
+                  <div key={question.id} className="border-b border-border p-4 last:border-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-sm font-bold text-foreground">
+                        {i + 1}. {question.q}
+                      </p>
+                      <div className="flex shrink-0 gap-1">
+                        <Button variant="ghost" size="sm" onClick={() => editQuestion(question)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeQuestion(question.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {question.options.map((option, oi) => (
+                        <span
+                          key={oi}
+                          className={cn(
+                            "rounded-full px-2.5 py-1 text-[11px] font-medium",
+                            oi === question.answer
+                              ? "bg-success/15 text-success"
+                              : "bg-secondary text-secondary-foreground",
+                          )}
+                        >
+                          {option}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {tab === "results" && (
+            <section className="mt-6 overflow-hidden rounded-3xl bg-card shadow-card">
+              {results.length === 0 && (
+                <p className="p-8 text-center text-sm text-muted-foreground">
+                  No mock results yet.
+                </p>
+              )}
+              {results.map((result) => (
+                <div
+                  key={result.id}
+                  className="flex flex-wrap items-center gap-4 border-b border-border px-5 py-4 last:border-0"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold text-foreground">{result.userName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(result.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    L {result.listening} · R {result.reading} · W {result.writing} · S{" "}
+                    {result.speaking}
+                  </p>
+                  <span className="text-lg font-extrabold text-foreground">
+                    {result.overall.toFixed(1)}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      queryClient.setQueryData(["mock-results"], (old: typeof results) =>
+                        old.filter((r) => r.id !== result.id),
+                      );
+                      toast.success("Mock result deleted");
+                      deleteMockResult(result.id, result.userId).catch(() => {
+                        queryClient.invalidateQueries({ queryKey: ["mock-results"] });
+                        toast.error("Failed to delete mock result");
+                      });
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+            </section>
+          )}
+
+          {tab === "bonus" && (
+            <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
+              <div className="rounded-3xl bg-card p-6 shadow-card">
+                <h2 className="text-base font-bold text-foreground">
+                  {editingBonusId ? "Edit bonus" : "Add bonus lesson"}
+                </h2>
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <Label htmlFor="bonus-title">Title</Label>
+                    <Input
+                      id="bonus-title"
+                      value={bonus_item.title}
+                      maxLength={120}
+                      onChange={(e) => setBonus_item({ ...bonus_item, title: e.target.value })}
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="bonus-desc">Description</Label>
+                    <Textarea
+                      id="bonus-desc"
+                      value={bonus_item.description}
+                      maxLength={400}
+                      rows={3}
+                      onChange={(e) =>
+                        setBonus_item({ ...bonus_item, description: e.target.value })
+                      }
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label>Source</Label>
+                    <div className="mt-1.5 flex gap-2">
                       <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingBonusId(item.id);
-                          setBonus_item(item);
-                          setBonusMode(item.sourceType === "file" ? "file" : "youtube");
-                          setBonusFile(null);
-                        }}
+                        type="button"
+                        variant={bonusMode === "youtube" ? "hero" : "soft"}
+                        size="pill"
+                        className="flex-1"
+                        onClick={() => setBonusMode("youtube")}
                       >
-                        <Pencil className="h-4 w-4" />
+                        Link
                       </Button>
                       <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                          await deleteBonusLesson(item.id);
-                          queryClient.invalidateQueries({ queryKey: ["bonus-lessons"] });
-                          toast.success("Bonus lesson deleted");
-                        }}
+                        type="button"
+                        variant={bonusMode === "file" ? "hero" : "soft"}
+                        size="pill"
+                        className="flex-1"
+                        onClick={() => setBonusMode("file")}
                       >
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        Upload file
                       </Button>
                     </div>
                   </div>
+                  {bonusMode === "youtube" ? (
+                    <div>
+                      <Label htmlFor="bonus-url">Video URL</Label>
+                      <Input
+                        id="bonus-url"
+                        value={bonus_item.url}
+                        maxLength={500}
+                        onChange={(e) => setBonus_item({ ...bonus_item, url: e.target.value })}
+                        className="mt-1.5"
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <Label htmlFor="bonus-file">Video file</Label>
+                      <Input
+                        id="bonus-file"
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => setBonusFile(e.target.files?.[0] ?? null)}
+                        className="mt-1.5"
+                      />
+                      <p className="mt-1.5 text-xs text-muted-foreground">
+                        Larger files are compressed in your browser first, then uploaded.
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="hero"
+                      size="pill"
+                      className="flex-1"
+                      disabled={uploadingBonus}
+                      onClick={async () => {
+                        if (!bonus_item.title.trim()) {
+                          toast.error("Title is required");
+                          return;
+                        }
+                        if (bonusMode === "youtube" && !bonus_item.url.trim()) {
+                          toast.error("Video URL is required");
+                          return;
+                        }
+                        if (bonusMode === "file" && !bonusFile && !editingBonusId) {
+                          toast.error("Choose a video file to upload");
+                          return;
+                        }
+
+                        setUploadingBonus(true);
+                        setBonusCompressRatio(null);
+                        try {
+                          const url =
+                            bonusMode === "file" && bonusFile
+                              ? await uploadLessonVideo(bonusFile, "bonus", setBonusCompressRatio)
+                              : bonus_item.url.trim();
+                          const payload = { ...bonus_item, url, sourceType: bonusMode };
+                          if (editingBonusId) {
+                            await updateBonusLesson(editingBonusId, payload);
+                            toast.success("Bonus lesson updated");
+                          } else {
+                            await addBonusLesson(payload);
+                            toast.success("Bonus lesson added");
+                          }
+                          setBonus_item({ title: "", description: "", url: "" });
+                          setBonusFile(null);
+                          setBonusMode("youtube");
+                          setEditingBonusId(null);
+                          queryClient.invalidateQueries({ queryKey: ["bonus-lessons"] });
+                        } catch (error) {
+                          toast.error(
+                            error instanceof Error ? error.message : "Video upload failed",
+                          );
+                        } finally {
+                          setUploadingBonus(false);
+                          setBonusCompressRatio(null);
+                        }
+                      }}
+                    >
+                      {uploadingBonus
+                        ? bonusCompressRatio !== null
+                          ? `Compressing… ${Math.round(bonusCompressRatio * 100)}%`
+                          : "Uploading…"
+                        : editingBonusId
+                          ? "Save changes"
+                          : "Add bonus"}
+                    </Button>
+                    {editingBonusId && (
+                      <Button
+                        variant="ghost"
+                        size="pill"
+                        onClick={() => {
+                          setBonus_item({ title: "", description: "", url: "" });
+                          setBonusFile(null);
+                          setBonusMode("youtube");
+                          setEditingBonusId(null);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              </div>
+
+              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                {bonusLessons.length === 0 && (
+                  <p className="p-8 text-center text-sm text-muted-foreground">
+                    No bonus lessons yet.
+                  </p>
+                )}
+                {bonusLessons.map((item) => (
+                  <div key={item.id} className="border-b border-border p-4 last:border-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
+                        <p className="truncate text-xs text-muted-foreground">{item.description}</p>
+                      </div>
+                      <div className="flex shrink-0 gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingBonusId(item.id);
+                            setBonus_item(item);
+                            setBonusMode(item.sourceType === "file" ? "file" : "youtube");
+                            setBonusFile(null);
+                          }}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async () => {
+                            await deleteBonusLesson(item.id);
+                            queryClient.invalidateQueries({ queryKey: ["bonus-lessons"] });
+                            toast.success("Bonus lesson deleted");
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </main>
       </div>
     </div>

@@ -20,9 +20,9 @@ export function Hero() {
           </h1>
 
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Learn English from zero or push your band score higher — with video lessons,
-            interactive games, full mock exams and a live leaderboard. Start with a quick
-            placement test and we&apos;ll build the path for you.
+            Learn English from zero or push your band score higher — with video lessons, interactive
+            games, full mock exams and a live leaderboard. Start with a quick placement test and
+            we&apos;ll build the path for you.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">

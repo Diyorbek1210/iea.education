@@ -27,7 +27,6 @@ const buttonVariants = cva(
         pill: "h-10 rounded-full px-6",
         "pill-lg": "h-12 rounded-full px-8 text-base",
       },
-
     },
     defaultVariants: {
       variant: "default",

@@ -27,7 +27,7 @@ import {
 } from "@/data/mockTest";
 import { scoreMockPerformance } from "@/lib/aiScoring";
 import { useAuth } from "@/lib/auth";
-import { addMockResult, markMockTestCompleted, recordActivity } from "@/lib/db";
+import { addMockResult, levelForBand, markMockTestCompleted, recordActivity, updateUserProfile } from "@/lib/db";
 import type { AiFeedback, AiSkillFeedback } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -209,7 +209,6 @@ function MockTestRunPage() {
   const mockSet = mockTests.find((m) => m.id === mockId);
   const mockIndex = mockSet ? mockTests.findIndex((m) => m.id === mockId) : -1;
   const previousMock = mockIndex > 0 ? mockTests[mockIndex - 1] : null;
-  const nextMock = mockIndex >= 0 ? mockTests[mockIndex + 1] : undefined;
 
   const [stage, setStage] = useState<Stage>("intro");
 
@@ -368,6 +367,8 @@ function MockTestRunPage() {
       await markMockTestCompleted(user.uid, mockSet.id);
       const optimistic = { ...user, mockResults: [...(user.mockResults ?? []), "pending"] };
       const { xpGained, newBadges } = await recordActivity(optimistic, "mockTest");
+      const newLevel = levelForBand(overall);
+      await updateUserProfile(user.uid, { level: newLevel });
       await refresh();
       queryClient.invalidateQueries({ queryKey: ["mock-results"] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -794,33 +795,13 @@ function MockTestRunPage() {
               {saving ? (
                 <p className="text-sm text-muted-foreground">Saving your result…</p>
               ) : (
-                <>
-                  <p className="text-sm font-semibold text-foreground">
-                    {nextMock
-                      ? `${nextMock.title} is now unlocked!`
-                      : "You've completed all 10 mock tests! 🎉"}
-                  </p>
-                  <div className="mt-4 flex flex-wrap justify-center gap-3">
-                    {nextMock && (
-                      <Button
-                        variant="hero"
-                        size="pill"
-                        onClick={() =>
-                          navigate({ to: "/mock-test/$mockId", params: { mockId: nextMock.id } })
-                        }
-                      >
-                        Start {nextMock.title}
-                      </Button>
-                    )}
-                    <Button
-                      variant="soft"
-                      size="pill"
-                      onClick={() => navigate({ to: "/mock-test" })}
-                    >
-                      Back to mock tests
-                    </Button>
-                  </div>
-                </>
+                <Button
+                  variant="hero"
+                  size="pill"
+                  onClick={() => navigate({ to: "/mock-test" })}
+                >
+                  OK
+                </Button>
               )}
             </section>
           </div>

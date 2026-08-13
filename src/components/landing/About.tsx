@@ -32,9 +32,9 @@ export function About() {
           An English academy that fits into your day
         </h2>
         <p className="mt-4 text-muted-foreground">
-          IEA — IELTS &amp; English Access — is a free learning platform built for students who
-          want measurable progress. Learn at your pace, test yourself often, and see exactly how
-          far you&apos;ve come.
+          IEA — IELTS &amp; English Access — is a free learning platform built for students who want
+          measurable progress. Learn at your pace, test yourself often, and see exactly how far
+          you&apos;ve come.
         </p>
       </div>
 

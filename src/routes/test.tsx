@@ -123,9 +123,7 @@ function PlacementTest() {
             <Button
               variant="hero"
               size="pill"
-              onClick={() =>
-                navigate({ to: "/register", search: { level, score } })
-              }
+              onClick={() => navigate({ to: "/register", search: { level, score } })}
             >
               Continue to registration <ArrowRight className="h-4 w-4" />
             </Button>
@@ -190,12 +188,7 @@ function PlacementTest() {
               >
                 Back
               </Button>
-              <Button
-                variant="outline"
-                size="pill"
-                disabled={index + 1 >= total}
-                onClick={goNext}
-              >
+              <Button variant="outline" size="pill" disabled={index + 1 >= total} onClick={goNext}>
                 Next <ArrowRight className="h-4 w-4" />
               </Button>
             </div>

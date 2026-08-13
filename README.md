@@ -3,10 +3,13 @@
 # IEA — IELTS & English Access | Lovable uchun to'liq loyiha prompti
 
 ## Umumiy g'oya
+
 "IEA (IELTS & English Access)" nomli veb-platforma yasa. Bu platforma foydalanuvchilarga ingliz tilini noldan o'rganish yoki mavjud darajasini oshirishga yordam beradi. Loyiha **Vite + React + TypeScript** asosida, **faqat frontend** (backend kerak emas), ma'lumotlar bazasi sifatida **Firebase (Firestore + Authentication)** ishlatiladi, alohida `firebaseConfig.ts` fayl orqali sozlansin.
 
 ## Dizayn yo'nalishi (stil manbai)
+
 Men tashlagan landing page skrinshotidagi stilni asos qilib ol:
+
 - Fon: oq / juda ochiq ko'k-kulrang (#F8FAFC)
 - Asosiy rang: to'q ko'k-siyoh (#1E3A8A) va yorqin ko'k (#2563EB) gradient
 - Tugmalar: to'liq yumaloq (pill-shape), gradient fon, oq matn
@@ -61,21 +64,25 @@ Quyidagi bo'limlardan iborat (navbar: Home, About, Courses, Teachers, Testimonia
 Ro'yxatdan o'tgandan keyin foydalanuvchi kiradigan asosiy hudud, ichida bir nechta sahifa/tab bo'lsin (sidebar yoki tab navigatsiya):
 
 ### 4.1. Videolar sahifasi (Home / Videos)
+
 - Admin tomonidan yuklab qo'yilgan video darslar ro'yxati (YouTube link yoki video URL asosida) shu yerda chiqib turadi
 - Har video: sarlavha, tavsif, thumbnail, "Watched" belgisi
 - Foydalanuvchi videoni ko'rgach "watched" deb belgilanadi (Firestore'da userning `videosWatched` massiviga video ID qo'shiladi)
 
 ### 4.2. O'yinlar sahifasi (Games)
+
 - Ingliz tilini o'rganishga yordam beradigan, qiziqarli va "adrenalinga boy" interaktiv o'yinlar (masalan: so'z topish, vocabulary quiz, timed challenge, hangman-uslubidagi so'z o'yini va h.k.) — kamida 2-3 ta o'yin turi frontend'da to'liq ishlaydigan qilib yasalsin
 - **Bonusli mexanika**: agar foydalanuvchi kamida 5 ta videoni ko'rgan bo'lsa, unga avtomatik ravishda **1 ta bepul IELTS darsi** ochiladi (bu ham admin tomonidan joylanadigan alohida kontent bo'lib, faqat shart bajarilgan userlarga ko'rinadi/unlock bo'ladi)
 
 ### 4.3. Mock Test sahifasi
+
 - Foydalanuvchi istalgan vaqtda haqiqiy IELTS imtihoniga o'xshash **to'liq mock test** topshirishi mumkin
 - 4 ta skill bo'yicha: **Listening, Reading, Writing, Speaking** (Speaking va Writing uchun matn/audio javob yozish maydoni, Listening/Reading uchun multiple-choice yoki qisqa javoblar)
 - Test yakunida natija hisoblanadi va Firestore'ga saqlanadi (`mockResults` collection: userId, sana, har skill bo'yicha ball, umumiy band score)
 - Barcha natijalar avtomatik **Admin panelga** ham yuboriladi (adminga umumiy jadvalda ko'rinadi)
 
 ### 4.4. Leaderboard sahifasi
+
 - Barcha foydalanuvchilar reyting jadvali — mock test natijalari yoki umumiy ball bo'yicha saralangan (yuqoridan pastga)
 - Foydalanuvchining ismi, darajasi, umumiy bali, o'rni (rank) ko'rsatilsin
 - O'zining joriy o'rni alohida ajratib ko'rsatilsin
@@ -100,7 +107,7 @@ Faqat `diyorbekmuzaffarovich4@gmail.com` / `admin123` orqali kirish mumkin. Keng
 
 - **Frontend**: Vite + React + TypeScript
 - **Backend yo'q** — hammasi frontend orqali to'g'ridan-to'g'ri Firebase bilan ishlaydi
-- **Firebase**: 
+- **Firebase**:
   - Authentication (Email/Password)
   - Firestore Database — collectionlar: `users`, `videos`, `mockResults`, `leaderboard` (yoki `users` ichidan hisoblanadi), `games` (agar kerak bo'lsa)
   - Alohida `src/firebaseConfig.ts` fayl yarat, unda Firebase config obyekti bo'lsin (men keyinroq o'z Firebase loyiham ma'lumotlarini qo'yaman)
@@ -112,6 +119,7 @@ Faqat `diyorbekmuzaffarovich4@gmail.com` / `admin123` orqali kirish mumkin. Keng
 ---
 
 ## Xulosa
+
 Yuqoridagi barcha bo'limlarni izchil, bir-biriga bog'liq flow sifatida qur: **Landing → Join Now → Placement Test (20 savol) → Register (daraja avtomatik biriktiriladi) → Student Dashboard (Videos / Games / Mock Test / Leaderboard)**, alohida yashirin **Admin Panel** (maxsus login orqali) — to'liq CRUD funksionallik bilan studentlar, videolar va mock natijalarni boshqarish uchun. Dizaynda men bergan skrinshotdagi ko'k-oq, minimal, professional ta'lim platformasi uslubini saqla.
 
 This project was built with [Lovable](https://lovable.dev).

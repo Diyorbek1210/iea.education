@@ -150,13 +150,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (isFirebaseConfigured && auth) {
         if (admin) {
+          let fbUser = null as { uid: string } | null;
           try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const cred = await signInWithEmailAndPassword(auth, email, password);
+            fbUser = cred.user;
           } catch {
-            /* admin may not exist in Auth — front-end admin access is still granted */
+            /* Admin account may not exist in Firebase Auth yet — create it so the
+               session persists across page reloads. */
+            try {
+              const cred = await createUserWithEmailAndPassword(auth, email, password);
+              fbUser = cred.user;
+              const existing = await getUserProfile(cred.user.uid);
+              if (!existing) {
+                await createUserProfile({
+                  uid: cred.user.uid,
+                  name: "Admin",
+                  email,
+                  level: "Advanced",
+                  createdAt: new Date().toISOString(),
+                  videosWatched: [],
+                  mockResults: [],
+                  xp: 0,
+                  streak: 0,
+                  longestStreak: 0,
+                  todayXp: 0,
+                  weeklyXp: 0,
+                  weekStartDate: weekStartKey(),
+                  dailyGoal: DEFAULT_DAILY_GOAL,
+                  badges: [],
+                  gamesPlayed: 0,
+                  placementCompleted: false,
+                });
+              }
+            } catch {
+              /* Creation also failed — still grant admin access for this session. */
+            }
           }
           setIsAdmin(true);
           window.localStorage.setItem(ADMIN_KEY, "true");
+          if (fbUser) await loadProfile(fbUser.uid);
           return { isAdmin: true };
         }
         const cred = await signInWithEmailAndPassword(auth, email, password);

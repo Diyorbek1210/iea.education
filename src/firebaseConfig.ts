@@ -1,10 +1,9 @@
-
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
 export const firebaseConfig = {
- apiKey: "AIzaSyCC5TBm4rC7AleakQl92W_yRPaiNoGoV9s",
+  apiKey: "AIzaSyCC5TBm4rC7AleakQl92W_yRPaiNoGoV9s",
 
   authDomain: "salom-4f3bd.firebaseapp.com",
 
@@ -18,8 +17,7 @@ export const firebaseConfig = {
 
   appId: "1:223747081418:web:5d1d89c7e00cc1a0b82033",
 
-  measurementId: "G-JYXYC0S8DX"
-
+  measurementId: "G-JYXYC0S8DX",
 };
 
 export const isFirebaseConfigured = !Object.values(firebaseConfig).some((value) =>

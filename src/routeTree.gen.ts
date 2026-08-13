@@ -17,6 +17,7 @@ import { Route as GamesRouteImport } from './routes/games'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MockTestRouteImport } from './routes/mock-test'
+import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as TestRouteImport } from './routes/test'
@@ -63,6 +64,11 @@ const MockTestRoute = MockTestRouteImport.update({
   path: '/mock-test',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PracticeRoute = PracticeRouteImport.update({
+  id: '/practice',
+  path: '/practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
+  '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
+  '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
+  '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/mock-test'
+    | '/practice'
     | '/profile'
     | '/register'
     | '/test'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/mock-test'
+    | '/practice'
     | '/profile'
     | '/register'
     | '/test'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/mock-test'
+    | '/practice'
     | '/profile'
     | '/register'
     | '/test'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MockTestRoute: typeof MockTestRoute
+  PracticeRoute: typeof PracticeRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   TestRoute: typeof TestRoute
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MockTestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/practice': {
+      id: '/practice'
+      path: '/practice'
+      fullPath: '/practice'
+      preLoaderRoute: typeof PracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MockTestRoute: MockTestRoute,
+  PracticeRoute: PracticeRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   TestRoute: TestRoute,

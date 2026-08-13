@@ -1,5 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
+  Bot,
   Gamepad2,
   Gift,
   LayoutDashboard,
@@ -23,6 +24,7 @@ const nav = [
   { to: "/bonuses", label: "Bonuses", icon: Gift },
   { to: "/games", label: "Games", icon: Gamepad2 },
   { to: "/mock-test", label: "Mock Test", icon: ClipboardCheck },
+  { to: "/practice", label: "Practice with AI", icon: Bot },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
 ] as const;
 

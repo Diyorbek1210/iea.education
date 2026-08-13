@@ -101,16 +101,8 @@
   --sidebar-border: oklch(0.925 0.014 255.5);
   --sidebar-ring: oklch(0.53 0.212 262.3);
 
-  --gradient-primary: linear-gradient(
-    135deg,
-    oklch(0.354 0.145 265.6),
-    oklch(0.53 0.212 262.3)
-  );
-  --gradient-soft: linear-gradient(
-    180deg,
-    oklch(0.984 0.004 247.9),
-    oklch(0.96 0.02 250)
-  );
+  --gradient-primary: linear-gradient(135deg, oklch(0.354 0.145 265.6), oklch(0.53 0.212 262.3));
+  --gradient-soft: linear-gradient(180deg, oklch(0.984 0.004 247.9), oklch(0.96 0.02 250));
   --shadow-soft: 0 10px 30px -12px oklch(0.354 0.145 265.6 / 0.25);
   --shadow-card: 0 4px 20px -8px oklch(0.354 0.145 265.6 / 0.18);
 }
@@ -230,4 +222,42 @@
 
 @utility animate-pulse-dot {
   animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
+}
+
+@keyframes lean-forward {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(-2deg); }
+}
+
+@keyframes tilt {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes speak-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes celebrate {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-6px) rotate(-3deg); }
+  75% { transform: translateY(-6px) rotate(3deg); }
+}
+
+@keyframes jolt {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float-up {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
 }

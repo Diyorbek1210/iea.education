@@ -44,8 +44,8 @@ export function Contact() {
             Questions before you start?
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Write to us and the IEA team will answer within one working day. Or skip ahead —
-            take the placement test and start learning right now.
+            Write to us and the IEA team will answer within one working day. Or skip ahead — take
+            the placement test and start learning right now.
           </p>
 
           <ul className="mt-8 space-y-4">

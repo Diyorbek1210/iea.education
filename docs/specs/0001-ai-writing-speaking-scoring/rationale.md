@@ -15,11 +15,13 @@ The consequence of not deciding: bands for half the exam stay decorative and use
 Call Google's Gemini 3.1 Flash Lite model from a new server function with a plain fetch request, mirroring the existing Text to Speech integration. One request scores both writing tasks together, one request scores the speaking transcripts. The key lives only on the server.
 
 **Pros**:
+
 - Free AI Studio tier (about 1500 requests per day) far exceeds current usage (2 requests per finished mock)
 - Reuses the proven pattern already running for TTS: no SDK, no new dependency, key handling solved
 - Fast responses (typically 3 to 8 seconds), so a waiting state on the result screen is acceptable
 
 **Cons**:
+
 - Scoring quality sits below top tier models; bands can vary slightly between runs
 - Hard external dependency: key outage or quota exhaustion must always fall back cleanly
 
@@ -30,9 +32,11 @@ Call Google's Gemini 3.1 Flash Lite model from a new server function with a plai
 Same integration, a stronger model.
 
 **Pros**:
+
 - Noticeably better judgement of argument structure and grammar
 
 **Cons**:
+
 - Much lower free limits and slower responses, so every finished mock risks a long wait or quota failure
 
 ### Option 3: OpenAI GPT 4o mini (or another hosted model)
@@ -40,9 +44,11 @@ Same integration, a stronger model.
 Call a different provider's chat model instead.
 
 **Pros**:
+
 - Comparable quality and low per call cost
 
 **Cons**:
+
 - Adds a second provider account, billing, and secret to operate, while the project already runs on Google's API surface
 
 ### Option 4: Fix in place, extend the heuristic only
@@ -50,9 +56,11 @@ Call a different provider's chat model instead.
 Keep scoring fully offline and add signals like connector words and sentence variety to the current formula.
 
 **Pros**:
+
 - Zero cost, zero latency, no external key to manage
 
 **Cons**:
+
 - Cannot judge grammar or content at all, which is the root gap; offline spell and grammar checking is itself a large project
 
 ## Rationale

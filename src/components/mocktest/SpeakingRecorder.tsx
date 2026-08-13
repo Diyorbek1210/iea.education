@@ -105,12 +105,26 @@ export function SpeakingRecorder({
   }
 
   function startRecording() {
-    if (recognitionSupported) {
+    if (!recognitionSupported) {
+      setRecording(true);
+      return;
+    }
+
+    // Stop any existing recognition first
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+      recognitionRef.current = null;
+    }
+
+    try {
       const Ctor = getSpeechRecognitionCtor();
-      if (!Ctor) return;
+      if (!Ctor) {
+        setRecording(true);
+        return;
+      }
       const recognition = new Ctor();
       recognition.lang = "en-US";
-      recognition.continuous = true;
+      recognition.continuous = false;
       recognition.interimResults = true;
       let finalText = "";
       recognition.onresult = (event) => {
@@ -122,12 +136,34 @@ export function SpeakingRecorder({
         }
         setTranscript((finalText + interim).trim());
       };
-      recognition.onerror = () => stopRecognition();
-      recognition.onend = () => setRecording(false);
+      recognition.onerror = () => {};
+      recognition.onend = () => {
+        // If no user stop and no text, restart
+        if (finalText.trim()) {
+          setRecording(false);
+        } else {
+          try {
+            const retry = new Ctor();
+            retry.lang = "en-US";
+            retry.continuous = false;
+            retry.interimResults = true;
+            retry.onresult = recognition.onresult;
+            retry.onerror = recognition.onerror;
+            retry.onend = recognition.onend;
+            recognitionRef.current = retry;
+            retry.start();
+          } catch {
+            setRecording(false);
+          }
+        }
+      };
       recognitionRef.current = recognition;
       recognition.start();
+      setRecording(true);
+    } catch (err) {
+      console.warn("Failed to start recognition:", err);
+      setRecording(true);
     }
-    setRecording(true);
   }
 
   function stopAndNext() {
