@@ -1,62 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
 import {
+  BookOpen,
+  CalendarCheck,
   CheckCircle2,
-  ClipboardCheck,
+  Clock,
   Flame,
-  Gamepad2,
-  Gift,
-  Lock,
-  PlayCircle,
-  Star,
-  Trophy,
-  type LucideIcon,
+  Loader2,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { DailyGoalRing } from "@/components/dashboard/DailyGoalRing";
-import { MockProgressChart } from "@/components/dashboard/MockProgressChart";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { BADGES } from "@/data/badges";
 import { useAuth } from "@/lib/auth";
-import { listMockResults, setDailyGoal } from "@/lib/db";
-import {
-  computeXpLevel,
-  DAILY_GOAL_PRESETS,
-  DEFAULT_DAILY_GOAL,
-  nextXpLevel,
-} from "@/lib/gamification";
+import { listStudyPlans } from "@/lib/db";
+import { type StudyTask, type SkillType, type DayOfWeek, DAY_LABELS } from "@/data/studyPlan";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — IEA" },
+      { title: "Dashboard - IEA" },
       {
         name: "description",
-        content: "Track your streak, XP, daily goal, mock test progress and unlocked badges.",
+        content: "Your IELTS study dashboard with daily tasks, progress and mock test results.",
       },
-      { property: "og:title", content: "Dashboard — IEA" },
-      { property: "og:description", content: "Your learning progress at a glance." },
+      { property: "og:title", content: "Dashboard - IEA" },
+      { property: "og:description", content: "Your IELTS learning progress at a glance." },
     ],
   }),
   component: DashboardPage,
 });
-
-const ICONS: Record<string, LucideIcon> = {
-  CheckCircle2,
-  Flame,
-  Gift,
-  PlayCircle,
-  ClipboardCheck,
-  Gamepad2,
-  Star,
-  Trophy,
-};
 
 function initials(name: string) {
   return name
@@ -67,51 +43,187 @@ function initials(name: string) {
     .join("");
 }
 
-function StatTile({ label, value }: { label: string; value: string | number }) {
+const SKILL_COLORS: Record<SkillType, string> = {
+  listening: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  reading: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+  writing: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  speaking: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
+};
+
+const SKILL_LABELS: Record<SkillType, string> = {
+  listening: "Listening",
+  reading: "Reading",
+  writing: "Writing",
+  speaking: "Speaking",
+};
+
+function getTodayKey(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getDayOfWeek(): DayOfWeek {
+  const days: DayOfWeek[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  return days[new Date().getDay()]!;
+}
+
+function getCompletedTasks(): Record<string, boolean> {
+  try {
+    const raw = localStorage.getItem(`iea_daily_tasks_${getTodayKey()}`);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveCompletedTasks(tasks: Record<string, boolean>) {
+  localStorage.setItem(`iea_daily_tasks_${getTodayKey()}`, JSON.stringify(tasks));
+}
+
+function DailyStudyTasks({ plans }: { plans: Array<{ weekSchedule: Array<{ day: DayOfWeek; tasks: StudyTask[] }> }> }) {
+  const today = getDayOfWeek();
+  const todayLabel = DAY_LABELS[today];
+
+  const todayTasks = useMemo(() => {
+    if (!plans.length) return [];
+    const plan = plans[0];
+    const todaySchedule = plan.weekSchedule.find((s) => s.day === today);
+    return todaySchedule?.tasks ?? [];
+  }, [plans, today]);
+
+  const [completed, setCompleted] = useState<Record<string, boolean>>(getCompletedTasks);
+
+  const completedCount = todayTasks.filter((t) => completed[t.id]).length;
+  const totalMinutes = todayTasks.reduce((sum, t) => sum + t.durationMinutes, 0);
+  const completedMinutes = todayTasks.filter((t) => completed[t.id]).reduce((sum, t) => sum + t.durationMinutes, 0);
+
+  function toggleTask(taskId: string) {
+    setCompleted((prev) => {
+      const next = { ...prev, [taskId]: !prev[taskId] };
+      saveCompletedTasks(next);
+      return next;
+    });
+  }
+
+  if (todayTasks.length === 0) {
+    return (
+      <section className="rounded-3xl bg-card p-6 shadow-card">
+        <div className="flex items-center gap-2 mb-3">
+          <CalendarCheck className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-bold text-foreground">Today's Tasks</h3>
+          <Badge variant="secondary" className="ml-auto">{todayLabel}</Badge>
+        </div>
+        <div className="rounded-2xl bg-secondary/60 p-8 text-center">
+          <BookOpen className="mx-auto h-8 w-8 text-muted-foreground/50" />
+          <p className="mt-3 text-sm font-semibold text-foreground">No tasks for today</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Set up your study plan to get daily tasks.
+          </p>
+          <Button asChild variant="soft" size="pill" className="mt-4">
+            <a href="/settings">Set up study plan</a>
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <div className="rounded-2xl bg-secondary p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-        {label}
+    <section className="rounded-3xl bg-card p-6 shadow-card">
+      <div className="flex items-center gap-2 mb-3">
+        <CalendarCheck className="h-4 w-4 text-primary" />
+        <h3 className="text-sm font-bold text-foreground">Today's Tasks</h3>
+        <Badge variant="secondary" className="ml-auto">{todayLabel}</Badge>
+      </div>
+
+      {/* Progress bar */}
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex-1 h-2 rounded-full bg-secondary">
+          <div
+            className="h-full rounded-full bg-gradient-primary transition-all duration-500"
+            style={{ width: `${todayTasks.length ? (completedCount / todayTasks.length) * 100 : 0}%` }}
+          />
+        </div>
+        <span className="text-xs font-bold text-muted-foreground">
+          {completedCount}/{todayTasks.length}
+        </span>
+      </div>
+
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+        {completedMinutes} / {totalMinutes} min completed
       </p>
-      <p className="mt-1 text-2xl font-extrabold text-secondary-foreground">{value}</p>
-    </div>
+
+      {/* Task list */}
+      <div className="space-y-2">
+        {todayTasks.map((task) => {
+          const isDone = !!completed[task.id];
+          return (
+            <button
+              key={task.id}
+              onClick={() => toggleTask(task.id)}
+              className={cn(
+                "flex w-full items-center gap-3 rounded-2xl p-3 text-left transition-all",
+                isDone
+                  ? "bg-primary/10 border border-primary/20"
+                  : "bg-secondary/60 hover:bg-secondary border border-transparent",
+              )}
+            >
+              <span
+                className={cn(
+                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                  isDone
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-muted-foreground",
+                )}
+              >
+                {isDone && <CheckCircle2 className="h-3.5 w-3.5" />}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className={cn(
+                  "text-sm font-semibold",
+                  isDone ? "text-muted-foreground line-through" : "text-foreground",
+                )}>
+                  {task.title}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{task.description}</p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold", SKILL_COLORS[task.skill])}>
+                  {SKILL_LABELS[task.skill]}
+                </span>
+                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  {task.durationMinutes}m
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {completedCount === todayTasks.length && todayTasks.length > 0 && (
+        <div className="mt-4 rounded-2xl bg-primary/10 p-4 text-center">
+          <p className="text-sm font-bold text-primary">All tasks completed!</p>
+          <p className="mt-1 text-xs text-muted-foreground">Great work today.</p>
+        </div>
+      )}
+    </section>
   );
 }
 
 function DashboardPage() {
-  const { user, refresh } = useAuth();
-  const { data: mockResults = [] } = useQuery({
-    queryKey: ["mock-results"],
-    queryFn: listMockResults,
+  const { user } = useAuth();
+  const { data: plans = [] } = useQuery({
+    queryKey: ["study-plans"],
+    queryFn: listStudyPlans,
   });
 
   if (!user) return null;
 
-  const myMockResults = mockResults.filter((r) => r.userId === user.uid);
-
-  const xp = user.xp ?? 0;
-  const streak = user.streak ?? 0;
-  const longestStreak = user.longestStreak ?? 0;
-  const todayXp = user.todayXp ?? 0;
-  const dailyGoal = user.dailyGoal ?? DEFAULT_DAILY_GOAL;
-  const unlockedBadges = new Set(user.badges ?? []);
-
-  const currentLevel = computeXpLevel(xp);
-  const next = nextXpLevel(xp);
-  const levelProgress = next
-    ? ((xp - currentLevel.minXp) / (next.minXp - currentLevel.minXp)) * 100
-    : 100;
-
-  async function pickGoal(goal: number) {
-    if (!user) return;
-    await setDailyGoal(user.uid, goal);
-    await refresh();
-    toast.success(`Daily goal set to ${goal} XP`);
-  }
+  const myPlans = plans.filter((p) => p.userId === user.uid);
 
   return (
-    <DashboardShell title="Dashboard" subtitle="Streak, XP, daily goal and badges">
+    <DashboardShell title="Dashboard">
       <div className="space-y-6">
+        {/* User Profile */}
         <section className="flex flex-wrap items-center gap-5 rounded-3xl bg-card p-6 shadow-card">
           <Avatar className="h-16 w-16">
             <AvatarFallback className="bg-gradient-primary text-lg font-extrabold text-primary-foreground">
@@ -123,107 +235,12 @@ function DashboardPage() {
             <p className="truncate text-xs text-muted-foreground">{user.email}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               <Badge variant="secondary">{user.level}</Badge>
-              <Badge className="bg-gradient-primary text-primary-foreground">
-                {currentLevel.title}
-              </Badge>
             </div>
           </div>
         </section>
 
-        <section className="grid gap-5 sm:grid-cols-2">
-          <div className="rounded-3xl bg-card p-6 shadow-card">
-            <p className="flex items-center gap-2 text-sm font-bold text-foreground">
-              <Flame className="h-4 w-4 text-primary" /> Streak
-            </p>
-            <p className="mt-2 text-3xl font-extrabold text-foreground">{streak} days</p>
-            <p className="mt-1 text-xs text-muted-foreground">Best streak: {longestStreak} days</p>
-          </div>
-          <div className="rounded-3xl bg-card p-6 shadow-card">
-            <p className="text-sm font-bold text-foreground">Experience</p>
-            <p className="mt-2 text-3xl font-extrabold text-foreground">{xp} XP</p>
-            <Progress value={levelProgress} className="mt-3 h-2" />
-            <p className="mt-1 text-xs text-muted-foreground">
-              {next ? `${next.minXp - xp} XP to ${next.title}` : "Max level reached"}
-            </p>
-          </div>
-        </section>
-
-        <MockProgressChart results={myMockResults} />
-
-        <section className="rounded-3xl bg-card p-6 shadow-card">
-          <p className="text-sm font-bold text-foreground">Daily goal</p>
-          <div className="mt-4 flex flex-wrap items-center gap-6">
-            <DailyGoalRing todayXp={todayXp} dailyGoal={dailyGoal} />
-            <div className="flex flex-wrap gap-2">
-              {DAILY_GOAL_PRESETS.map((preset) => (
-                <Button
-                  key={preset}
-                  variant={dailyGoal === preset ? "hero" : "soft"}
-                  size="pill"
-                  onClick={() => pickGoal(preset)}
-                >
-                  {preset} XP
-                </Button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h3 className="text-sm font-bold text-foreground">Badges</h3>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {BADGES.map((badge) => {
-              const unlocked = unlockedBadges.has(badge.id);
-              const Icon = ICONS[badge.icon] ?? Star;
-              return (
-                <div
-                  key={badge.id}
-                  className={cn(
-                    "flex items-center gap-3 rounded-2xl p-4 shadow-card transition-all",
-                    unlocked ? "bg-gradient-primary" : "bg-secondary opacity-70",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
-                      unlocked ? "bg-primary-foreground/20" : "bg-card",
-                    )}
-                  >
-                    {unlocked ? (
-                      <Icon className="h-5 w-5 text-primary-foreground" />
-                    ) : (
-                      <Lock className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </span>
-                  <div className="min-w-0">
-                    <p
-                      className={cn(
-                        "text-sm font-bold",
-                        unlocked ? "text-primary-foreground" : "text-foreground",
-                      )}
-                    >
-                      {badge.name}
-                    </p>
-                    <p
-                      className={cn(
-                        "text-xs",
-                        unlocked ? "text-primary-foreground/80" : "text-muted-foreground",
-                      )}
-                    >
-                      {badge.description}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          <StatTile label="Videos watched" value={user.videosWatched?.length ?? 0} />
-          <StatTile label="Mock tests" value={user.mockResults?.length ?? 0} />
-          <StatTile label="Games played" value={user.gamesPlayed ?? 0} />
-        </section>
+        {/* Daily Study Tasks */}
+        <DailyStudyTasks plans={myPlans} />
       </div>
     </DashboardShell>
   );

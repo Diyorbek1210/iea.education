@@ -27,7 +27,7 @@ import {
 } from "@/data/mockTest";
 import { scoreMockPerformance } from "@/lib/aiScoring";
 import { useAuth } from "@/lib/auth";
-import { addMockResult, levelForBand, markMockTestCompleted, recordActivity, updateUserProfile } from "@/lib/db";
+import { addMockResult, levelForBand, markMockTestCompleted, updateUserProfile } from "@/lib/db";
 import type { AiFeedback, AiSkillFeedback } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -365,15 +365,12 @@ function MockTestRunPage() {
         feedback: fb,
       });
       await markMockTestCompleted(user.uid, mockSet.id);
-      const optimistic = { ...user, mockResults: [...(user.mockResults ?? []), "pending"] };
-      const { xpGained, newBadges } = await recordActivity(optimistic, "mockTest");
       const newLevel = levelForBand(overall);
       await updateUserProfile(user.uid, { level: newLevel });
       await refresh();
       queryClient.invalidateQueries({ queryKey: ["mock-results"] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success(`Result saved · +${xpGained} XP`);
-      newBadges.forEach((b) => toast(`🏅 New badge: ${b.name}`));
+      toast.success("Result saved");
     } catch {
       toast.error("Could not save your result");
     } finally {

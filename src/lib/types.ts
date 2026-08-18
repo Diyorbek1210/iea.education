@@ -1,6 +1,6 @@
 export type Level = "Beginner" | "Elementary" | "Intermediate" | "Upper-Intermediate" | "Advanced";
 
-export type ActivityType = "video" | "game" | "mockTest" | "placementTest";
+export type ActivityType = "game" | "mockTest" | "placementTest";
 
 export interface UserProfile {
   uid: string;
@@ -8,7 +8,6 @@ export interface UserProfile {
   email: string;
   level: Level | string;
   createdAt: string;
-  videosWatched: string[];
   mockResults: string[];
 
   // --- Gamification (optional so pre-existing profiles stay valid) ---
@@ -24,17 +23,6 @@ export interface UserProfile {
   gamesPlayed?: number;
   placementCompleted?: boolean;
   completedMockTests?: string[];
-}
-
-export interface VideoDoc {
-  id: string;
-  title: string;
-  description: string;
-  url: string;
-  thumbnail: string;
-  createdAt: string;
-  /** How `url` should be played. Missing on older docs — treat as "youtube". */
-  sourceType?: "youtube" | "file";
 }
 
 export interface AiCriterion {
@@ -77,12 +65,18 @@ export interface MockResult {
   feedback?: AiFeedback;
 }
 
-export interface BonusLesson {
+export interface ResourceDoc {
+  id: string;
   title: string;
   description: string;
   url: string;
-  /** How `url` should be played. Missing on older docs — treat as "youtube". */
-  sourceType?: "youtube" | "file";
+  type: "official" | "video" | "book" | "website" | "app";
+  skill: "all" | "listening" | "reading" | "writing" | "speaking";
+  isFree: boolean;
+  sourceType: "link" | "file";
+  thumbnail: string;
+  order: number;
+  createdAt: string;
 }
 
 export interface PlacementQuestion {

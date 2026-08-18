@@ -4,37 +4,31 @@ import {
   Bot,
   BookOpen,
   Calculator,
-  Calendar,
-  Gamepad2,
-  Gift,
   Globe,
   GraduationCap,
   LayoutDashboard,
-  LogOut,
   Menu,
   Mic,
   PenLine,
   Trophy,
   ClipboardCheck,
-  Video,
   X,
   FileText,
   Target,
+  Users,
+  Settings,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { Logo } from "@/components/Logo";
-import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/NotificationBell";
+import { SearchDialog } from "@/components/SearchDialog";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/videos", label: "Videos", icon: Video },
-  { to: "/bonuses", label: "Bonuses", icon: Gift },
-  { to: "/games", label: "Games", icon: Gamepad2 },
   { to: "/vocabulary", label: "Vocabulary", icon: BookOpen },
-  { to: "/study-plan", label: "Study Plan", icon: Calendar },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/task-practice", label: "Task Practice", icon: Target },
   { to: "/model-answers", label: "Model Answers", icon: FileText },
@@ -46,6 +40,7 @@ const nav = [
   { to: "/mock-test", label: "Mock Test", icon: ClipboardCheck },
   { to: "/practice", label: "Practice with AI", icon: Bot },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  { to: "/community", label: "Community", icon: Users },
 ] as const;
 
 export function DashboardShell({
@@ -57,7 +52,7 @@ export function DashboardShell({
   subtitle?: string;
   children: ReactNode;
 }) {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
@@ -69,16 +64,22 @@ export function DashboardShell({
   if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">Loading your dashboard…</p>
+        <p className="text-sm text-muted-foreground">Loading your dashboard...</p>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen bg-background">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-primary-foreground"
+      >
+        Skip to content
+      </a>
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 shrink-0 border-r border-sidebar-border bg-sidebar p-5 shadow-card transition-transform lg:static lg:translate-x-0 lg:shadow-none",
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-sidebar-border bg-sidebar p-5 shadow-card transition-transform lg:static lg:translate-x-0 lg:shadow-none",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -86,12 +87,13 @@ export function DashboardShell({
           <Logo />
         </Link>
 
-        <nav className="mt-8 space-y-1">
+        <nav className="mt-8 flex-1 space-y-1 overflow-y-auto" aria-label="Main navigation">
           {nav.map((item) => (
             <Link
               key={item.to}
               to={item.to}
               onClick={() => setOpen(false)}
+              aria-current={pathname === item.to ? "page" : undefined}
               className={cn(
                 "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors",
                 pathname === item.to
@@ -99,34 +101,26 @@ export function DashboardShell({
                   : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               )}
             >
-              <item.icon className="h-4 w-4" />
+              <item.icon className="h-4 w-4" aria-hidden="true" />
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="mt-8 rounded-2xl bg-secondary p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Your level
-          </p>
-          <p className="text-base font-extrabold text-secondary-foreground">{user.level}</p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {user.videosWatched?.length ?? 0} lessons watched
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">🔥 {user.streak ?? 0}-day streak</p>
-        </div>
-
-        <Button
-          variant="ghost"
-          size="pill"
-          className="mt-6 w-full justify-start"
-          onClick={async () => {
-            await signOut();
-            navigate({ to: "/", replace: true });
-          }}
+        <Link
+          to="/settings"
+          onClick={() => setOpen(false)}
+          aria-current={pathname === "/settings" ? "page" : undefined}
+          className={cn(
+            "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors mt-auto",
+            pathname === "/settings"
+              ? "bg-gradient-primary text-primary-foreground shadow-card"
+              : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+          )}
         >
-          <LogOut className="h-4 w-4" /> Sign out
-        </Button>
+          <Settings className="h-4 w-4" aria-hidden="true" />
+          Settings
+        </Link>
       </aside>
 
       {open && (
@@ -152,12 +146,16 @@ export function DashboardShell({
             <h1 className="truncate text-lg font-extrabold text-foreground">{title}</h1>
             {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
           </div>
-          <span className="ml-auto hidden rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-secondary-foreground sm:block">
-            {user.name}
-          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <SearchDialog />
+            <NotificationBell />
+            <span className="hidden rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-secondary-foreground sm:block">
+              {user.name}
+            </span>
+          </div>
         </header>
 
-        <main className="p-5 lg:p-8">{children}</main>
+        <main id="main-content" className="p-5 lg:p-8" tabIndex={-1}>{children}</main>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import {
   ExternalLink,
@@ -10,27 +11,26 @@ import {
   Video,
   Star,
   Filter,
-  GraduationCap,
   Globe,
 } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { IELTS_RESOURCES, type Resource } from "@/data/resources";
+import { listResources } from "@/lib/db";
 import { cn } from "@/lib/utils";
+import type { ResourceDoc } from "@/lib/types";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Resources — IEA" },
+      { title: "Resources - IEA" },
       { name: "description", content: "Curated IELTS preparation resources, links, and materials." },
     ],
   }),
   component: ResourcesPage,
 });
 
-const TYPE_ICONS: Record<Resource["type"], typeof BookOpen> = {
+const TYPE_ICONS: Record<ResourceDoc["type"], typeof BookOpen> = {
   official: Star,
   video: Video,
   book: BookOpen,
@@ -38,7 +38,7 @@ const TYPE_ICONS: Record<Resource["type"], typeof BookOpen> = {
   app: ExternalLink,
 };
 
-const TYPE_COLORS: Record<Resource["type"], string> = {
+const TYPE_COLORS: Record<ResourceDoc["type"], string> = {
   official: "text-yellow-500",
   video: "text-red-500",
   book: "text-blue-500",
@@ -49,15 +49,19 @@ const TYPE_COLORS: Record<Resource["type"], string> = {
 const SKILL_FILTERS = ["all", "listening", "reading", "writing", "speaking"] as const;
 
 function ResourcesPage() {
-  const [typeFilter, setTypeFilter] = useState<Resource["type"] | "all">("all");
-  const [skillFilter, setSkillFilter] = useState<"all" | Resource["skill"]>("all");
+  const { data: resources = [] } = useQuery({
+    queryKey: ["resources"],
+    queryFn: listResources,
+  });
+  const [typeFilter, setTypeFilter] = useState<ResourceDoc["type"] | "all">("all");
+  const [skillFilter, setSkillFilter] = useState<"all" | ResourceDoc["skill"]>("all");
 
   const filtered = useMemo(() => {
-    let resources = [...IELTS_RESOURCES];
-    if (typeFilter !== "all") resources = resources.filter((r) => r.type === typeFilter);
-    if (skillFilter !== "all") resources = resources.filter((r) => r.skill === skillFilter || r.skill === "all");
-    return resources;
-  }, [typeFilter, skillFilter]);
+    let list = [...resources];
+    if (typeFilter !== "all") list = list.filter((r) => r.type === typeFilter);
+    if (skillFilter !== "all") list = list.filter((r) => r.skill === skillFilter || r.skill === "all");
+    return list;
+  }, [resources, typeFilter, skillFilter]);
 
   const freeCount = filtered.filter((r) => r.isFree).length;
 
@@ -68,7 +72,7 @@ function ResourcesPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl bg-card p-4 shadow-card">
             <p className="text-xs font-semibold uppercase text-muted-foreground">Total Resources</p>
-            <p className="mt-1 text-2xl font-extrabold text-foreground">{IELTS_RESOURCES.length}</p>
+            <p className="mt-1 text-2xl font-extrabold text-foreground">{resources.length}</p>
           </div>
           <div className="rounded-2xl bg-card p-4 shadow-card">
             <p className="text-xs font-semibold uppercase text-muted-foreground">Free Resources</p>
@@ -84,29 +88,35 @@ function ResourcesPage() {
         <div className="flex flex-wrap gap-3">
           <div className="flex flex-wrap gap-1.5">
             {(["all", "official", "website", "video", "book", "app"] as const).map((type) => (
-              <Button
+              <button
                 key={type}
-                variant={typeFilter === type ? "hero" : "soft"}
-                size="pill"
                 onClick={() => setTypeFilter(type)}
-                className="text-xs"
+                className={cn(
+                  "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                  typeFilter === type
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                )}
               >
                 {type === "all" ? "All Types" : type.charAt(0).toUpperCase() + type.slice(1)}
-              </Button>
+              </button>
             ))}
           </div>
           <div className="h-6 w-px bg-border" />
           <div className="flex flex-wrap gap-1.5">
             {SKILL_FILTERS.map((skill) => (
-              <Button
+              <button
                 key={skill}
-                variant={skillFilter === skill ? "hero" : "soft"}
-                size="pill"
                 onClick={() => setSkillFilter(skill)}
-                className="text-xs"
+                className={cn(
+                  "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                  skillFilter === skill
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                )}
               >
                 {skill === "all" ? "All Skills" : skill.charAt(0).toUpperCase() + skill.slice(1)}
-              </Button>
+              </button>
             ))}
           </div>
         </div>

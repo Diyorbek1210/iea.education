@@ -11,11 +11,13 @@ import {
   arrayUnion,
   orderBy,
   query,
+  where,
 } from "firebase/firestore";
 
 import { auth, db, isFirebaseConfigured } from "@/firebaseConfig";
 import { deleteAuthUser } from "./authAdmin";
 import { placementQuestions as staticPlacementQuestions } from "@/data/placement";
+import { IELTS_RESOURCES } from "@/data/resources";
 import { BADGES, type BadgeDef } from "@/data/badges";
 import {
   applyStreak,
@@ -27,14 +29,13 @@ import {
 } from "./gamification";
 import type {
   ActivityType,
-  BonusLesson,
   Level,
   MockResult,
   PlacementQuestion,
   PracticeSession,
+  ResourceDoc,
   StudyPlanRecord,
   UserProfile,
-  VideoDoc,
   WritingSubmission,
 } from "./types";
 
@@ -57,9 +58,8 @@ export function levelForBand(overall: number): Level {
 
 const KEYS = {
   users: "iea_users",
-  videos: "iea_videos",
   mocks: "iea_mock_results",
-  bonus: "iea_bonus_lesson",
+  resources: "iea_resources",
   placement: "iea_placement_questions",
 };
 
@@ -78,76 +78,6 @@ function write<T>(key: string, value: T) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
-const seedVideos: VideoDoc[] = [
-  {
-    id: "v1",
-    title: "IELTS Speaking Part 1 — Fluency Basics",
-    description: "How to answer personal questions naturally and confidently.",
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    thumbnail: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=60",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "v2",
-    title: "Listening: Note Completion Strategy",
-    description: "Predict answers before the recording starts and never lose your place.",
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    thumbnail: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800&q=60",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "v3",
-    title: "Reading: True / False / Not Given",
-    description: "The decision rules that make this question type simple.",
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    thumbnail: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800&q=60",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "v4",
-    title: "Writing Task 2 — Essay Structure",
-    description: "A repeatable four-paragraph plan for band 7+ essays.",
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    thumbnail: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=60",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "v5",
-    title: "Grammar Reset: Tenses in 20 Minutes",
-    description: "Fix the tense mistakes that cost you marks in every skill.",
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    thumbnail: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=60",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "v6",
-    title: "Vocabulary for Describing Graphs",
-    description: "Precise language for Writing Task 1 trends and comparisons.",
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=60",
-    createdAt: new Date().toISOString(),
-  },
-];
-
-const defaultBonus: BonusLesson = {
-  title: "Bonus: Full IELTS Speaking Masterclass",
-  description:
-    "Unlocked for learners who completed 5 video lessons. A complete walkthrough of all three Speaking parts with band-9 model answers.",
-  url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-};
-
-interface BonusItem extends BonusLesson {
-  id: string;
-  createdAt: string;
-}
-
-function localVideos(): VideoDoc[] {
-  const existing = read<VideoDoc[] | null>(KEYS.videos, null);
-  if (existing && existing.length) return existing;
-  write(KEYS.videos, seedVideos);
-  return seedVideos;
-}
-
 const seedPlacementQuestions: PlacementQuestion[] = staticPlacementQuestions.map(
   (question, index) => ({
     id: `p${index + 1}`,
@@ -164,16 +94,10 @@ function localPlacementQuestions(): PlacementQuestion[] {
 }
 
 /* ------------------------------------------------------------------ *
- * Video file uploads (admin-uploaded lessons, as opposed to YouTube links)
- * Hosted on Cloudflare R2 via the S3-compatible API. A server function
- * handles the upload directly — credentials stay server-side, no CORS
- * configuration needed. Firebase Storage isn't used here because it
- * requires the paid Blaze plan.
+ * File uploads via Cloudflare R2
  * ------------------------------------------------------------------ */
 
 import { uploadToR2 } from "./r2Server";
-
-export const MAX_LESSON_VIDEO_BYTES = 200 * 1024 * 1024;
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -187,38 +111,16 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-/**
- * Uploads a video file for a lesson/bonus and returns its public URL.
- * Large files are compressed in the browser first (see videoCompress.ts).
- * `onCompressProgress` receives a 0–1 ratio while transcoding.
- */
-export async function uploadLessonVideo(
-  file: File,
-  folder: "videos" | "bonus",
-  onCompressProgress?: (ratio: number) => void,
-): Promise<string> {
-  if (file.size > MAX_LESSON_VIDEO_BYTES) {
-    const { compressVideo } = await import("./videoCompress");
-    file = await compressVideo(file, onCompressProgress);
-    if (file.size > MAX_LESSON_VIDEO_BYTES) {
-      const mb = Math.round(file.size / (1024 * 1024));
-      throw new Error(
-        `Video is still ${mb}MB after compression — the limit is ${Math.round(MAX_LESSON_VIDEO_BYTES / (1024 * 1024))}MB.`,
-      );
-    }
-  }
-
+export async function uploadResourceFile(file: File): Promise<string> {
   const fileBase64 = await fileToBase64(file);
-
   const { objectUrl } = await uploadToR2({
     data: {
       fileBase64,
       fileName: file.name,
-      contentType: file.type || "video/mp4",
-      folder,
+      contentType: file.type || "application/octet-stream",
+      folder: "resources",
     },
   });
-
   return objectUrl;
 }
 
@@ -270,10 +172,6 @@ export async function updateUserProfile(uid: string, data: Partial<UserProfile>)
 
 /**
  * Deletes a student's Firestore profile AND their Firebase Auth account.
- * Auth deletion runs through a server function (the client SDK can only
- * delete the current user's own account). Returns whether the Auth account
- * was removed too — false means the server key isn't configured, the Auth
- * account still exists, and the student could still log in.
  */
 export async function deleteUserProfile(uid: string): Promise<boolean> {
   if (!isFirebaseConfigured || !db) {
@@ -297,22 +195,6 @@ export async function deleteUserProfile(uid: string): Promise<boolean> {
   }
   await deleteDoc(doc(db, "users", uid));
   return authDeleted;
-}
-
-export async function markVideoWatched(uid: string, videoId: string): Promise<void> {
-  if (!isFirebaseConfigured || !db) {
-    const users = read<UserProfile[]>(KEYS.users, []);
-    write(
-      KEYS.users,
-      users.map((u) =>
-        u.uid === uid
-          ? { ...u, videosWatched: Array.from(new Set([...(u.videosWatched ?? []), videoId])) }
-          : u,
-      ),
-    );
-    return;
-  }
-  await updateDoc(doc(db, "users", uid), { videosWatched: arrayUnion(videoId) });
 }
 
 export async function markMockTestCompleted(uid: string, mockTestId: string): Promise<void> {
@@ -383,44 +265,90 @@ export async function setDailyGoal(uid: string, goalXp: number): Promise<void> {
 }
 
 /* ------------------------------------------------------------------ *
- * Videos
+ * Resources
  * ------------------------------------------------------------------ */
 
-export async function listVideos(): Promise<VideoDoc[]> {
-  if (!isFirebaseConfigured || !db) return localVideos();
-  const snap = await getDocs(query(collection(db, "videos"), orderBy("createdAt", "desc")));
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VideoDoc, "id">) }));
+function seedLocalResources(): ResourceDoc[] {
+  const existing = read<ResourceDoc[] | null>(KEYS.resources, null);
+  if (existing && existing.length) return existing;
+  const seeded = IELTS_RESOURCES.map((r, i) => ({
+    ...r,
+    sourceType: "link" as const,
+    thumbnail: "",
+    order: i,
+    createdAt: new Date().toISOString(),
+  }));
+  write(KEYS.resources, seeded);
+  return seeded;
 }
 
-export async function addVideo(video: Omit<VideoDoc, "id" | "createdAt">): Promise<void> {
-  const payload = { ...video, createdAt: new Date().toISOString() };
+export async function listResources(): Promise<ResourceDoc[]> {
   if (!isFirebaseConfigured || !db) {
-    write(KEYS.videos, [{ id: crypto.randomUUID(), ...payload }, ...localVideos()]);
-    return;
+    return seedLocalResources().sort((a, b) => a.order - b.order);
   }
-  await addDoc(collection(db, "videos"), payload);
+  const snap = await getDocs(query(collection(db, "resources"), orderBy("order", "asc")));
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ResourceDoc, "id">) }));
 }
 
-export async function updateVideo(id: string, data: Partial<VideoDoc>): Promise<void> {
+export async function addResource(resource: Omit<ResourceDoc, "id" | "createdAt" | "order">): Promise<void> {
+  const now = new Date().toISOString();
   if (!isFirebaseConfigured || !db) {
-    write(
-      KEYS.videos,
-      localVideos().map((v) => (v.id === id ? { ...v, ...data } : v)),
-    );
+    const existing = read<ResourceDoc[]>(KEYS.resources, []);
+    const maxOrder = existing.reduce((max, r) => Math.max(max, r.order), -1);
+    write(KEYS.resources, [...existing, { ...resource, id: crypto.randomUUID(), order: maxOrder + 1, createdAt: now }]);
     return;
   }
-  await updateDoc(doc(db, "videos", id), data);
+  const snap = await getDocs(collection(db, "resources"));
+  const maxOrder = snap.docs.reduce((max, d) => {
+    const data = d.data() as Omit<ResourceDoc, "id">;
+    return Math.max(max, data.order ?? 0);
+  }, -1);
+  await addDoc(collection(db, "resources"), { ...resource, order: maxOrder + 1, createdAt: now });
 }
 
-export async function deleteVideo(id: string): Promise<void> {
+export async function updateResource(id: string, data: Partial<Omit<ResourceDoc, "id" | "createdAt">>): Promise<void> {
   if (!isFirebaseConfigured || !db) {
-    write(
-      KEYS.videos,
-      localVideos().filter((v) => v.id !== id),
-    );
+    const existing = read<ResourceDoc[]>(KEYS.resources, []);
+    write(KEYS.resources, existing.map((r) => (r.id === id ? { ...r, ...data } : r)));
     return;
   }
-  await deleteDoc(doc(db, "videos", id));
+  await updateDoc(doc(db, "resources", id), data);
+}
+
+export async function deleteResource(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<ResourceDoc[]>(KEYS.resources, []);
+    const filtered = existing.filter((r) => r.id !== id);
+    filtered.forEach((r, i) => { r.order = i; });
+    write(KEYS.resources, filtered);
+    return;
+  }
+  await deleteDoc(doc(db, "resources", id));
+}
+
+export async function moveResource(id: string, direction: "up" | "down"): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<ResourceDoc[]>(KEYS.resources, []).sort((a, b) => a.order - b.order);
+    const idx = existing.findIndex((r) => r.id === id);
+    if (idx < 0) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= existing.length) return;
+    const temp = existing[idx]!.order;
+    existing[idx]!.order = existing[swapIdx]!.order;
+    existing[swapIdx]!.order = temp;
+    write(KEYS.resources, existing);
+    return;
+  }
+  const snap = await getDocs(query(collection(db, "resources"), orderBy("order", "asc")));
+  const docs = snap.docs.map((d) => ({ ref: d.ref, data: d.data() as Omit<ResourceDoc, "id"> }));
+  const idx = docs.findIndex((d) => d.ref.id === id);
+  if (idx < 0) return;
+  const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= docs.length) return;
+  const a = docs[idx]!;
+  const b = docs[swapIdx]!;
+  await updateDoc(a.ref, { order: b.data.order });
+  await updateDoc(b.ref, { order: a.data.order });
 }
 
 /* ------------------------------------------------------------------ *
@@ -484,76 +412,6 @@ export async function deleteMockResult(id: string, userId: string): Promise<void
     patch["completedMockTests"] = arrayRemove(mockTestId);
   }
   await updateDoc(doc(db, "users", userId), patch);
-}
-
-/* ------------------------------------------------------------------ *
- * Bonus lesson
- * ------------------------------------------------------------------ */
-
-export async function getBonusLesson(): Promise<BonusLesson> {
-  if (!isFirebaseConfigured || !db) return read<BonusLesson>(KEYS.bonus, defaultBonus);
-  const snap = await getDoc(doc(db, "content", "bonusLesson"));
-  return snap.exists() ? (snap.data() as BonusLesson) : defaultBonus;
-}
-
-export async function saveBonusLesson(lesson: BonusLesson): Promise<void> {
-  if (!isFirebaseConfigured || !db) {
-    write(KEYS.bonus, lesson);
-    return;
-  }
-  await setDoc(doc(db, "content", "bonusLesson"), lesson);
-}
-
-/* ------------------------------------------------------------------ *
- * Bonus lessons (multiple items)
- * ------------------------------------------------------------------ */
-
-const KEYS_BONUS_LESSONS = "iea_bonus_lessons";
-
-function localBonusLessons(): BonusItem[] {
-  const existing = read<BonusItem[] | null>(KEYS_BONUS_LESSONS, null);
-  if (existing && existing.length) return existing;
-  return [];
-}
-
-export async function listBonusLessons(): Promise<BonusItem[]> {
-  if (!isFirebaseConfigured || !db) return localBonusLessons();
-  const snap = await getDocs(query(collection(db, "bonusLessons"), orderBy("createdAt", "desc")));
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<BonusItem, "id">) }));
-}
-
-export async function addBonusLesson(lesson: Omit<BonusItem, "id" | "createdAt">): Promise<void> {
-  const payload = { ...lesson, createdAt: new Date().toISOString() };
-  if (!isFirebaseConfigured || !db) {
-    write(KEYS_BONUS_LESSONS, [{ id: crypto.randomUUID(), ...payload }, ...localBonusLessons()]);
-    return;
-  }
-  await addDoc(collection(db, "bonusLessons"), payload);
-}
-
-export async function updateBonusLesson(
-  id: string,
-  data: Partial<Omit<BonusItem, "id" | "createdAt">>,
-): Promise<void> {
-  if (!isFirebaseConfigured || !db) {
-    write(
-      KEYS_BONUS_LESSONS,
-      localBonusLessons().map((b) => (b.id === id ? { ...b, ...data } : b)),
-    );
-    return;
-  }
-  await updateDoc(doc(db, "bonusLessons", id), data);
-}
-
-export async function deleteBonusLesson(id: string): Promise<void> {
-  if (!isFirebaseConfigured || !db) {
-    write(
-      KEYS_BONUS_LESSONS,
-      localBonusLessons().filter((b) => b.id !== id),
-    );
-    return;
-  }
-  await deleteDoc(doc(db, "bonusLessons", id));
 }
 
 /* ------------------------------------------------------------------ *

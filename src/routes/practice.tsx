@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useSpeechSynthesis } from "@/components/mocktest/useSpeechSynthesis";
 import { chatWithAi } from "@/lib/aiChat";
+import { useAccent } from "@/lib/useAccent";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/practice")({
   head: () => ({
@@ -43,7 +45,8 @@ function getSpeechRecognitionCtor() {
 }
 
 function PracticePage() {
-  const { speak, stop: stopSpeaking, isSpeaking } = useSpeechSynthesis();
+  const { accent, setAccent, config: accentConfig, allAccents } = useAccent();
+  const { speak, stop: stopSpeaking, isSpeaking } = useSpeechSynthesis(accentConfig.lang);
   const [emotion, setEmotion] = useState<AvatarEmotion>("idle");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [recording, setRecording] = useState(false);
@@ -229,6 +232,27 @@ function PracticePage() {
   return (
     <DashboardShell title="Practice with AI">
       <div className="flex flex-col items-center gap-6 py-4">
+        {/* Accent Selector */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-muted-foreground">Voice accent:</span>
+          <div className="flex gap-1">
+            {allAccents.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => setAccent(a.id)}
+                className={cn(
+                  "rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors",
+                  accent === a.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {a.flag} {a.label.split(" ")[0]}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Avatar */}
         <div className="relative">
           <AiAvatar emotion={emotion} size={200} />

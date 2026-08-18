@@ -13,23 +13,22 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as BandCalculatorRouteImport } from './routes/band-calculator'
-import { Route as BonusesRouteImport } from './routes/bonuses'
+import { Route as CommunityRouteImport } from './routes/community'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as GamesRouteImport } from './routes/games'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MockTestRouteImport } from './routes/mock-test'
 import { Route as ModelAnswersRouteImport } from './routes/model-answers'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PronunciationRouteImport } from './routes/pronunciation'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RequirementsRouteImport } from './routes/requirements'
 import { Route as ResourcesRouteImport } from './routes/resources'
-import { Route as StudyPlanRouteImport } from './routes/study-plan'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TaskPracticeRouteImport } from './routes/task-practice'
 import { Route as TestRouteImport } from './routes/test'
-import { Route as VideosRouteImport } from './routes/videos'
 import { Route as VocabularyRouteImport } from './routes/vocabulary'
 import { Route as WritingGeneratorRouteImport } from './routes/writing-generator'
 import { Route as MockTestMockIdRouteImport } from './routes/mock-test_.$mockId'
@@ -54,19 +53,14 @@ const BandCalculatorRoute = BandCalculatorRouteImport.update({
   path: '/band-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BonusesRoute = BonusesRouteImport.update({
-  id: '/bonuses',
-  path: '/bonuses',
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GamesRoute = GamesRouteImport.update({
-  id: '/games',
-  path: '/games',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
@@ -87,6 +81,11 @@ const MockTestRoute = MockTestRouteImport.update({
 const ModelAnswersRoute = ModelAnswersRouteImport.update({
   id: '/model-answers',
   path: '/model-answers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeRoute = PracticeRouteImport.update({
@@ -119,9 +118,9 @@ const ResourcesRoute = ResourcesRouteImport.update({
   path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudyPlanRoute = StudyPlanRouteImport.update({
-  id: '/study-plan',
-  path: '/study-plan',
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TaskPracticeRoute = TaskPracticeRouteImport.update({
@@ -132,11 +131,6 @@ const TaskPracticeRoute = TaskPracticeRouteImport.update({
 const TestRoute = TestRouteImport.update({
   id: '/test',
   path: '/test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VideosRoute = VideosRouteImport.update({
-  id: '/videos',
-  path: '/videos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VocabularyRoute = VocabularyRouteImport.update({
@@ -160,23 +154,22 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/analytics': typeof AnalyticsRoute
   '/band-calculator': typeof BandCalculatorRoute
-  '/bonuses': typeof BonusesRoute
+  '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
-  '/games': typeof GamesRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
   '/model-answers': typeof ModelAnswersRoute
+  '/notifications': typeof NotificationsRoute
   '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
   '/pronunciation': typeof PronunciationRoute
   '/register': typeof RegisterRoute
   '/requirements': typeof RequirementsRoute
   '/resources': typeof ResourcesRoute
-  '/study-plan': typeof StudyPlanRoute
+  '/settings': typeof SettingsRoute
   '/task-practice': typeof TaskPracticeRoute
   '/test': typeof TestRoute
-  '/videos': typeof VideosRoute
   '/vocabulary': typeof VocabularyRoute
   '/writing-generator': typeof WritingGeneratorRoute
   '/mock-test/$mockId': typeof MockTestMockIdRoute
@@ -186,23 +179,22 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/analytics': typeof AnalyticsRoute
   '/band-calculator': typeof BandCalculatorRoute
-  '/bonuses': typeof BonusesRoute
+  '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
-  '/games': typeof GamesRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
   '/model-answers': typeof ModelAnswersRoute
+  '/notifications': typeof NotificationsRoute
   '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
   '/pronunciation': typeof PronunciationRoute
   '/register': typeof RegisterRoute
   '/requirements': typeof RequirementsRoute
   '/resources': typeof ResourcesRoute
-  '/study-plan': typeof StudyPlanRoute
+  '/settings': typeof SettingsRoute
   '/task-practice': typeof TaskPracticeRoute
   '/test': typeof TestRoute
-  '/videos': typeof VideosRoute
   '/vocabulary': typeof VocabularyRoute
   '/writing-generator': typeof WritingGeneratorRoute
   '/mock-test/$mockId': typeof MockTestMockIdRoute
@@ -213,23 +205,22 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/analytics': typeof AnalyticsRoute
   '/band-calculator': typeof BandCalculatorRoute
-  '/bonuses': typeof BonusesRoute
+  '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
-  '/games': typeof GamesRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
   '/model-answers': typeof ModelAnswersRoute
+  '/notifications': typeof NotificationsRoute
   '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
   '/pronunciation': typeof PronunciationRoute
   '/register': typeof RegisterRoute
   '/requirements': typeof RequirementsRoute
   '/resources': typeof ResourcesRoute
-  '/study-plan': typeof StudyPlanRoute
+  '/settings': typeof SettingsRoute
   '/task-practice': typeof TaskPracticeRoute
   '/test': typeof TestRoute
-  '/videos': typeof VideosRoute
   '/vocabulary': typeof VocabularyRoute
   '/writing-generator': typeof WritingGeneratorRoute
   '/mock-test_/$mockId': typeof MockTestMockIdRoute
@@ -241,23 +232,22 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analytics'
     | '/band-calculator'
-    | '/bonuses'
+    | '/community'
     | '/dashboard'
-    | '/games'
     | '/leaderboard'
     | '/login'
     | '/mock-test'
     | '/model-answers'
+    | '/notifications'
     | '/practice'
     | '/profile'
     | '/pronunciation'
     | '/register'
     | '/requirements'
     | '/resources'
-    | '/study-plan'
+    | '/settings'
     | '/task-practice'
     | '/test'
-    | '/videos'
     | '/vocabulary'
     | '/writing-generator'
     | '/mock-test/$mockId'
@@ -267,23 +257,22 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analytics'
     | '/band-calculator'
-    | '/bonuses'
+    | '/community'
     | '/dashboard'
-    | '/games'
     | '/leaderboard'
     | '/login'
     | '/mock-test'
     | '/model-answers'
+    | '/notifications'
     | '/practice'
     | '/profile'
     | '/pronunciation'
     | '/register'
     | '/requirements'
     | '/resources'
-    | '/study-plan'
+    | '/settings'
     | '/task-practice'
     | '/test'
-    | '/videos'
     | '/vocabulary'
     | '/writing-generator'
     | '/mock-test/$mockId'
@@ -293,23 +282,22 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analytics'
     | '/band-calculator'
-    | '/bonuses'
+    | '/community'
     | '/dashboard'
-    | '/games'
     | '/leaderboard'
     | '/login'
     | '/mock-test'
     | '/model-answers'
+    | '/notifications'
     | '/practice'
     | '/profile'
     | '/pronunciation'
     | '/register'
     | '/requirements'
     | '/resources'
-    | '/study-plan'
+    | '/settings'
     | '/task-practice'
     | '/test'
-    | '/videos'
     | '/vocabulary'
     | '/writing-generator'
     | '/mock-test_/$mockId'
@@ -320,23 +308,22 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AnalyticsRoute: typeof AnalyticsRoute
   BandCalculatorRoute: typeof BandCalculatorRoute
-  BonusesRoute: typeof BonusesRoute
+  CommunityRoute: typeof CommunityRoute
   DashboardRoute: typeof DashboardRoute
-  GamesRoute: typeof GamesRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MockTestRoute: typeof MockTestRoute
   ModelAnswersRoute: typeof ModelAnswersRoute
+  NotificationsRoute: typeof NotificationsRoute
   PracticeRoute: typeof PracticeRoute
   ProfileRoute: typeof ProfileRoute
   PronunciationRoute: typeof PronunciationRoute
   RegisterRoute: typeof RegisterRoute
   RequirementsRoute: typeof RequirementsRoute
   ResourcesRoute: typeof ResourcesRoute
-  StudyPlanRoute: typeof StudyPlanRoute
+  SettingsRoute: typeof SettingsRoute
   TaskPracticeRoute: typeof TaskPracticeRoute
   TestRoute: typeof TestRoute
-  VideosRoute: typeof VideosRoute
   VocabularyRoute: typeof VocabularyRoute
   WritingGeneratorRoute: typeof WritingGeneratorRoute
   MockTestMockIdRoute: typeof MockTestMockIdRoute
@@ -372,11 +359,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BandCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/bonuses': {
-      id: '/bonuses'
-      path: '/bonuses'
-      fullPath: '/bonuses'
-      preLoaderRoute: typeof BonusesRouteImport
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -384,13 +371,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/games': {
-      id: '/games'
-      path: '/games'
-      fullPath: '/games'
-      preLoaderRoute: typeof GamesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
@@ -419,6 +399,13 @@ declare module '@tanstack/react-router' {
       path: '/model-answers'
       fullPath: '/model-answers'
       preLoaderRoute: typeof ModelAnswersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/practice': {
@@ -463,11 +450,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/study-plan': {
-      id: '/study-plan'
-      path: '/study-plan'
-      fullPath: '/study-plan'
-      preLoaderRoute: typeof StudyPlanRouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/task-practice': {
@@ -482,13 +469,6 @@ declare module '@tanstack/react-router' {
       path: '/test'
       fullPath: '/test'
       preLoaderRoute: typeof TestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/videos': {
-      id: '/videos'
-      path: '/videos'
-      fullPath: '/videos'
-      preLoaderRoute: typeof VideosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vocabulary': {
@@ -520,23 +500,22 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AnalyticsRoute: AnalyticsRoute,
   BandCalculatorRoute: BandCalculatorRoute,
-  BonusesRoute: BonusesRoute,
+  CommunityRoute: CommunityRoute,
   DashboardRoute: DashboardRoute,
-  GamesRoute: GamesRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MockTestRoute: MockTestRoute,
   ModelAnswersRoute: ModelAnswersRoute,
+  NotificationsRoute: NotificationsRoute,
   PracticeRoute: PracticeRoute,
   ProfileRoute: ProfileRoute,
   PronunciationRoute: PronunciationRoute,
   RegisterRoute: RegisterRoute,
   RequirementsRoute: RequirementsRoute,
   ResourcesRoute: ResourcesRoute,
-  StudyPlanRoute: StudyPlanRoute,
+  SettingsRoute: SettingsRoute,
   TaskPracticeRoute: TaskPracticeRoute,
   TestRoute: TestRoute,
-  VideosRoute: VideosRoute,
   VocabularyRoute: VocabularyRoute,
   WritingGeneratorRoute: WritingGeneratorRoute,
   MockTestMockIdRoute: MockTestMockIdRoute,

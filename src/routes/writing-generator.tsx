@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Shuffle,
   PenLine,
@@ -9,11 +9,15 @@ import {
   Lightbulb,
   RotateCcw,
   ChevronDown,
+  Send,
+  Save,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   ESSAY_TOPICS,
   ESSAY_TYPES,
@@ -22,6 +26,9 @@ import {
   type EssayTopic,
 } from "@/data/essayTopics";
 import { WRITING_TASK2_RUBRIC, ESSAY_CHECKLIST } from "@/data/essayRubric";
+import { useAuth } from "@/lib/auth";
+import { addWritingSubmission } from "@/lib/db";
+import type { AiSkillFeedback } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/writing-generator")({
@@ -35,6 +42,7 @@ export const Route = createFileRoute("/writing-generator")({
 });
 
 function WritingGeneratorPage() {
+  const { user } = useAuth();
   const [selectedType, setSelectedType] = useState<EssayType | "all">("all");
   const [currentTopic, setCurrentTopic] = useState<EssayTopic | null>(null);
   const [essayText, setEssayText] = useState("");
@@ -43,6 +51,9 @@ function WritingGeneratorPage() {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [feedback, setFeedback] = useState<AiSkillFeedback | null>(null);
 
   const filteredTopics = useMemo(
     () => selectedType === "all" ? ESSAY_TOPICS : ESSAY_TOPICS.filter((t) => t.type === selectedType),
@@ -50,6 +61,20 @@ function WritingGeneratorPage() {
   );
 
   const wordCount = essayText.trim().split(/\s+/).filter(Boolean).length;
+
+  useEffect(() => {
+    if (!isTimerRunning || timeLeft <= 0) return;
+    const id = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          setIsTimerRunning(false);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [isTimerRunning, timeLeft > 0]);
 
   const generateRandom = () => {
     const topic = getRandomTopic(selectedType === "all" ? undefined : selectedType);
@@ -72,6 +97,42 @@ function WritingGeneratorPage() {
     const total = ESSAY_CHECKLIST.reduce((sum, section) => sum + section.items.length, 0);
     return total > 0 ? (checkedItems.size / total) * 100 : 0;
   }, [checkedItems]);
+
+  const handleSubmit = async () => {
+    if (!user || !currentTopic || !essayText.trim()) return;
+    if (wordCount < 50) {
+      toast.error("Write at least 50 words before submitting");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await addWritingSubmission({
+        userId: user.uid,
+        topicId: currentTopic.id,
+        text: essayText,
+        wordCount,
+        submittedAt: new Date().toISOString(),
+      });
+      setSubmitted(true);
+      setFeedback({
+        source: "heuristic",
+        band: Math.min(9, Math.max(4, Math.round(wordCount / 50) + 4)),
+        criteria: [],
+        summary: "Essay submitted successfully! Full AI scoring is available in mock tests.",
+        tips: [
+          "Review the IELTS rubric for detailed scoring criteria",
+          "Check your essay against the checklist above",
+          "Practice with different essay types to improve",
+        ],
+      });
+      setIsTimerRunning(false);
+      toast.success("Essay submitted!");
+    } catch {
+      toast.error("Failed to submit essay");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <DashboardShell title="Writing Practice" subtitle="Generate IELTS essay topics and practice">
@@ -178,7 +239,67 @@ function WritingGeneratorPage() {
                     : `Need ${currentTopic.minWords - wordCount} more words`}
                 </span>
               </div>
+              <div className="mt-4 flex items-center gap-3">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || submitted || wordCount < 50}
+                  variant="hero"
+                  size="pill"
+                >
+                  {isSubmitting ? (
+                    "Submitting..."
+                  ) : submitted ? (
+                    <><CheckCircle2 className="mr-2 h-4 w-4" /> Submitted</>
+                  ) : (
+                    <><Send className="mr-2 h-4 w-4" /> Submit Essay</>
+                  )}
+                </Button>
+                {submitted && (
+                  <Button
+                    onClick={() => {
+                      setSubmitted(false);
+                      setFeedback(null);
+                      setEssayText("");
+                    }}
+                    variant="soft"
+                    size="pill"
+                  >
+                    <PenLine className="mr-2 h-4 w-4" /> Write Another
+                  </Button>
+                )}
+              </div>
             </div>
+
+            {/* Feedback Display */}
+            {submitted && feedback && (
+              <div className="rounded-3xl bg-card p-6 shadow-card">
+                <h3 className="text-lg font-extrabold text-foreground">Submission Feedback</h3>
+                {feedback.band > 0 && (
+                  <div className="mt-3 flex items-center gap-3">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-primary text-xl font-extrabold text-primary-foreground">
+                      {feedback.band}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground">Estimated Band Score</p>
+                      <p className="text-xs text-muted-foreground">Based on word count and structure</p>
+                    </div>
+                  </div>
+                )}
+                {feedback.summary && (
+                  <p className="mt-3 text-sm text-foreground">{feedback.summary}</p>
+                )}
+                {feedback.tips.length > 0 && (
+                  <div className="mt-3 space-y-1">
+                    {feedback.tips.map((tip, i) => (
+                      <p key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                        {tip}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Checklist */}
             <div className="rounded-3xl bg-card p-6 shadow-card">

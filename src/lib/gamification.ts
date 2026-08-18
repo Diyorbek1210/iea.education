@@ -1,10 +1,7 @@
 import { BADGES, type BadgeDef } from "@/data/badges";
 import type { ActivityType, UserProfile } from "./types";
 
-export const BONUS_UNLOCK_VIDEOS = 5;
-
 export const XP_REWARDS = {
-  VIDEO_WATCHED: 10,
   GAME_BASE: 5,
   GAME_SCORE_MULTIPLIER: 2,
   GAME_MAX_BONUS: 20,
@@ -120,8 +117,6 @@ export function effectiveWeeklyXp(u: UserProfile, today = todayKey()): number {
 
 export function xpForActivity(activity: ActivityType, opts?: { gameScore?: number }): number {
   switch (activity) {
-    case "video":
-      return XP_REWARDS.VIDEO_WATCHED;
     case "mockTest":
       return XP_REWARDS.MOCK_TEST_COMPLETED;
     case "placementTest":
@@ -141,8 +136,6 @@ function meetsCriteria(p: UserProfile, b: BadgeDef): boolean {
   switch (c.type) {
     case "streak":
       return (p.streak ?? 0) >= c.days;
-    case "videosWatched":
-      return (p.videosWatched?.length ?? 0) >= c.count;
     case "mockTestsTaken":
       return (p.mockResults?.length ?? 0) >= c.count;
     case "gamesPlayed":

@@ -1,16 +1,19 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  ArrowDown,
+  ArrowUp,
   ClipboardList,
   GraduationCap,
-  Gift,
+  Globe,
   LayoutDashboard,
   LogOut,
   Menu,
   Pencil,
+  Plus,
   Trash2,
+  Upload,
   Users,
-  Video,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -25,50 +28,45 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/lib/auth";
 import {
-  addBonusLesson,
   addPlacementQuestion,
-  addVideo,
-  deleteBonusLesson,
+  addResource,
   deleteMockResult,
   deletePlacementQuestion,
+  deleteResource,
   deleteUserProfile,
-  deleteVideo,
-  getBonusLesson,
-  listBonusLessons,
   listMockResults,
   listPlacementQuestions,
+  listResources,
   listUsers,
-  listVideos,
-  saveBonusLesson,
-  updateBonusLesson,
+  moveResource,
   updatePlacementQuestion,
-  uploadLessonVideo,
+  updateResource,
+  uploadResourceFile,
 } from "@/lib/db";
-import type { Level } from "@/lib/types";
+import type { Level, ResourceDoc } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Panel — IEA" },
-      { name: "description", content: "Manage IEA students, video lessons and bonus content." },
+      { title: "Admin Panel - IEA" },
+      { name: "description", content: "Manage IEA students, resources and placement tests." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Admin Panel — IEA" },
+      { property: "og:title", content: "Admin Panel - IEA" },
       { property: "og:description", content: "Internal management area for IEA administrators." },
     ],
   }),
   component: AdminPage,
 });
 
-type Tab = "overview" | "students" | "videos" | "placement" | "results" | "bonus";
+type Tab = "overview" | "students" | "resources" | "placement" | "results";
 
 const tabs: { id: Tab; label: string; icon: typeof Users }[] = [
   { id: "overview", label: "Dashboard", icon: LayoutDashboard },
   { id: "students", label: "Students", icon: Users },
-  { id: "videos", label: "Videos", icon: Video },
+  { id: "resources", label: "Resources", icon: Globe },
   { id: "placement", label: "Placement test", icon: ClipboardList },
   { id: "results", label: "Mock results", icon: GraduationCap },
-  { id: "bonus", label: "Bonus lesson", icon: Gift },
 ];
 
 const levelOrder: Level[] = [
@@ -87,6 +85,9 @@ const levelChartConfig = {
   value: { label: "Students", color: "var(--color-primary)" },
 };
 
+const RESOURCE_TYPES: ResourceDoc["type"][] = ["official", "video", "book", "website", "app"];
+const RESOURCE_SKILLS: ResourceDoc["skill"][] = ["all", "listening", "reading", "writing", "speaking"];
+
 function AdminPage() {
   const { isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -95,15 +96,13 @@ function AdminPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { data: users = [] } = useQuery({ queryKey: ["users"], queryFn: listUsers });
-  const { data: videos = [] } = useQuery({ queryKey: ["videos"], queryFn: listVideos });
   const { data: results = [] } = useQuery({
     queryKey: ["mock-results"],
     queryFn: listMockResults,
   });
-  const { data: bonus } = useQuery({ queryKey: ["bonus"], queryFn: getBonusLesson });
-  const { data: bonusLessons = [] } = useQuery({
-    queryKey: ["bonus-lessons"],
-    queryFn: listBonusLessons,
+  const { data: resources = [] } = useQuery({
+    queryKey: ["resources"],
+    queryFn: listResources,
   });
   const { data: placementQuestions = [] } = useQuery({
     queryKey: ["placement-questions"],
@@ -169,22 +168,73 @@ function AdminPage() {
     }),
   );
 
-  const [video, setVideo] = useState({ title: "", description: "", url: "", thumbnail: "" });
-  const [videoMode, setVideoMode] = useState<"youtube" | "file">("youtube");
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [uploadingVideo, setUploadingVideo] = useState(false);
-  const [videoCompressRatio, setVideoCompressRatio] = useState<number | null>(null);
-  const [bonusForm, setBonusForm] = useState({ title: "", description: "", url: "" });
-  const [bonus_item, setBonus_item] = useState({ title: "", description: "", url: "" });
-  const [editingBonusId, setEditingBonusId] = useState<string | null>(null);
-  const [bonusMode, setBonusMode] = useState<"youtube" | "file">("youtube");
-  const [bonusFile, setBonusFile] = useState<File | null>(null);
-  const [uploadingBonus, setUploadingBonus] = useState(false);
-  const [bonusCompressRatio, setBonusCompressRatio] = useState<number | null>(null);
+  // Resource form state
+  const [resourceForm, setResourceForm] = useState({
+    title: "",
+    description: "",
+    url: "",
+    type: "website" as ResourceDoc["type"],
+    skill: "all" as ResourceDoc["skill"],
+    isFree: true,
+    thumbnail: "",
+  });
+  const [resourceMode, setResourceMode] = useState<"link" | "file">("link");
+  const [resourceFile, setResourceFile] = useState<File | null>(null);
+  const [uploadingResource, setUploadingResource] = useState(false);
+  const [editingResourceId, setEditingResourceId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (bonus) setBonusForm(bonus);
-  }, [bonus]);
+  function resetResourceForm() {
+    setResourceForm({ title: "", description: "", url: "", type: "website", skill: "all", isFree: true, thumbnail: "" });
+    setResourceMode("link");
+    setResourceFile(null);
+    setEditingResourceId(null);
+  }
+
+  async function submitResource() {
+    if (!resourceForm.title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+    if (resourceMode === "link" && !resourceForm.url.trim()) {
+      toast.error("URL is required");
+      return;
+    }
+    if (resourceMode === "file" && !resourceFile && !editingResourceId) {
+      toast.error("Choose a file to upload");
+      return;
+    }
+
+    setUploadingResource(true);
+    try {
+      let url = resourceForm.url.trim();
+      if (resourceMode === "file" && resourceFile) {
+        url = await uploadResourceFile(resourceFile);
+      }
+      const payload = {
+        title: resourceForm.title.trim(),
+        description: resourceForm.description.trim(),
+        url,
+        type: resourceForm.type,
+        skill: resourceForm.skill,
+        isFree: resourceForm.isFree,
+        sourceType: resourceMode,
+        thumbnail: resourceForm.thumbnail.trim(),
+      };
+      if (editingResourceId) {
+        await updateResource(editingResourceId, payload);
+        toast.success("Resource updated");
+      } else {
+        await addResource(payload);
+        toast.success("Resource added");
+      }
+      resetResourceForm();
+      queryClient.invalidateQueries({ queryKey: ["resources"] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Upload failed");
+    } finally {
+      setUploadingResource(false);
+    }
+  }
 
   useEffect(() => {
     if (!loading && !isAdmin) navigate({ to: "/login" });
@@ -193,51 +243,9 @@ function AdminPage() {
   if (loading || !isAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">Checking admin access…</p>
+        <p className="text-sm text-muted-foreground">Checking admin access...</p>
       </div>
     );
-  }
-
-  async function submitVideo() {
-    if (!video.title.trim()) {
-      toast.error("Title is required");
-      return;
-    }
-    if (videoMode === "youtube" && !video.url.trim()) {
-      toast.error("Video URL is required");
-      return;
-    }
-    if (videoMode === "file" && !videoFile) {
-      toast.error("Choose a video file to upload");
-      return;
-    }
-
-    setUploadingVideo(true);
-    setVideoCompressRatio(null);
-    try {
-      const url =
-        videoMode === "file"
-          ? await uploadLessonVideo(videoFile!, "videos", setVideoCompressRatio)
-          : video.url.trim();
-      await addVideo({
-        title: video.title.trim(),
-        description: video.description.trim(),
-        url,
-        sourceType: videoMode,
-        thumbnail:
-          video.thumbnail.trim() ||
-          "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=60",
-      });
-      setVideo({ title: "", description: "", url: "", thumbnail: "" });
-      setVideoFile(null);
-      queryClient.invalidateQueries({ queryKey: ["videos"] });
-      toast.success("Video added");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Video upload failed");
-    } finally {
-      setUploadingVideo(false);
-      setVideoCompressRatio(null);
-    }
   }
 
   return (
@@ -320,7 +328,7 @@ function AdminPage() {
               <div className="grid gap-4 sm:grid-cols-3">
                 {[
                   { label: "Students", value: users.length },
-                  { label: "Video lessons", value: videos.length },
+                  { label: "Resources", value: resources.length },
                   { label: "Mock attempts", value: results.length },
                 ].map((stat) => (
                   <div key={stat.label} className="rounded-3xl bg-card p-6 shadow-card">
@@ -410,9 +418,6 @@ function AdminPage() {
                   <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
                     {student.level}
                   </span>
-                  <span className="text-xs text-muted-foreground">
-                    {student.videosWatched?.length ?? 0} lessons
-                  </span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -422,7 +427,7 @@ function AdminPage() {
                       toast.success("Student removed");
                       if (!authDeleted) {
                         toast.warning(
-                          "The Firebase Auth account could not be removed (server key not configured). The student may still log in.",
+                          "The Firebase Auth account could not be removed (server key not configured).",
                         );
                       }
                     }}
@@ -434,29 +439,31 @@ function AdminPage() {
             </section>
           )}
 
-          {tab === "videos" && (
+          {tab === "resources" && (
             <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
               <div className="rounded-3xl bg-card p-6 shadow-card">
-                <h2 className="text-base font-bold text-foreground">Add a video lesson</h2>
+                <h2 className="text-base font-bold text-foreground">
+                  {editingResourceId ? "Edit resource" : "Add a resource"}
+                </h2>
                 <div className="mt-4 space-y-3">
                   <div>
-                    <Label htmlFor="v-title">Title</Label>
+                    <Label htmlFor="r-title">Title</Label>
                     <Input
-                      id="v-title"
-                      value={video.title}
+                      id="r-title"
+                      value={resourceForm.title}
                       maxLength={120}
-                      onChange={(e) => setVideo({ ...video, title: e.target.value })}
+                      onChange={(e) => setResourceForm({ ...resourceForm, title: e.target.value })}
                       className="mt-1.5"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="v-desc">Description</Label>
+                    <Label htmlFor="r-desc">Description</Label>
                     <Textarea
-                      id="v-desc"
-                      value={video.description}
+                      id="r-desc"
+                      value={resourceForm.description}
                       maxLength={400}
                       rows={3}
-                      onChange={(e) => setVideo({ ...video, description: e.target.value })}
+                      onChange={(e) => setResourceForm({ ...resourceForm, description: e.target.value })}
                       className="mt-1.5"
                     />
                   </div>
@@ -465,104 +472,196 @@ function AdminPage() {
                     <div className="mt-1.5 flex gap-2">
                       <Button
                         type="button"
-                        variant={videoMode === "youtube" ? "hero" : "soft"}
+                        variant={resourceMode === "link" ? "hero" : "soft"}
                         size="pill"
                         className="flex-1"
-                        onClick={() => setVideoMode("youtube")}
+                        onClick={() => setResourceMode("link")}
                       >
                         Link
                       </Button>
                       <Button
                         type="button"
-                        variant={videoMode === "file" ? "hero" : "soft"}
+                        variant={resourceMode === "file" ? "hero" : "soft"}
                         size="pill"
                         className="flex-1"
-                        onClick={() => setVideoMode("file")}
+                        onClick={() => setResourceMode("file")}
                       >
                         Upload file
                       </Button>
                     </div>
                   </div>
-                  {videoMode === "youtube" ? (
+                  {resourceMode === "link" ? (
                     <div>
-                      <Label htmlFor="v-url">Video URL</Label>
+                      <Label htmlFor="r-url">URL</Label>
                       <Input
-                        id="v-url"
-                        value={video.url}
+                        id="r-url"
+                        value={resourceForm.url}
                         maxLength={500}
-                        placeholder="https://youtube.com/watch?v=…"
-                        onChange={(e) => setVideo({ ...video, url: e.target.value })}
+                        placeholder="https://..."
+                        onChange={(e) => setResourceForm({ ...resourceForm, url: e.target.value })}
                         className="mt-1.5"
                       />
                     </div>
                   ) : (
                     <div>
-                      <Label htmlFor="v-file">Video file</Label>
+                      <Label htmlFor="r-file">File</Label>
                       <Input
-                        id="v-file"
+                        id="r-file"
                         type="file"
-                        accept="video/*"
-                        onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
+                        accept="*/*"
+                        onChange={(e) => setResourceFile(e.target.files?.[0] ?? null)}
                         className="mt-1.5"
                       />
                       <p className="mt-1.5 text-xs text-muted-foreground">
-                        Larger files are compressed in your browser first, then uploaded.
+                        Upload any file (PDF, image, document, etc.)
                       </p>
                     </div>
                   )}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="r-type">Type</Label>
+                      <select
+                        id="r-type"
+                        value={resourceForm.type}
+                        onChange={(e) => setResourceForm({ ...resourceForm, type: e.target.value as ResourceDoc["type"] })}
+                        className="mt-1.5 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm"
+                      >
+                        {RESOURCE_TYPES.map((t) => (
+                          <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="r-skill">Skill</Label>
+                      <select
+                        id="r-skill"
+                        value={resourceForm.skill}
+                        onChange={(e) => setResourceForm({ ...resourceForm, skill: e.target.value as ResourceDoc["skill"] })}
+                        className="mt-1.5 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm"
+                      >
+                        {RESOURCE_SKILLS.map((s) => (
+                          <option key={s} value={s}>{s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                   <div>
-                    <Label htmlFor="v-thumb">Thumbnail URL (optional)</Label>
+                    <Label htmlFor="r-thumb">Thumbnail URL (optional)</Label>
                     <Input
-                      id="v-thumb"
-                      value={video.thumbnail}
+                      id="r-thumb"
+                      value={resourceForm.thumbnail}
                       maxLength={500}
-                      onChange={(e) => setVideo({ ...video, thumbnail: e.target.value })}
+                      onChange={(e) => setResourceForm({ ...resourceForm, thumbnail: e.target.value })}
                       className="mt-1.5"
                     />
                   </div>
-                  <Button
-                    variant="hero"
-                    size="pill"
-                    className="w-full"
-                    onClick={submitVideo}
-                    disabled={uploadingVideo}
-                  >
-                    {uploadingVideo
-                      ? videoCompressRatio !== null
-                        ? `Compressing… ${Math.round(videoCompressRatio * 100)}%`
-                        : "Uploading…"
-                      : "Add video"}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="r-free"
+                      type="checkbox"
+                      checked={resourceForm.isFree}
+                      onChange={(e) => setResourceForm({ ...resourceForm, isFree: e.target.checked })}
+                      className="h-4 w-4 rounded"
+                    />
+                    <Label htmlFor="r-free">Free resource</Label>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="hero"
+                      size="pill"
+                      className="flex-1"
+                      onClick={submitResource}
+                      disabled={uploadingResource}
+                    >
+                      {uploadingResource ? "Uploading..." : editingResourceId ? "Save changes" : "Add resource"}
+                    </Button>
+                    {editingResourceId && (
+                      <Button variant="ghost" size="pill" onClick={resetResourceForm}>
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
 
               <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {videos.map((item) => (
+                {resources.length === 0 && (
+                  <p className="p-8 text-center text-sm text-muted-foreground">
+                    No resources yet.
+                  </p>
+                )}
+                {resources.map((item, index) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-4 border-b border-border p-4 last:border-0"
+                    className="flex items-center gap-3 border-b border-border p-4 last:border-0"
                   >
-                    <img
-                      src={item.thumbnail}
-                      alt={item.title}
-                      loading="lazy"
-                      className="h-14 w-24 shrink-0 rounded-xl object-cover"
-                    />
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-secondary-foreground">
+                      {index + 1}
+                    </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
                       <p className="truncate text-xs text-muted-foreground">{item.description}</p>
+                      <div className="mt-1 flex gap-1.5">
+                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">{item.type}</span>
+                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">{item.skill}</span>
+                        {item.isFree && <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-semibold text-success">Free</span>}
+                      </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={async () => {
-                        await deleteVideo(item.id);
-                        queryClient.invalidateQueries({ queryKey: ["videos"] });
-                        toast.success("Video deleted");
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <div className="flex shrink-0 gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={index === 0}
+                        onClick={async () => {
+                          await moveResource(item.id, "up");
+                          queryClient.invalidateQueries({ queryKey: ["resources"] });
+                        }}
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={index === resources.length - 1}
+                        onClick={async () => {
+                          await moveResource(item.id, "down");
+                          queryClient.invalidateQueries({ queryKey: ["resources"] });
+                        }}
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingResourceId(item.id);
+                          setResourceForm({
+                            title: item.title,
+                            description: item.description,
+                            url: item.url,
+                            type: item.type,
+                            skill: item.skill,
+                            isFree: item.isFree,
+                            thumbnail: item.thumbnail,
+                          });
+                          setResourceMode(item.sourceType === "file" ? "file" : "link");
+                          setResourceFile(null);
+                        }}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          await deleteResource(item.id);
+                          queryClient.invalidateQueries({ queryKey: ["resources"] });
+                          toast.success("Resource deleted");
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -589,7 +688,7 @@ function AdminPage() {
                   </div>
 
                   <div>
-                    <Label>Options — click the letter to mark the correct one</Label>
+                    <Label>Options - click the letter to mark the correct one</Label>
                     <div className="mt-1.5 space-y-2">
                       {questionForm.options.map((option, i) => (
                         <div key={i} className="flex items-center gap-2">
@@ -655,7 +754,7 @@ function AdminPage() {
                           size="sm"
                           onClick={() => removeQuestion(question.id)}
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -699,7 +798,7 @@ function AdminPage() {
                     </p>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    L {result.listening} · R {result.reading} · W {result.writing} · S{" "}
+                    L {result.listening} / R {result.reading} / W {result.writing} / S{" "}
                     {result.speaking}
                   </p>
                   <span className="text-lg font-extrabold text-foreground">
@@ -723,206 +822,6 @@ function AdminPage() {
                   </Button>
                 </div>
               ))}
-            </section>
-          )}
-
-          {tab === "bonus" && (
-            <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
-              <div className="rounded-3xl bg-card p-6 shadow-card">
-                <h2 className="text-base font-bold text-foreground">
-                  {editingBonusId ? "Edit bonus" : "Add bonus lesson"}
-                </h2>
-                <div className="mt-4 space-y-3">
-                  <div>
-                    <Label htmlFor="bonus-title">Title</Label>
-                    <Input
-                      id="bonus-title"
-                      value={bonus_item.title}
-                      maxLength={120}
-                      onChange={(e) => setBonus_item({ ...bonus_item, title: e.target.value })}
-                      className="mt-1.5"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bonus-desc">Description</Label>
-                    <Textarea
-                      id="bonus-desc"
-                      value={bonus_item.description}
-                      maxLength={400}
-                      rows={3}
-                      onChange={(e) =>
-                        setBonus_item({ ...bonus_item, description: e.target.value })
-                      }
-                      className="mt-1.5"
-                    />
-                  </div>
-                  <div>
-                    <Label>Source</Label>
-                    <div className="mt-1.5 flex gap-2">
-                      <Button
-                        type="button"
-                        variant={bonusMode === "youtube" ? "hero" : "soft"}
-                        size="pill"
-                        className="flex-1"
-                        onClick={() => setBonusMode("youtube")}
-                      >
-                        Link
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={bonusMode === "file" ? "hero" : "soft"}
-                        size="pill"
-                        className="flex-1"
-                        onClick={() => setBonusMode("file")}
-                      >
-                        Upload file
-                      </Button>
-                    </div>
-                  </div>
-                  {bonusMode === "youtube" ? (
-                    <div>
-                      <Label htmlFor="bonus-url">Video URL</Label>
-                      <Input
-                        id="bonus-url"
-                        value={bonus_item.url}
-                        maxLength={500}
-                        onChange={(e) => setBonus_item({ ...bonus_item, url: e.target.value })}
-                        className="mt-1.5"
-                      />
-                    </div>
-                  ) : (
-                    <div>
-                      <Label htmlFor="bonus-file">Video file</Label>
-                      <Input
-                        id="bonus-file"
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) => setBonusFile(e.target.files?.[0] ?? null)}
-                        className="mt-1.5"
-                      />
-                      <p className="mt-1.5 text-xs text-muted-foreground">
-                        Larger files are compressed in your browser first, then uploaded.
-                      </p>
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <Button
-                      variant="hero"
-                      size="pill"
-                      className="flex-1"
-                      disabled={uploadingBonus}
-                      onClick={async () => {
-                        if (!bonus_item.title.trim()) {
-                          toast.error("Title is required");
-                          return;
-                        }
-                        if (bonusMode === "youtube" && !bonus_item.url.trim()) {
-                          toast.error("Video URL is required");
-                          return;
-                        }
-                        if (bonusMode === "file" && !bonusFile && !editingBonusId) {
-                          toast.error("Choose a video file to upload");
-                          return;
-                        }
-
-                        setUploadingBonus(true);
-                        setBonusCompressRatio(null);
-                        try {
-                          const url =
-                            bonusMode === "file" && bonusFile
-                              ? await uploadLessonVideo(bonusFile, "bonus", setBonusCompressRatio)
-                              : bonus_item.url.trim();
-                          const payload = { ...bonus_item, url, sourceType: bonusMode };
-                          if (editingBonusId) {
-                            await updateBonusLesson(editingBonusId, payload);
-                            toast.success("Bonus lesson updated");
-                          } else {
-                            await addBonusLesson(payload);
-                            toast.success("Bonus lesson added");
-                          }
-                          setBonus_item({ title: "", description: "", url: "" });
-                          setBonusFile(null);
-                          setBonusMode("youtube");
-                          setEditingBonusId(null);
-                          queryClient.invalidateQueries({ queryKey: ["bonus-lessons"] });
-                        } catch (error) {
-                          toast.error(
-                            error instanceof Error ? error.message : "Video upload failed",
-                          );
-                        } finally {
-                          setUploadingBonus(false);
-                          setBonusCompressRatio(null);
-                        }
-                      }}
-                    >
-                      {uploadingBonus
-                        ? bonusCompressRatio !== null
-                          ? `Compressing… ${Math.round(bonusCompressRatio * 100)}%`
-                          : "Uploading…"
-                        : editingBonusId
-                          ? "Save changes"
-                          : "Add bonus"}
-                    </Button>
-                    {editingBonusId && (
-                      <Button
-                        variant="ghost"
-                        size="pill"
-                        onClick={() => {
-                          setBonus_item({ title: "", description: "", url: "" });
-                          setBonusFile(null);
-                          setBonusMode("youtube");
-                          setEditingBonusId(null);
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {bonusLessons.length === 0 && (
-                  <p className="p-8 text-center text-sm text-muted-foreground">
-                    No bonus lessons yet.
-                  </p>
-                )}
-                {bonusLessons.map((item) => (
-                  <div key={item.id} className="border-b border-border p-4 last:border-0">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
-                        <p className="truncate text-xs text-muted-foreground">{item.description}</p>
-                      </div>
-                      <div className="flex shrink-0 gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setEditingBonusId(item.id);
-                            setBonus_item(item);
-                            setBonusMode(item.sourceType === "file" ? "file" : "youtube");
-                            setBonusFile(null);
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={async () => {
-                            await deleteBonusLesson(item.id);
-                            queryClient.invalidateQueries({ queryKey: ["bonus-lessons"] });
-                            toast.success("Bonus lesson deleted");
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </section>
           )}
         </main>

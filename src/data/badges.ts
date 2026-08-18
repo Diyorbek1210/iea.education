@@ -1,6 +1,5 @@
 export type BadgeCriteria =
   | { type: "streak"; days: number }
-  | { type: "videosWatched"; count: number }
   | { type: "mockTestsTaken"; count: number }
   | { type: "gamesPlayed"; count: number }
   | { type: "xp"; amount: number }
@@ -42,20 +41,6 @@ export const BADGES: BadgeDef[] = [
     description: "30-day streak",
     icon: "Flame",
     criteria: { type: "streak", days: 30 },
-  },
-  {
-    id: "videos-5",
-    name: "Bonus Unlocked",
-    description: "Watched 5 video lessons",
-    icon: "Gift",
-    criteria: { type: "videosWatched", count: 5 },
-  },
-  {
-    id: "videos-15",
-    name: "Video Scholar",
-    description: "Watched 15 video lessons",
-    icon: "PlayCircle",
-    criteria: { type: "videosWatched", count: 15 },
   },
   {
     id: "mock-1",

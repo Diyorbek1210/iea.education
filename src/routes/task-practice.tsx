@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Headphones,
   BookOpen,
@@ -181,6 +181,21 @@ function TaskPracticePage() {
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  useEffect(() => {
+    if (!isTimerRunning || timeLeft <= 0 || !activeSection) return;
+    const id = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          setIsTimerRunning(false);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [isTimerRunning, timeLeft > 0, !!activeSection]);
 
   const filteredSections = useMemo(
     () => selectedSkill === "all" ? TASK_SECTIONS : TASK_SECTIONS.filter((s) => s.skill === selectedSkill),
@@ -193,6 +208,7 @@ function TaskPracticePage() {
     setUserAnswers({});
     setShowResult(false);
     setTimeLeft(section.estimatedTime * 60);
+    setIsTimerRunning(true);
   };
 
   const handleAnswer = (questionId: string, answer: string) => {
@@ -293,9 +309,27 @@ function TaskPracticePage() {
                   {activeSection.questions.length} questions • {activeSection.estimatedTime} min
                 </p>
               </div>
-              <Button variant="ghost" size="pill" onClick={() => setActiveSection(null)}>
-                Back
-              </Button>
+              <div className="flex items-center gap-3">
+                <div className={cn(
+                  "flex items-center gap-2 rounded-2xl px-4 py-2",
+                  timeLeft < 300 ? "bg-destructive/10 text-destructive" : "bg-secondary text-foreground",
+                )}>
+                  <Clock className="h-4 w-4" />
+                  <span className="font-mono text-lg font-extrabold">
+                    {Math.floor(timeLeft / 60).toString().padStart(2, "0")}:{(timeLeft % 60).toString().padStart(2, "0")}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="pill"
+                  onClick={() => setIsTimerRunning(!isTimerRunning)}
+                >
+                  {isTimerRunning ? "Pause" : "Resume"}
+                </Button>
+                <Button variant="ghost" size="pill" onClick={() => { setActiveSection(null); setIsTimerRunning(false); }}>
+                  Back
+                </Button>
+              </div>
             </div>
 
             {/* Progress */}
