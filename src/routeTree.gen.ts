@@ -11,17 +11,27 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as BandCalculatorRouteImport } from './routes/band-calculator'
 import { Route as BonusesRouteImport } from './routes/bonuses'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as GamesRouteImport } from './routes/games'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MockTestRouteImport } from './routes/mock-test'
+import { Route as ModelAnswersRouteImport } from './routes/model-answers'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PronunciationRouteImport } from './routes/pronunciation'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as RequirementsRouteImport } from './routes/requirements'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as StudyPlanRouteImport } from './routes/study-plan'
+import { Route as TaskPracticeRouteImport } from './routes/task-practice'
 import { Route as TestRouteImport } from './routes/test'
 import { Route as VideosRouteImport } from './routes/videos'
+import { Route as VocabularyRouteImport } from './routes/vocabulary'
+import { Route as WritingGeneratorRouteImport } from './routes/writing-generator'
 import { Route as MockTestMockIdRouteImport } from './routes/mock-test_.$mockId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -32,6 +42,16 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BandCalculatorRoute = BandCalculatorRouteImport.update({
+  id: '/band-calculator',
+  path: '/band-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BonusesRoute = BonusesRouteImport.update({
@@ -64,6 +84,11 @@ const MockTestRoute = MockTestRouteImport.update({
   path: '/mock-test',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ModelAnswersRoute = ModelAnswersRouteImport.update({
+  id: '/model-answers',
+  path: '/model-answers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PracticeRoute = PracticeRouteImport.update({
   id: '/practice',
   path: '/practice',
@@ -74,9 +99,34 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PronunciationRoute = PronunciationRouteImport.update({
+  id: '/pronunciation',
+  path: '/pronunciation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequirementsRoute = RequirementsRouteImport.update({
+  id: '/requirements',
+  path: '/requirements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyPlanRoute = StudyPlanRouteImport.update({
+  id: '/study-plan',
+  path: '/study-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TaskPracticeRoute = TaskPracticeRouteImport.update({
+  id: '/task-practice',
+  path: '/task-practice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TestRoute = TestRouteImport.update({
@@ -89,6 +139,16 @@ const VideosRoute = VideosRouteImport.update({
   path: '/videos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VocabularyRoute = VocabularyRouteImport.update({
+  id: '/vocabulary',
+  path: '/vocabulary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WritingGeneratorRoute = WritingGeneratorRouteImport.update({
+  id: '/writing-generator',
+  path: '/writing-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MockTestMockIdRoute = MockTestMockIdRouteImport.update({
   id: '/mock-test_/$mockId',
   path: '/mock-test/$mockId',
@@ -98,50 +158,80 @@ const MockTestMockIdRoute = MockTestMockIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/analytics': typeof AnalyticsRoute
+  '/band-calculator': typeof BandCalculatorRoute
   '/bonuses': typeof BonusesRoute
   '/dashboard': typeof DashboardRoute
   '/games': typeof GamesRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
+  '/model-answers': typeof ModelAnswersRoute
   '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
+  '/pronunciation': typeof PronunciationRoute
   '/register': typeof RegisterRoute
+  '/requirements': typeof RequirementsRoute
+  '/resources': typeof ResourcesRoute
+  '/study-plan': typeof StudyPlanRoute
+  '/task-practice': typeof TaskPracticeRoute
   '/test': typeof TestRoute
   '/videos': typeof VideosRoute
+  '/vocabulary': typeof VocabularyRoute
+  '/writing-generator': typeof WritingGeneratorRoute
   '/mock-test/$mockId': typeof MockTestMockIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/analytics': typeof AnalyticsRoute
+  '/band-calculator': typeof BandCalculatorRoute
   '/bonuses': typeof BonusesRoute
   '/dashboard': typeof DashboardRoute
   '/games': typeof GamesRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
+  '/model-answers': typeof ModelAnswersRoute
   '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
+  '/pronunciation': typeof PronunciationRoute
   '/register': typeof RegisterRoute
+  '/requirements': typeof RequirementsRoute
+  '/resources': typeof ResourcesRoute
+  '/study-plan': typeof StudyPlanRoute
+  '/task-practice': typeof TaskPracticeRoute
   '/test': typeof TestRoute
   '/videos': typeof VideosRoute
+  '/vocabulary': typeof VocabularyRoute
+  '/writing-generator': typeof WritingGeneratorRoute
   '/mock-test/$mockId': typeof MockTestMockIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/analytics': typeof AnalyticsRoute
+  '/band-calculator': typeof BandCalculatorRoute
   '/bonuses': typeof BonusesRoute
   '/dashboard': typeof DashboardRoute
   '/games': typeof GamesRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
+  '/model-answers': typeof ModelAnswersRoute
   '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
+  '/pronunciation': typeof PronunciationRoute
   '/register': typeof RegisterRoute
+  '/requirements': typeof RequirementsRoute
+  '/resources': typeof ResourcesRoute
+  '/study-plan': typeof StudyPlanRoute
+  '/task-practice': typeof TaskPracticeRoute
   '/test': typeof TestRoute
   '/videos': typeof VideosRoute
+  '/vocabulary': typeof VocabularyRoute
+  '/writing-generator': typeof WritingGeneratorRoute
   '/mock-test_/$mockId': typeof MockTestMockIdRoute
 }
 export interface FileRouteTypes {
@@ -149,66 +239,106 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/analytics'
+    | '/band-calculator'
     | '/bonuses'
     | '/dashboard'
     | '/games'
     | '/leaderboard'
     | '/login'
     | '/mock-test'
+    | '/model-answers'
     | '/practice'
     | '/profile'
+    | '/pronunciation'
     | '/register'
+    | '/requirements'
+    | '/resources'
+    | '/study-plan'
+    | '/task-practice'
     | '/test'
     | '/videos'
+    | '/vocabulary'
+    | '/writing-generator'
     | '/mock-test/$mockId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/analytics'
+    | '/band-calculator'
     | '/bonuses'
     | '/dashboard'
     | '/games'
     | '/leaderboard'
     | '/login'
     | '/mock-test'
+    | '/model-answers'
     | '/practice'
     | '/profile'
+    | '/pronunciation'
     | '/register'
+    | '/requirements'
+    | '/resources'
+    | '/study-plan'
+    | '/task-practice'
     | '/test'
     | '/videos'
+    | '/vocabulary'
+    | '/writing-generator'
     | '/mock-test/$mockId'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/analytics'
+    | '/band-calculator'
     | '/bonuses'
     | '/dashboard'
     | '/games'
     | '/leaderboard'
     | '/login'
     | '/mock-test'
+    | '/model-answers'
     | '/practice'
     | '/profile'
+    | '/pronunciation'
     | '/register'
+    | '/requirements'
+    | '/resources'
+    | '/study-plan'
+    | '/task-practice'
     | '/test'
     | '/videos'
+    | '/vocabulary'
+    | '/writing-generator'
     | '/mock-test_/$mockId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  BandCalculatorRoute: typeof BandCalculatorRoute
   BonusesRoute: typeof BonusesRoute
   DashboardRoute: typeof DashboardRoute
   GamesRoute: typeof GamesRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   MockTestRoute: typeof MockTestRoute
+  ModelAnswersRoute: typeof ModelAnswersRoute
   PracticeRoute: typeof PracticeRoute
   ProfileRoute: typeof ProfileRoute
+  PronunciationRoute: typeof PronunciationRoute
   RegisterRoute: typeof RegisterRoute
+  RequirementsRoute: typeof RequirementsRoute
+  ResourcesRoute: typeof ResourcesRoute
+  StudyPlanRoute: typeof StudyPlanRoute
+  TaskPracticeRoute: typeof TaskPracticeRoute
   TestRoute: typeof TestRoute
   VideosRoute: typeof VideosRoute
+  VocabularyRoute: typeof VocabularyRoute
+  WritingGeneratorRoute: typeof WritingGeneratorRoute
   MockTestMockIdRoute: typeof MockTestMockIdRoute
 }
 
@@ -226,6 +356,20 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/band-calculator': {
+      id: '/band-calculator'
+      path: '/band-calculator'
+      fullPath: '/band-calculator'
+      preLoaderRoute: typeof BandCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bonuses': {
@@ -270,6 +414,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MockTestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/model-answers': {
+      id: '/model-answers'
+      path: '/model-answers'
+      fullPath: '/model-answers'
+      preLoaderRoute: typeof ModelAnswersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/practice': {
       id: '/practice'
       path: '/practice'
@@ -284,11 +435,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pronunciation': {
+      id: '/pronunciation'
+      path: '/pronunciation'
+      fullPath: '/pronunciation'
+      preLoaderRoute: typeof PronunciationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requirements': {
+      id: '/requirements'
+      path: '/requirements'
+      fullPath: '/requirements'
+      preLoaderRoute: typeof RequirementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study-plan': {
+      id: '/study-plan'
+      path: '/study-plan'
+      fullPath: '/study-plan'
+      preLoaderRoute: typeof StudyPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/task-practice': {
+      id: '/task-practice'
+      path: '/task-practice'
+      fullPath: '/task-practice'
+      preLoaderRoute: typeof TaskPracticeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/test': {
@@ -305,6 +491,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VideosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vocabulary': {
+      id: '/vocabulary'
+      path: '/vocabulary'
+      fullPath: '/vocabulary'
+      preLoaderRoute: typeof VocabularyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/writing-generator': {
+      id: '/writing-generator'
+      path: '/writing-generator'
+      fullPath: '/writing-generator'
+      preLoaderRoute: typeof WritingGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mock-test_/$mockId': {
       id: '/mock-test_/$mockId'
       path: '/mock-test/$mockId'
@@ -318,17 +518,27 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  BandCalculatorRoute: BandCalculatorRoute,
   BonusesRoute: BonusesRoute,
   DashboardRoute: DashboardRoute,
   GamesRoute: GamesRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   MockTestRoute: MockTestRoute,
+  ModelAnswersRoute: ModelAnswersRoute,
   PracticeRoute: PracticeRoute,
   ProfileRoute: ProfileRoute,
+  PronunciationRoute: PronunciationRoute,
   RegisterRoute: RegisterRoute,
+  RequirementsRoute: RequirementsRoute,
+  ResourcesRoute: ResourcesRoute,
+  StudyPlanRoute: StudyPlanRoute,
+  TaskPracticeRoute: TaskPracticeRoute,
   TestRoute: TestRoute,
   VideosRoute: VideosRoute,
+  VocabularyRoute: VocabularyRoute,
+  WritingGeneratorRoute: WritingGeneratorRoute,
   MockTestMockIdRoute: MockTestMockIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -167,24 +167,42 @@ export const deleteAuthUser = createServerFn({ method: "POST" })
     return { uid: data.uid, idToken: data.idToken };
   })
   .handler(async ({ data }) => {
-    // `vite dev` doesn't load plain (non-VITE_-prefixed) .env vars into process.env —
-    // only the production build (via nitro/Cloudflare) does that automatically. This
-    // branch is dev-only and dead-code-eliminated from the production bundle.
-    if (import.meta.env.DEV && !process.env["FIREBASE_CLIENT_EMAIL"]) {
-      const dotenv = await import("dotenv");
-      dotenv.config();
+    // Vite dev loads VITE_-prefixed vars only; production via Nitro/Cloudflare
+    // injects them automatically — but Cloudflare Workers need secrets set in
+    // the dashboard. The dotenv fallback covers local dev; override: true is
+    // needed because Vite may set empty-string values that dotenv won't
+    // replace by default.
+    if (!process.env["FIREBASE_CLIENT_EMAIL"]) {
+      try {
+        const dotenv = await import("dotenv");
+        const { resolve, dirname } = await import("node:path");
+        const { fileURLToPath } = await import("node:url");
+        const cwd = process.cwd();
+        const srcDir = dirname(fileURLToPath(import.meta.url));
+        dotenv.config({ path: resolve(cwd, ".env"), override: true });
+        if (!process.env["FIREBASE_CLIENT_EMAIL"]) {
+          dotenv.config({ path: resolve(srcDir, "../../.env"), override: true });
+        }
+        if (!process.env["FIREBASE_CLIENT_EMAIL"]) {
+          dotenv.config({ path: resolve(srcDir, "../../../.env"), override: true });
+        }
+      } catch {
+        // Production Cloudflare Workers can't read the filesystem;
+        // secrets must be set via the Lovable dashboard.
+      }
     }
 
     const clientEmail = process.env["FIREBASE_CLIENT_EMAIL"];
     const privateKey = process.env["FIREBASE_PRIVATE_KEY"];
-    // Fallbacks mirror the values hardcoded in firebaseConfig.ts; keep in sync.
     const projectId = process.env["FIREBASE_PROJECT_ID"] || "salom-4f3bd";
     const adminEmail = process.env["ADMIN_EMAIL"] || "diyorbekmuzaffarovich4@gmail.com";
 
     if (!clientEmail || !privateKey) {
-      throw new Error(
-        "Auth deletion isn't configured on the server. Set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY — see .env.example.",
+      console.error(
+        "[deleteAuthUser] FIREBASE_CLIENT_EMAIL or FIREBASE_PRIVATE_KEY is missing from process.env. " +
+          "In production, set them as secrets in the Lovable dashboard (Project Settings → Environment Variables).",
       );
+      return { deleted: false, reason: "missing_keys" };
     }
 
     await verifyAdminIdToken(data.idToken, projectId, adminEmail);

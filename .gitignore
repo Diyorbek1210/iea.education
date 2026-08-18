@@ -25,8 +25,7 @@ dist-ssr
 
 # Secrets
 .env
-.env.local
-.env.example
+
 
 # Editor directories and files
 .vscode/*
@@ -38,3 +37,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vercel
+.env*

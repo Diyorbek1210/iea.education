@@ -92,3 +92,65 @@ export interface PlacementQuestion {
   answer: number;
   createdAt: string;
 }
+
+/* ------------------------------------------------------------------ *
+ * Phase 1 — Vocabulary, Practice, Analytics types
+ * ------------------------------------------------------------------ */
+
+export interface PracticeSession {
+  id: string;
+  userId: string;
+  skill: "listening" | "reading" | "writing" | "speaking";
+  section: string;
+  score: number;
+  totalQuestions: number;
+  durationMinutes: number;
+  date: string;
+  details?: string;
+}
+
+export interface WritingSubmission {
+  id: string;
+  userId: string;
+  topicId: string;
+  text: string;
+  wordCount: number;
+  bandScore?: number;
+  feedback?: AiSkillFeedback;
+  submittedAt: string;
+}
+
+export interface SpeakingSession {
+  id: string;
+  userId: string;
+  part: 1 | 2 | 3;
+  topic: string;
+  transcript: string;
+  durationSeconds: number;
+  bandScore?: number;
+  feedback?: AiSkillFeedback;
+  fillerWords?: number;
+  date: string;
+}
+
+export interface StudyPlanRecord {
+  id: string;
+  userId: string;
+  targetBand: number;
+  examDate: string;
+  currentBand: number;
+  weakSkills: string[];
+  studyHoursPerDay: number;
+  createdAt: string;
+  weekSchedule: unknown;
+}
+
+export type SkillType = "listening" | "reading" | "writing" | "speaking";
+
+export interface SkillStats {
+  skill: SkillType;
+  attempts: number;
+  averageScore: number;
+  bestScore: number;
+  recentTrend: "improving" | "declining" | "stable";
+}

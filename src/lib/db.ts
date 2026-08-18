@@ -31,8 +31,11 @@ import type {
   Level,
   MockResult,
   PlacementQuestion,
+  PracticeSession,
+  StudyPlanRecord,
   UserProfile,
   VideoDoc,
+  WritingSubmission,
 } from "./types";
 
 /* ------------------------------------------------------------------ *
@@ -286,8 +289,8 @@ export async function deleteUserProfile(uid: string): Promise<boolean> {
   if (current) {
     try {
       const idToken = await current.getIdToken();
-      await deleteAuthUser({ data: { uid, idToken } });
-      authDeleted = true;
+      const result = await deleteAuthUser({ data: { uid, idToken } });
+      authDeleted = result?.deleted === true;
     } catch (error) {
       console.warn("Firebase Auth account removal failed:", error);
     }
@@ -608,4 +611,80 @@ export async function deletePlacementQuestion(id: string): Promise<void> {
     return;
   }
   await deleteDoc(doc(db, "placementQuestions", id));
+}
+
+/* ------------------------------------------------------------------ *
+ * Practice Sessions
+ * ------------------------------------------------------------------ */
+
+const PRACTICE_KEY = "iea_practice_sessions";
+
+export async function listPracticeSessions(): Promise<PracticeSession[]> {
+  if (!isFirebaseConfigured || !db) return read<PracticeSession[]>(PRACTICE_KEY, []);
+  const snap = await getDocs(collection(db, "practiceSessions"));
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PracticeSession, "id">) }));
+}
+
+export async function addPracticeSession(session: Omit<PracticeSession, "id">): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const id = crypto.randomUUID();
+    write(PRACTICE_KEY, [{ id, ...session }, ...read<PracticeSession[]>(PRACTICE_KEY, [])]);
+    return;
+  }
+  await addDoc(collection(db, "practiceSessions"), session);
+}
+
+/* ------------------------------------------------------------------ *
+ * Writing Submissions
+ * ------------------------------------------------------------------ */
+
+const WRITING_KEY = "iea_writing_submissions";
+
+export async function listWritingSubmissions(): Promise<WritingSubmission[]> {
+  if (!isFirebaseConfigured || !db) return read<WritingSubmission[]>(WRITING_KEY, []);
+  const snap = await getDocs(collection(db, "writingSubmissions"));
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<WritingSubmission, "id">) }));
+}
+
+export async function addWritingSubmission(submission: Omit<WritingSubmission, "id">): Promise<string> {
+  if (!isFirebaseConfigured || !db) {
+    const id = crypto.randomUUID();
+    write(WRITING_KEY, [{ id, ...submission }, ...read<WritingSubmission[]>(WRITING_KEY, [])]);
+    return id;
+  }
+  const created = await addDoc(collection(db, "writingSubmissions"), submission);
+  return created.id;
+}
+
+/* ------------------------------------------------------------------ *
+ * Study Plans
+ * ------------------------------------------------------------------ */
+
+const STUDY_PLAN_KEY = "iea_study_plans";
+
+export async function listStudyPlans(): Promise<StudyPlanRecord[]> {
+  if (!isFirebaseConfigured || !db) return read<StudyPlanRecord[]>(STUDY_PLAN_KEY, []);
+  const snap = await getDocs(collection(db, "studyPlans"));
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<StudyPlanRecord, "id">) }));
+}
+
+export async function addStudyPlan(plan: Omit<StudyPlanRecord, "id">): Promise<string> {
+  if (!isFirebaseConfigured || !db) {
+    const id = crypto.randomUUID();
+    write(STUDY_PLAN_KEY, [{ id, ...plan }, ...read<StudyPlanRecord[]>(STUDY_PLAN_KEY, [])]);
+    return id;
+  }
+  const created = await addDoc(collection(db, "studyPlans"), plan);
+  return created.id;
+}
+
+export async function deleteStudyPlan(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(
+      STUDY_PLAN_KEY,
+      read<StudyPlanRecord[]>(STUDY_PLAN_KEY, []).filter((p) => p.id !== id),
+    );
+    return;
+  }
+  await deleteDoc(doc(db, "studyPlans", id));
 }
