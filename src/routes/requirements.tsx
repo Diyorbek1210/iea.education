@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import {
   Globe,
@@ -18,6 +19,7 @@ import {
   POPULAR_UNIVERSITIES,
   type CountryRequirement,
 } from "@/data/requirements";
+import { listCountryRequirements, listUniversityRequirements } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/requirements")({
@@ -31,26 +33,31 @@ export const Route = createFileRoute("/requirements")({
 });
 
 function RequirementsPage() {
+  const { data: dbCountryReqs } = useQuery({ queryKey: ["country-requirements"], queryFn: listCountryRequirements });
+  const { data: dbUniReqs } = useQuery({ queryKey: ["university-requirements"], queryFn: listUniversityRequirements });
+  const allCountryReqs: CountryRequirement[] = dbCountryReqs?.length ? dbCountryReqs : COUNTRY_REQUIREMENTS;
+  const allUniReqs = dbUniReqs?.length ? dbUniReqs : POPULAR_UNIVERSITIES;
+
   const [activeTab, setActiveTab] = useState<"country" | "university">("country");
   const [expandedCountry, setExpandedCountry] = useState<string | null>(null);
 
   const countries = useMemo(() => {
     const map = new Map<string, CountryRequirement[]>();
-    for (const req of COUNTRY_REQUIREMENTS) {
+    for (const req of allCountryReqs) {
       if (!map.has(req.country)) map.set(req.country, []);
       map.get(req.country)!.push(req);
     }
     return [...map.entries()];
-  }, []);
+  }, [allCountryReqs]);
 
   const universityByCountry = useMemo(() => {
-    const map = new Map<string, typeof POPULAR_UNIVERSITIES>();
-    for (const uni of POPULAR_UNIVERSITIES) {
+    const map = new Map<string, typeof allUniReqs>();
+    for (const uni of allUniReqs) {
       if (!map.has(uni.country)) map.set(uni.country, []);
       map.get(uni.country)!.push(uni);
     }
     return [...map.entries()];
-  }, []);
+  }, [allUniReqs]);
 
   return (
     <DashboardShell title="Score Requirements" subtitle="IELTS requirements by country and university">

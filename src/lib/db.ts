@@ -19,6 +19,10 @@ import { deleteAuthUser } from "./authAdmin";
 import { placementQuestions as staticPlacementQuestions } from "@/data/placement";
 import { IELTS_RESOURCES } from "@/data/resources";
 import { BADGES, type BadgeDef } from "@/data/badges";
+import { VOCABULARY, type VocabWord, type VocabTopic } from "@/data/vocabulary";
+import { MODEL_ANSWERS, type ModelAnswer } from "@/data/modelAnswers";
+import { COUNTRY_REQUIREMENTS, POPULAR_UNIVERSITIES, type CountryRequirement, type UniversityRequirement } from "@/data/requirements";
+import type { MockTestSet } from "@/data/mockTests/types";
 import {
   applyStreak,
   applyWeeklyReset,
@@ -61,6 +65,10 @@ const KEYS = {
   mocks: "iea_mock_results",
   resources: "iea_resources",
   placement: "iea_placement_questions",
+  vocabulary: "iea_vocabulary",
+  modelAnswers: "iea_model_answers",
+  countryRequirements: "iea_country_requirements",
+  universityRequirements: "iea_university_requirements",
 };
 
 function read<T>(key: string, fallback: T): T {
@@ -287,6 +295,20 @@ export async function listResources(): Promise<ResourceDoc[]> {
     return seedLocalResources().sort((a, b) => a.order - b.order);
   }
   const snap = await getDocs(query(collection(db, "resources"), orderBy("order", "asc")));
+  if (snap.empty) {
+    const seeded = IELTS_RESOURCES.map((r, i) => ({
+      ...r,
+      sourceType: "link" as const,
+      thumbnail: "",
+      order: i,
+      createdAt: new Date().toISOString(),
+    }));
+    for (const res of seeded) {
+      const { id, ...data } = res;
+      await setDoc(doc(db, "resources", id), data);
+    }
+    return seeded;
+  }
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ResourceDoc, "id">) }));
 }
 
@@ -545,4 +567,276 @@ export async function deleteStudyPlan(id: string): Promise<void> {
     return;
   }
   await deleteDoc(doc(db, "studyPlans", id));
+}
+
+/* ------------------------------------------------------------------ *
+ * Vocabulary (admin-managed)
+ * ------------------------------------------------------------------ */
+
+export interface VocabWordDoc extends VocabWord {
+  id: string;
+}
+
+const VOCAB_KEY = "iea_vocabulary";
+
+function seedLocalVocabulary(): VocabWordDoc[] {
+  const existing = read<VocabWordDoc[] | null>(VOCAB_KEY, null);
+  if (existing && existing.length) return existing;
+  const seeded = VOCABULARY.map((w, i) => ({ ...w, id: `v${i + 1}` }));
+  write(VOCAB_KEY, seeded);
+  return seeded;
+}
+
+export async function listVocabulary(): Promise<VocabWordDoc[]> {
+  if (!isFirebaseConfigured || !db) return seedLocalVocabulary();
+  const snap = await getDocs(query(collection(db, "vocabulary"), orderBy("word", "asc")));
+  if (snap.empty) {
+    const seeded = VOCABULARY.map((w, i) => ({ ...w, id: `v${i + 1}` }));
+    await Promise.all(seeded.map(({ id, ...rest }) => setDoc(doc(db!, "vocabulary", id), rest)));
+    return seeded;
+  }
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VocabWordDoc, "id">) }));
+}
+
+export async function addVocabWord(word: Omit<VocabWordDoc, "id">): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<VocabWordDoc[]>(VOCAB_KEY, []);
+    write(VOCAB_KEY, [...existing, { ...word, id: crypto.randomUUID() }]);
+    return;
+  }
+  await addDoc(collection(db, "vocabulary"), word);
+}
+
+export async function updateVocabWord(id: string, data: Partial<Omit<VocabWordDoc, "id">>): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<VocabWordDoc[]>(VOCAB_KEY, []);
+    write(VOCAB_KEY, existing.map((w) => (w.id === id ? { ...w, ...data } : w)));
+    return;
+  }
+  await updateDoc(doc(db, "vocabulary", id), data);
+}
+
+export async function deleteVocabWord(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(VOCAB_KEY, read<VocabWordDoc[]>(VOCAB_KEY, []).filter((w) => w.id !== id));
+    return;
+  }
+  await deleteDoc(doc(db, "vocabulary", id));
+}
+
+/* ------------------------------------------------------------------ *
+ * Model Answers (admin-managed)
+ * ------------------------------------------------------------------ */
+
+export interface ModelAnswerDoc extends ModelAnswer {
+  id: string;
+}
+
+const MODEL_ANSWER_KEY = "iea_model_answers";
+
+function seedLocalModelAnswers(): ModelAnswerDoc[] {
+  const existing = read<ModelAnswerDoc[] | null>(MODEL_ANSWER_KEY, null);
+  if (existing && existing.length) return existing;
+  write(MODEL_ANSWER_KEY, MODEL_ANSWERS);
+  return MODEL_ANSWERS;
+}
+
+export async function listModelAnswers(): Promise<ModelAnswerDoc[]> {
+  if (!isFirebaseConfigured || !db) return seedLocalModelAnswers();
+  const snap = await getDocs(query(collection(db, "modelAnswers"), orderBy("title", "asc")));
+  if (snap.empty) {
+    await Promise.all(
+      MODEL_ANSWERS.map((a) => setDoc(doc(db!, "modelAnswers", a.id), { ...a })),
+    );
+    return MODEL_ANSWERS;
+  }
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ModelAnswerDoc, "id">) }));
+}
+
+export async function addModelAnswer(answer: Omit<ModelAnswerDoc, "id">): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<ModelAnswerDoc[]>(MODEL_ANSWER_KEY, []);
+    write(MODEL_ANSWER_KEY, [...existing, { ...answer, id: crypto.randomUUID() }]);
+    return;
+  }
+  await addDoc(collection(db, "modelAnswers"), answer);
+}
+
+export async function updateModelAnswer(id: string, data: Partial<Omit<ModelAnswerDoc, "id">>): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<ModelAnswerDoc[]>(MODEL_ANSWER_KEY, []);
+    write(MODEL_ANSWER_KEY, existing.map((a) => (a.id === id ? { ...a, ...data } : a)));
+    return;
+  }
+  await updateDoc(doc(db, "modelAnswers", id), data);
+}
+
+export async function deleteModelAnswer(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(MODEL_ANSWER_KEY, read<ModelAnswerDoc[]>(MODEL_ANSWER_KEY, []).filter((a) => a.id !== id));
+    return;
+  }
+  await deleteDoc(doc(db, "modelAnswers", id));
+}
+
+/* ------------------------------------------------------------------ *
+ * Requirements (admin-managed)
+ * ------------------------------------------------------------------ */
+
+export interface CountryRequirementDoc extends CountryRequirement {
+  id: string;
+}
+
+export interface UniversityRequirementDoc extends UniversityRequirement {
+  id: string;
+}
+
+const COUNTRY_REQ_KEY = "iea_country_requirements";
+const UNI_REQ_KEY = "iea_university_requirements";
+
+function seedLocalCountryRequirements(): CountryRequirementDoc[] {
+  const existing = read<CountryRequirementDoc[] | null>(COUNTRY_REQ_KEY, null);
+  if (existing && existing.length) return existing;
+  const seeded = COUNTRY_REQUIREMENTS.map((r, i) => ({ ...r, id: `cr${i + 1}` }));
+  write(COUNTRY_REQ_KEY, seeded);
+  return seeded;
+}
+
+function seedLocalUniversityRequirements(): UniversityRequirementDoc[] {
+  const existing = read<UniversityRequirementDoc[] | null>(UNI_REQ_KEY, null);
+  if (existing && existing.length) return existing;
+  const seeded = POPULAR_UNIVERSITIES.map((r, i) => ({ ...r, id: `ur${i + 1}` }));
+  write(UNI_REQ_KEY, seeded);
+  return seeded;
+}
+
+export async function listCountryRequirements(): Promise<CountryRequirementDoc[]> {
+  if (!isFirebaseConfigured || !db) return seedLocalCountryRequirements();
+  const snap = await getDocs(query(collection(db, "countryRequirements"), orderBy("country", "asc")));
+  if (snap.empty) {
+    const seeded = COUNTRY_REQUIREMENTS.map((r, i) => ({ ...r, id: `cr${i + 1}` }));
+    await Promise.all(seeded.map(({ id, ...rest }) => setDoc(doc(db!, "countryRequirements", id), rest)));
+    return seeded;
+  }
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<CountryRequirementDoc, "id">) }));
+}
+
+export async function addCountryRequirement(req: Omit<CountryRequirementDoc, "id">): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<CountryRequirementDoc[]>(COUNTRY_REQ_KEY, []);
+    write(COUNTRY_REQ_KEY, [...existing, { ...req, id: crypto.randomUUID() }]);
+    return;
+  }
+  await addDoc(collection(db, "countryRequirements"), req);
+}
+
+export async function updateCountryRequirement(id: string, data: Partial<Omit<CountryRequirementDoc, "id">>): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<CountryRequirementDoc[]>(COUNTRY_REQ_KEY, []);
+    write(COUNTRY_REQ_KEY, existing.map((r) => (r.id === id ? { ...r, ...data } : r)));
+    return;
+  }
+  await updateDoc(doc(db, "countryRequirements", id), data);
+}
+
+export async function deleteCountryRequirement(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(COUNTRY_REQ_KEY, read<CountryRequirementDoc[]>(COUNTRY_REQ_KEY, []).filter((r) => r.id !== id));
+    return;
+  }
+  await deleteDoc(doc(db, "countryRequirements", id));
+}
+
+export async function listUniversityRequirements(): Promise<UniversityRequirementDoc[]> {
+  if (!isFirebaseConfigured || !db) return seedLocalUniversityRequirements();
+  const snap = await getDocs(query(collection(db, "universityRequirements"), orderBy("university", "asc")));
+  if (snap.empty) {
+    const seeded = POPULAR_UNIVERSITIES.map((r, i) => ({ ...r, id: `ur${i + 1}` }));
+    await Promise.all(seeded.map(({ id, ...rest }) => setDoc(doc(db!, "universityRequirements", id), rest)));
+    return seeded;
+  }
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<UniversityRequirementDoc, "id">) }));
+}
+
+export async function addUniversityRequirement(req: Omit<UniversityRequirementDoc, "id">): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<UniversityRequirementDoc[]>(UNI_REQ_KEY, []);
+    write(UNI_REQ_KEY, [...existing, { ...req, id: crypto.randomUUID() }]);
+    return;
+  }
+  await addDoc(collection(db, "universityRequirements"), req);
+}
+
+export async function updateUniversityRequirement(id: string, data: Partial<Omit<UniversityRequirementDoc, "id">>): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<UniversityRequirementDoc[]>(UNI_REQ_KEY, []);
+    write(UNI_REQ_KEY, existing.map((r) => (r.id === id ? { ...r, ...data } : r)));
+    return;
+  }
+  await updateDoc(doc(db, "universityRequirements", id), data);
+}
+
+export async function deleteUniversityRequirement(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(UNI_REQ_KEY, read<UniversityRequirementDoc[]>(UNI_REQ_KEY, []).filter((r) => r.id !== id));
+    return;
+  }
+  await deleteDoc(doc(db, "universityRequirements", id));
+}
+
+/* ------------------------------------------------------------------ *
+ * Mock Tests (admin-managed)
+ * ------------------------------------------------------------------ */
+
+const MOCK_TEST_KEY = "iea_mock_tests";
+
+function seedLocalMockTests(): MockTestSet[] {
+  const existing = read<MockTestSet[] | null>(MOCK_TEST_KEY, null);
+  if (existing && existing.length) return existing;
+  return [];
+}
+
+export async function listMockTests(): Promise<MockTestSet[]> {
+  if (!isFirebaseConfigured || !db) {
+    const local = seedLocalMockTests();
+    if (local.length) return local;
+    const { mockTests: staticMockTests } = await import("@/data/mockTest");
+    write(MOCK_TEST_KEY, staticMockTests);
+    return staticMockTests;
+  }
+  const snap = await getDocs(query(collection(db, "mockTests"), orderBy("order", "asc")));
+  if (snap.empty) {
+    const { mockTests: staticMockTests } = await import("@/data/mockTest");
+    await Promise.all(
+      staticMockTests.map((m) => setDoc(doc(db!, "mockTests", m.id), { ...m })),
+    );
+    return staticMockTests;
+  }
+  return snap.docs.map((d) => d.data() as MockTestSet);
+}
+
+export async function addMockTest(mock: MockTestSet): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<MockTestSet[]>(MOCK_TEST_KEY, []);
+    write(MOCK_TEST_KEY, [...existing, mock]);
+    return;
+  }
+  await setDoc(doc(db, "mockTests", mock.id), { ...mock });
+}
+
+export async function updateMockTest(id: string, data: Partial<MockTestSet>): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<MockTestSet[]>(MOCK_TEST_KEY, []);
+    write(MOCK_TEST_KEY, existing.map((m) => (m.id === id ? { ...m, ...data } : m)));
+    return;
+  }
+  await updateDoc(doc(db, "mockTests", id), data);
+}
+
+export async function deleteMockTest(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(MOCK_TEST_KEY, read<MockTestSet[]>(MOCK_TEST_KEY, []).filter((m) => m.id !== id));
+    return;
+  }
+  await deleteDoc(doc(db, "mockTests", id));
 }

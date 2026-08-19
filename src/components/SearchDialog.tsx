@@ -6,7 +6,6 @@ import {
   PenLine,
   Globe,
   Calculator,
-  Mic,
   Target,
   Trophy,
   BarChart3,
@@ -37,8 +36,6 @@ const NAV_ITEMS: { to: string; label: string; icon: typeof Search }[] = [
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/task-practice", label: "Task Practice", icon: Target },
   { to: "/model-answers", label: "Model Answers", icon: FileText },
-  { to: "/writing-generator", label: "Writing Practice", icon: PenLine },
-  { to: "/pronunciation", label: "Pronunciation", icon: Mic },
   { to: "/band-calculator", label: "Band Calculator", icon: Calculator },
   { to: "/resources", label: "Resources", icon: Globe },
   { to: "/requirements", label: "Requirements", icon: GraduationCap },
@@ -82,7 +79,7 @@ export function SearchDialog() {
       description: t.prompt.slice(0, 100) + "...",
       category: "essay" as const,
       icon: PenLine,
-      action: "/writing-generator",
+      action: "/task-practice",
       keywords: [t.title.toLowerCase(), t.category, t.type.replace(/_/g, " ")],
     }));
 

@@ -8,8 +8,6 @@ import {
   GraduationCap,
   LayoutDashboard,
   Menu,
-  Mic,
-  PenLine,
   Trophy,
   ClipboardCheck,
   X,
@@ -32,8 +30,7 @@ const nav = [
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/task-practice", label: "Task Practice", icon: Target },
   { to: "/model-answers", label: "Model Answers", icon: FileText },
-  { to: "/writing-generator", label: "Writing Practice", icon: PenLine },
-  { to: "/pronunciation", label: "Pronunciation", icon: Mic },
+
   { to: "/band-calculator", label: "Band Calculator", icon: Calculator },
   { to: "/resources", label: "Resources", icon: Globe },
   { to: "/requirements", label: "Requirements", icon: GraduationCap },
@@ -79,7 +76,7 @@ export function DashboardShell({
       </a>
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-sidebar-border bg-sidebar p-5 shadow-card transition-transform lg:static lg:translate-x-0 lg:shadow-none",
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-sidebar-border bg-sidebar p-5 shadow-card transition-transform overflow-y-auto lg:static lg:translate-x-0 lg:shadow-none",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -105,22 +102,23 @@ export function DashboardShell({
               {item.label}
             </Link>
           ))}
+          <div className="border-t border-sidebar-border pt-3 mt-3">
+            <Link
+              to="/settings"
+              onClick={() => setOpen(false)}
+              aria-current={pathname === "/settings" ? "page" : undefined}
+              className={cn(
+                "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors",
+                pathname === "/settings"
+                  ? "bg-gradient-primary text-primary-foreground shadow-card"
+                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              )}
+            >
+              <Settings className="h-4 w-4" aria-hidden="true" />
+              Settings
+            </Link>
+          </div>
         </nav>
-
-        <Link
-          to="/settings"
-          onClick={() => setOpen(false)}
-          aria-current={pathname === "/settings" ? "page" : undefined}
-          className={cn(
-            "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors mt-auto",
-            pathname === "/settings"
-              ? "bg-gradient-primary text-primary-foreground shadow-card"
-              : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-          )}
-        >
-          <Settings className="h-4 w-4" aria-hidden="true" />
-          Settings
-        </Link>
       </aside>
 
       {open && (

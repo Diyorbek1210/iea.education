@@ -22,7 +22,6 @@ import { Route as ModelAnswersRouteImport } from './routes/model-answers'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as PronunciationRouteImport } from './routes/pronunciation'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RequirementsRouteImport } from './routes/requirements'
 import { Route as ResourcesRouteImport } from './routes/resources'
@@ -30,7 +29,6 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TaskPracticeRouteImport } from './routes/task-practice'
 import { Route as TestRouteImport } from './routes/test'
 import { Route as VocabularyRouteImport } from './routes/vocabulary'
-import { Route as WritingGeneratorRouteImport } from './routes/writing-generator'
 import { Route as MockTestMockIdRouteImport } from './routes/mock-test_.$mockId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -98,11 +96,6 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PronunciationRoute = PronunciationRouteImport.update({
-  id: '/pronunciation',
-  path: '/pronunciation',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -138,11 +131,6 @@ const VocabularyRoute = VocabularyRouteImport.update({
   path: '/vocabulary',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WritingGeneratorRoute = WritingGeneratorRouteImport.update({
-  id: '/writing-generator',
-  path: '/writing-generator',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MockTestMockIdRoute = MockTestMockIdRouteImport.update({
   id: '/mock-test_/$mockId',
   path: '/mock-test/$mockId',
@@ -163,7 +151,6 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
-  '/pronunciation': typeof PronunciationRoute
   '/register': typeof RegisterRoute
   '/requirements': typeof RequirementsRoute
   '/resources': typeof ResourcesRoute
@@ -171,7 +158,6 @@ export interface FileRoutesByFullPath {
   '/task-practice': typeof TaskPracticeRoute
   '/test': typeof TestRoute
   '/vocabulary': typeof VocabularyRoute
-  '/writing-generator': typeof WritingGeneratorRoute
   '/mock-test/$mockId': typeof MockTestMockIdRoute
 }
 export interface FileRoutesByTo {
@@ -188,7 +174,6 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsRoute
   '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
-  '/pronunciation': typeof PronunciationRoute
   '/register': typeof RegisterRoute
   '/requirements': typeof RequirementsRoute
   '/resources': typeof ResourcesRoute
@@ -196,7 +181,6 @@ export interface FileRoutesByTo {
   '/task-practice': typeof TaskPracticeRoute
   '/test': typeof TestRoute
   '/vocabulary': typeof VocabularyRoute
-  '/writing-generator': typeof WritingGeneratorRoute
   '/mock-test/$mockId': typeof MockTestMockIdRoute
 }
 export interface FileRoutesById {
@@ -214,7 +198,6 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsRoute
   '/practice': typeof PracticeRoute
   '/profile': typeof ProfileRoute
-  '/pronunciation': typeof PronunciationRoute
   '/register': typeof RegisterRoute
   '/requirements': typeof RequirementsRoute
   '/resources': typeof ResourcesRoute
@@ -222,7 +205,6 @@ export interface FileRoutesById {
   '/task-practice': typeof TaskPracticeRoute
   '/test': typeof TestRoute
   '/vocabulary': typeof VocabularyRoute
-  '/writing-generator': typeof WritingGeneratorRoute
   '/mock-test_/$mockId': typeof MockTestMockIdRoute
 }
 export interface FileRouteTypes {
@@ -241,7 +223,6 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/practice'
     | '/profile'
-    | '/pronunciation'
     | '/register'
     | '/requirements'
     | '/resources'
@@ -249,7 +230,6 @@ export interface FileRouteTypes {
     | '/task-practice'
     | '/test'
     | '/vocabulary'
-    | '/writing-generator'
     | '/mock-test/$mockId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -266,7 +246,6 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/practice'
     | '/profile'
-    | '/pronunciation'
     | '/register'
     | '/requirements'
     | '/resources'
@@ -274,7 +253,6 @@ export interface FileRouteTypes {
     | '/task-practice'
     | '/test'
     | '/vocabulary'
-    | '/writing-generator'
     | '/mock-test/$mockId'
   id:
     | '__root__'
@@ -291,7 +269,6 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/practice'
     | '/profile'
-    | '/pronunciation'
     | '/register'
     | '/requirements'
     | '/resources'
@@ -299,7 +276,6 @@ export interface FileRouteTypes {
     | '/task-practice'
     | '/test'
     | '/vocabulary'
-    | '/writing-generator'
     | '/mock-test_/$mockId'
   fileRoutesById: FileRoutesById
 }
@@ -317,7 +293,6 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   PracticeRoute: typeof PracticeRoute
   ProfileRoute: typeof ProfileRoute
-  PronunciationRoute: typeof PronunciationRoute
   RegisterRoute: typeof RegisterRoute
   RequirementsRoute: typeof RequirementsRoute
   ResourcesRoute: typeof ResourcesRoute
@@ -325,7 +300,6 @@ export interface RootRouteChildren {
   TaskPracticeRoute: typeof TaskPracticeRoute
   TestRoute: typeof TestRoute
   VocabularyRoute: typeof VocabularyRoute
-  WritingGeneratorRoute: typeof WritingGeneratorRoute
   MockTestMockIdRoute: typeof MockTestMockIdRoute
 }
 
@@ -422,13 +396,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pronunciation': {
-      id: '/pronunciation'
-      path: '/pronunciation'
-      fullPath: '/pronunciation'
-      preLoaderRoute: typeof PronunciationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -478,13 +445,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VocabularyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/writing-generator': {
-      id: '/writing-generator'
-      path: '/writing-generator'
-      fullPath: '/writing-generator'
-      preLoaderRoute: typeof WritingGeneratorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/mock-test_/$mockId': {
       id: '/mock-test_/$mockId'
       path: '/mock-test/$mockId'
@@ -509,7 +469,6 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsRoute: NotificationsRoute,
   PracticeRoute: PracticeRoute,
   ProfileRoute: ProfileRoute,
-  PronunciationRoute: PronunciationRoute,
   RegisterRoute: RegisterRoute,
   RequirementsRoute: RequirementsRoute,
   ResourcesRoute: ResourcesRoute,
@@ -517,7 +476,6 @@ const rootRouteChildren: RootRouteChildren = {
   TaskPracticeRoute: TaskPracticeRoute,
   TestRoute: TestRoute,
   VocabularyRoute: VocabularyRoute,
-  WritingGeneratorRoute: WritingGeneratorRoute,
   MockTestMockIdRoute: MockTestMockIdRoute,
 }
 export const routeTree = rootRouteImport

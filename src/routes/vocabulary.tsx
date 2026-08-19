@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   BookOpen,
@@ -19,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { VOCABULARY, VOCAB_TOPICS, type VocabWord, type VocabTopic } from "@/data/vocabulary";
+import { listVocabulary } from "@/lib/db";
 import {
   getSrsCard,
   updateSrsCard,
@@ -40,6 +42,9 @@ export const Route = createFileRoute("/vocabulary")({
 type ReviewMode = "recognition" | "production" | "mixed";
 
 function VocabularyPage() {
+  const { data: dbWords } = useQuery({ queryKey: ["vocabulary"], queryFn: listVocabulary });
+  const allWords: VocabWord[] = dbWords?.length ? dbWords : VOCABULARY;
+
   const [mode, setMode] = useState<"browse" | "review">("browse");
   const [reviewMode, setReviewMode] = useState<ReviewMode>("mixed");
   const [selectedTopic, setSelectedTopic] = useState<VocabTopic | "all">("all");
@@ -55,7 +60,7 @@ function VocabularyPage() {
   const [mixedSubMode, setMixedSubMode] = useState<"recognition" | "production">("recognition");
 
   const filteredWords = useMemo(() => {
-    let words = [...VOCABULARY];
+    let words = [...allWords];
     if (selectedTopic !== "all") words = words.filter((w) => w.topic === selectedTopic);
     if (selectedDifficulty !== "all") words = words.filter((w) => w.difficulty === selectedDifficulty);
     return words;

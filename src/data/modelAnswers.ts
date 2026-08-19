@@ -2,7 +2,7 @@ export interface ModelAnswer {
   id: string;
   title: string;
   category: string;
-  skill: "writing" | "speaking";
+  skill: "writing" | "speaking" | "reading" | "listening";
   band: number;
   prompt: string;
   answer: string;
@@ -173,13 +173,131 @@ In conclusion, while the modern workplace presents real challenges to work-life 
       "Each body paragraph focuses on one aspect — problems first, then solutions."
     ],
   },
+  // ── Reading Model Answers ──
+  {
+    id: "ma-reading-1",
+    title: "Reading Passage — Urban Gardening (Band 8)",
+    category: "environment",
+    skill: "reading",
+    band: 8,
+    prompt: "Read the passage below and answer the questions that follow.\n\nUrban gardening has seen a remarkable surge in popularity over the past decade. What was once considered a hobby for retirees has transformed into a global movement embraced by年轻人 and city planners alike. The reasons for this shift are multifaceted, ranging from concerns about food security to a growing awareness of mental health benefits associated with nurturing living plants.\n\nIn cities like Detroit, abandoned lots have been converted into thriving community gardens, providing fresh produce to neighbourhoods that were previously classified as food deserts. These initiatives have not only improved access to healthy food but have also strengthened community bonds. Residents who participate in urban gardening programmes report feeling more connected to their neighbours and more invested in the wellbeing of their local area.\n\nCritics argue that urban gardening is merely a trend that will fade as cities continue to prioritise development. However, the data suggests otherwise. A 2023 study published in the Journal of Urban Agriculture found that cities with established urban gardening programmes experienced a 15% reduction in food-related carbon emissions and a measurable improvement in居民 mental health indicators.\n\nFurthermore, urban gardens serve as crucial green spaces in densely populated areas. They provide habitats for pollinators, reduce the urban heat island effect, and improve air quality. These ecological benefits make urban gardening not just a social phenomenon but an essential component of sustainable urban planning.",
+    answer: `Question 1: The passage states that urban gardening was once considered "a hobby for retirees" but has now become "a global movement embraced by年轻人 and city planners alike."
+
+Question 2: According to the passage, abandoned lots in Detroit have been converted into community gardens that provide fresh produce to neighbourhoods previously classified as food deserts.
+
+Question 3: The 2023 study found that cities with established urban gardening programmes experienced a 15% reduction in food-related carbon emissions and measurable improvement in居民 mental health indicators.
+
+Question 4: The author presents a balanced view but ultimately supports urban gardening, citing evidence of its ecological, social, and health benefits.
+
+Question 5: The main purpose of the passage is to discuss the growth, benefits, and future prospects of urban gardening in modern cities.`,
+    criteria: [
+      { label: "Reading Comprehension", band: 8, comment: "Reader correctly identifies key details, author's purpose, and supporting evidence." },
+      { label: "Inference Skills", band: 8, comment: "Draws logical conclusions from implicit information in the passage." },
+      { label: "Vocabulary in Context", band: 8, comment: "Understands meaning of words as used in context, including less common items." },
+      { label: "Detail Identification", band: 8, comment: "Accurately locates and extracts specific information from the text." },
+    ],
+    tips: [
+      "Always read the questions before the passage to know what to look for.",
+      "Pay attention to signal words: 'however', 'furthermore', 'according to'.",
+      "For True/False/Not Given, only use information explicitly stated in the passage.",
+      "Practice skimming for main ideas and scanning for specific details."
+    ],
+  },
+  {
+    id: "ma-reading-2",
+    title: "Reading Passage — Digital Literacy (Band 7)",
+    category: "technology",
+    skill: "reading",
+    band: 7,
+    prompt: `Read the passage and answer the questions.\n\nDigital literacy has become as fundamental as traditional literacy in the modern world. The ability to find, evaluate, and communicate information through various digital platforms is now essential for participation in civic, economic, and social life. Yet significant disparities persist in digital skills across age groups, income levels, and geographic regions.\n\nA report by the OECD found that approximately 30% of adults in developed countries lack basic digital skills, struggling with tasks such as sending emails, using search engines, or completing online forms. This digital divide disproportionately affects elderly populations and those with lower educational attainment.\n\nEducational institutions are increasingly integrating digital literacy into their curricula. Finland, often cited as a leader in education reform, introduced computational thinking and digital citizenship as core subjects in primary schools as early as 2016. The results have been promising, with Finnish students consistently ranking among the top performers in international assessments.\n\nHowever, critics caution that teaching technical skills alone is insufficient. True digital literacy encompasses critical thinking about online information, understanding privacy and data protection, recognising misinformation, and using technology ethically. Without these broader competencies, individuals remain vulnerable to manipulation and exploitation in the digital sphere.`,
+    answer: `Question 1: Digital literacy is defined as the ability to find, evaluate, and communicate information through various digital platforms.
+
+Question 2: According to the OECD report, approximately 30% of adults in developed countries lack basic digital skills.
+
+Question 3: Finland introduced computational thinking and digital citizenship as core subjects in primary schools in 2016.
+
+Question 4: Critics argue that true digital literacy includes critical thinking, privacy awareness, recognising misinformation, and ethical use of technology — not just technical skills.
+
+Question 5: The author's main argument is that digital literacy is essential but must go beyond technical skills to include critical and ethical competencies.`,
+    criteria: [
+      { label: "Reading Comprehension", band: 7, comment: "Good understanding of main ideas and supporting details." },
+      { label: "Inference Skills", band: 7, comment: "Can draw reasonable inferences from the text." },
+      { label: "Vocabulary in Context", band: 7, comment: "Understands most vocabulary in context, including some less common terms." },
+      { label: "Detail Identification", band: 7, comment: "Accurately identifies most specific information." },
+    ],
+    tips: [
+      "Underline key statistics and names as you read — they often appear in questions.",
+      "Distinguish between the author's opinion and facts presented.",
+      "For summary completion, ensure your answer fits grammatically in the gap.",
+      "Manage your time: spend no more than 20 minutes per passage."
+    ],
+  },
+  // ── Listening Model Answers ──
+  {
+    id: "ma-listening-1",
+    title: "Listening Section 1 — Hotel Booking (Band 8)",
+    category: "travel",
+    skill: "listening",
+    band: 8,
+    prompt: "Listen to the conversation between a hotel receptionist and a guest making a reservation. Answer the following questions based on what you hear.\n\n1. What is the guest's booking reference?\n2. How many nights will the guest be staying?\n3. What time is check-out?\n4. Does the guest request a room with a view?\n5. What additional service does the guest book?",
+    answer: `1. The booking reference is BK7429. The receptionist confirms: "Your booking reference is BK7429."
+
+2. The guest will be staying for 3 nights (arriving Friday, departing Monday).
+
+3. Check-out time is at 11:00 am. The receptionist states: "Check-out is at eleven am, but we can offer a late check-out until noon if needed."
+
+4. Yes, the guest requests a room with a garden view. The receptionist confirms availability on the third floor.
+
+5. The guest also books an airport transfer for Monday morning at 6:30 am.`,
+    criteria: [
+      { label: "Listening for Detail", band: 8, comment: "Correctly identifies all specific information from the audio." },
+      { label: "Note-taking", band: 8, comment: "Effective at capturing key details while listening." },
+      { label: "Number Recognition", band: 8, comment: "Accurately records numbers, times, and references." },
+      { label: "Inference", band: 8, comment: "Can infer unstated information from context." },
+    ],
+    tips: [
+      "Read the questions before the audio plays — know what information to listen for.",
+      "Write answers as you hear them; don't try to remember everything.",
+      "Pay attention to corrections: speakers sometimes change their answers mid-sentence.",
+      "Check spelling and word limits carefully on the answer sheet."
+    ],
+  },
+  {
+    id: "ma-listening-2",
+    title: "Listening Section 3 — Academic Discussion (Band 7)",
+    category: "education",
+    skill: "listening",
+    band: 7,
+    prompt: "Listen to a discussion between two students about their research project on climate change. Answer:\n\n1. What topic did they choose for their presentation?\n2. Who will handle the data analysis section?\n3. What is the deadline for the first draft?\n4. What source did they decide to use for statistics?\n5. When will they meet again to review progress?",
+    answer: `1. They chose 'The Impact of Urbanisation on Local Climate Patterns' as their presentation topic.
+
+2. Sarah will handle the data analysis section, as she has experience with statistical software.
+
+3. The deadline for the first draft is November 15th.
+
+4. They decided to use the World Climate Database for their statistics, as it provides reliable and up-to-date data.
+
+5. They will meet again on Thursday at 3 pm in the library to review their progress.`,
+    criteria: [
+      { label: "Listening for Detail", band: 7, comment: "Captures most key details accurately." },
+      { label: "Note-taking", band: 7, comment: "Good note-taking skills with minor omissions." },
+      { label: "Speaker Identification", band: 7, comment: "Can distinguish between different speakers in a conversation." },
+      { label: "Inference", band: 7, comment: "Makes reasonable inferences from the discussion." },
+    ],
+    tips: [
+      "In academic discussions, pay attention to which speaker says what.",
+      "Note down names, dates, and specific references as they are mentioned.",
+      "Speakers may disagree initially but reach consensus — follow the final decision.",
+      "Practice with academic podcasts and lectures to improve comprehension."
+    ],
+  },
 ];
 
 export function getAnswersByCategory(category: string): ModelAnswer[] {
   return MODEL_ANSWERS.filter((a) => a.category === category);
 }
 
-export function getAnswersBySkill(skill: "writing" | "speaking"): ModelAnswer[] {
+export function getAnswersBySkill(skill: "writing" | "speaking" | "reading" | "listening"): ModelAnswer[] {
   return MODEL_ANSWERS.filter((a) => a.skill === skill);
 }
 

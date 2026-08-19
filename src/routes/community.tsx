@@ -7,12 +7,15 @@ import {
   Users,
   PenLine,
   Clock,
+  Shield,
+  Trash2,
 } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
+import { ADMIN_EMAIL } from "@/firebaseConfig";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/community")({
@@ -29,6 +32,7 @@ interface Thread {
   id: string;
   title: string;
   author: string;
+  authorEmail: string | undefined;
   category: "tips" | "question" | "experience" | "resource";
   content: string;
   replies: Reply[];
@@ -40,6 +44,7 @@ interface Thread {
 interface Reply {
   id: string;
   author: string;
+  authorEmail: string | undefined;
   content: string;
   createdAt: string;
   likes: number;
@@ -49,12 +54,13 @@ const SEED_THREADS: Thread[] = [
   {
     id: "t1",
     title: "How I improved from Band 6 to 7.5 in Writing",
-    author: "Sarah M.",
+    author: "Admin",
+    authorEmail: ADMIN_EMAIL,
     category: "experience",
     content: "I focused on Task Response and Coherence. Here are my top 3 tips:\n\n1. Always spend 5 minutes planning before writing\n2. Use discourse markers to connect paragraphs\n3. Write a clear thesis statement in your introduction\n\nThe biggest game changer was timing - I practiced writing 250 words in exactly 40 minutes until it became natural.",
     replies: [
-      { id: "r1", author: "Ahmed K.", content: "Great tips! The planning phase is so underrated. I always rush into writing and it shows.", createdAt: new Date(Date.now() - 86400000).toISOString(), likes: 5 },
-      { id: "r2", author: "Li Wei", content: "Can you share more about discourse markers? I struggle with cohesion.", createdAt: new Date(Date.now() - 43200000).toISOString(), likes: 3 },
+      { id: "r1", author: "Ahmed K.", authorEmail: undefined, content: "Great tips! The planning phase is so underrated. I always rush into writing and it shows.", createdAt: new Date(Date.now() - 86400000).toISOString(), likes: 5 },
+      { id: "r2", author: "Li Wei", authorEmail: undefined, content: "Can you share more about discourse markers? I struggle with cohesion.", createdAt: new Date(Date.now() - 43200000).toISOString(), likes: 3 },
     ],
     likes: 24,
     createdAt: new Date(Date.now() - 172800000).toISOString(),
@@ -63,10 +69,11 @@ const SEED_THREADS: Thread[] = [
     id: "t2",
     title: "Best resources for Listening Section 4?",
     author: "Raj P.",
+    authorEmail: undefined,
     category: "question",
     content: "I keep losing marks in Section 4 because the academic vocabulary is so dense. Does anyone have tips or resources specifically for this section? I'm currently scoring 6.5 in Listening overall but Section 4 brings me down.",
     replies: [
-      { id: "r3", author: "Emma T.", content: "Try the BBC podcasts - they have similar academic content. Also, practice note-taking while listening to TED talks.", createdAt: new Date(Date.now() - 7200000).toISOString(), likes: 8 },
+      { id: "r3", author: "Emma T.", authorEmail: undefined, content: "Try the BBC podcasts - they have similar academic content. Also, practice note-taking while listening to TED talks.", createdAt: new Date(Date.now() - 7200000).toISOString(), likes: 8 },
     ],
     likes: 12,
     createdAt: new Date(Date.now() - 259200000).toISOString(),
@@ -75,6 +82,7 @@ const SEED_THREADS: Thread[] = [
     id: "t3",
     title: "Speaking Part 2 - Use the full 1 minute preparation",
     author: "Yuki H.",
+    authorEmail: undefined,
     category: "tips",
     content: "Many candidates waste the 1-minute preparation time. Here's my method:\n\n- 20 seconds: Read all bullet points carefully\n- 20 seconds: Jot down keywords for each bullet\n- 20 seconds: Plan your opening sentence\n\nThis gives you a clear structure and prevents you from going off-topic during the 2-minute speech.",
     replies: [],
@@ -101,8 +109,25 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`;
 }
 
+function AuthorName({ name, email }: { name: string; email: string | undefined }) {
+  const isAdmin = email === ADMIN_EMAIL || name === "Admin";
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span className="text-sm font-bold text-foreground">
+        {isAdmin ? "Admin" : name}
+      </span>
+      {isAdmin && (
+        <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+          <Shield className="h-2.5 w-2.5" /> Admin
+        </span>
+      )}
+    </span>
+  );
+}
+
 function CommunityPage() {
   const { user } = useAuth();
+  const isAdmin = user?.email === ADMIN_EMAIL;
   const [threads, setThreads] = useState<Thread[]>(SEED_THREADS);
   const [activeTab, setActiveTab] = useState<"all" | "tips" | "question" | "experience">("all");
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
@@ -114,12 +139,39 @@ function CommunityPage() {
 
   const filteredThreads = activeTab === "all" ? threads : threads.filter((t) => t.category === activeTab);
 
+  function canDeleteThread(thread: Thread): boolean {
+    if (isAdmin) return true;
+    return thread.authorEmail === user?.email;
+  }
+
+  function canDeleteReply(reply: Reply): boolean {
+    if (isAdmin) return true;
+    return reply.authorEmail === user?.email;
+  }
+
+  function deleteThread(threadId: string) {
+    setThreads((prev) => prev.filter((t) => t.id !== threadId));
+    if (selectedThread?.id === threadId) setSelectedThread(null);
+  }
+
+  function deleteReply(threadId: string, replyId: string) {
+    setThreads((prev) =>
+      prev.map((t) =>
+        t.id === threadId ? { ...t, replies: t.replies.filter((r) => r.id !== replyId) } : t,
+      ),
+    );
+    setSelectedThread((prev) =>
+      prev ? { ...prev, replies: prev.replies.filter((r) => r.id !== replyId) } : prev,
+    );
+  }
+
   const handleNewThread = () => {
     if (!newThreadTitle.trim() || !newThreadContent.trim()) return;
     const thread: Thread = {
       id: crypto.randomUUID(),
       title: newThreadTitle,
       author: user?.name ?? "Anonymous",
+      authorEmail: user?.email,
       category: newThreadCategory,
       content: newThreadContent,
       replies: [],
@@ -137,6 +189,7 @@ function CommunityPage() {
     const reply: Reply = {
       id: crypto.randomUUID(),
       author: user?.name ?? "Anonymous",
+      authorEmail: user?.email,
       content: replyText,
       createdAt: new Date().toISOString(),
       likes: 0,
@@ -172,7 +225,8 @@ function CommunityPage() {
           <div className="rounded-3xl bg-card p-6 shadow-card">
             <div className="flex items-center gap-2">
               <Badge className={catInfo.color}>{catInfo.label}</Badge>
-              <span className="text-xs text-muted-foreground">by {thread.author} • {timeAgo(thread.createdAt)}</span>
+              <AuthorName name={thread.author} email={thread.authorEmail} />
+              <span className="text-xs text-muted-foreground">• {timeAgo(thread.createdAt)}</span>
             </div>
             <h2 className="mt-2 text-lg font-extrabold text-foreground">{thread.title}</h2>
             <p className="mt-3 whitespace-pre-wrap text-sm text-foreground leading-relaxed">{thread.content}</p>
@@ -186,6 +240,14 @@ function CommunityPage() {
               <span className="flex items-center gap-1 text-sm text-muted-foreground">
                 <MessageSquare className="h-4 w-4" /> {thread.replies.length} replies
               </span>
+              {canDeleteThread(thread) && (
+                <button
+                  onClick={() => deleteThread(thread.id)}
+                  className="flex items-center gap-1 text-sm text-destructive hover:text-destructive/80"
+                >
+                  <Trash2 className="h-4 w-4" /> Delete
+                </button>
+              )}
             </div>
           </div>
 
@@ -193,8 +255,16 @@ function CommunityPage() {
           {thread.replies.map((reply) => (
             <div key={reply.id} className="rounded-2xl bg-card p-4 shadow-card">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-foreground">{reply.author}</span>
+                <AuthorName name={reply.author} email={reply.authorEmail} />
                 <span className="text-xs text-muted-foreground">{timeAgo(reply.createdAt)}</span>
+                {canDeleteReply(reply) && (
+                  <button
+                    onClick={() => deleteReply(thread.id, reply.id)}
+                    className="ml-auto text-destructive hover:text-destructive/80"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
               <p className="mt-2 text-sm text-foreground">{reply.content}</p>
               <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
@@ -295,8 +365,16 @@ function CommunityPage() {
               >
                 <div className="flex items-center gap-2">
                   <Badge className={catInfo.color}>{catInfo.label}</Badge>
-                  <span className="text-xs text-muted-foreground">by {thread.author}</span>
+                  <AuthorName name={thread.author} email={thread.authorEmail} />
                   <span className="text-xs text-muted-foreground">• {timeAgo(thread.createdAt)}</span>
+                  {canDeleteThread(thread) && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); deleteThread(thread.id); }}
+                      className="ml-auto text-destructive hover:text-destructive/80"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
                 <h3 className="mt-2 font-bold text-foreground">{thread.title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{thread.content}</p>

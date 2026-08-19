@@ -99,7 +99,16 @@ function RegisterPage() {
     setBusy(true);
     try {
       const plan = generateStudyPlan(planConfig);
-      await addStudyPlan({ ...plan, userId: user.uid });
+      await addStudyPlan({
+        userId: user.uid,
+        targetBand: plan.config.targetBand,
+        examDate: plan.config.examDate,
+        currentBand: plan.config.currentBand,
+        weakSkills: plan.config.weakSkills,
+        studyHoursPerDay: plan.config.studyHoursPerDay,
+        createdAt: plan.createdAt,
+        weekSchedule: plan.weekSchedule,
+      });
       toast.success("Study plan created! Let's start learning.");
       navigate({ to: "/dashboard" });
     } catch (error) {

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   BookOpen,
@@ -18,6 +18,7 @@ import { useAuth } from "@/lib/auth";
 import { listStudyPlans } from "@/lib/db";
 import { type StudyTask, type SkillType, type DayOfWeek, DAY_LABELS } from "@/data/studyPlan";
 import { cn } from "@/lib/utils";
+import type { StudyPlanRecord } from "@/lib/types";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -79,14 +80,16 @@ function saveCompletedTasks(tasks: Record<string, boolean>) {
   localStorage.setItem(`iea_daily_tasks_${getTodayKey()}`, JSON.stringify(tasks));
 }
 
-function DailyStudyTasks({ plans }: { plans: Array<{ weekSchedule: Array<{ day: DayOfWeek; tasks: StudyTask[] }> }> }) {
+function DailyStudyTasks({ plans }: { plans: StudyPlanRecord[] }) {
   const today = getDayOfWeek();
   const todayLabel = DAY_LABELS[today];
 
   const todayTasks = useMemo(() => {
     if (!plans.length) return [];
     const plan = plans[0];
-    const todaySchedule = plan.weekSchedule.find((s) => s.day === today);
+    if (!plan) return [];
+    const schedule = plan.weekSchedule as Array<{ day: DayOfWeek; tasks: StudyTask[] }>;
+    const todaySchedule = schedule.find((s) => s.day === today);
     return todaySchedule?.tasks ?? [];
   }, [plans, today]);
 
@@ -119,7 +122,7 @@ function DailyStudyTasks({ plans }: { plans: Array<{ weekSchedule: Array<{ day: 
             Set up your study plan to get daily tasks.
           </p>
           <Button asChild variant="soft" size="pill" className="mt-4">
-            <a href="/settings">Set up study plan</a>
+            <Link to="/settings">Set up study plan</Link>
           </Button>
         </div>
       </section>

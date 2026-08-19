@@ -1,43 +1,50 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { BookOpen, Star, ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
+import { BookOpen, Headphones, Star, ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MODEL_ANSWERS, getAnswersByCategory, getAnswersBySkill, type ModelAnswer } from "@/data/modelAnswers";
+import { listModelAnswers } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/model-answers")({
   head: () => ({
     meta: [
       { title: "Model Answers — IEA" },
-      { name: "description", content: "Band-scored model essays and speaking responses with explanations." },
+      { name: "description", content: "Band-scored essays, speaking samples, and reading/listening guides with explanations." },
     ],
   }),
   component: ModelAnswersPage,
 });
 
 function ModelAnswersPage() {
-  const [skillFilter, setSkillFilter] = useState<"all" | "writing" | "speaking">("all");
+  const { data: dbAnswers } = useQuery({ queryKey: ["model-answers"], queryFn: listModelAnswers });
+  const allAnswers: ModelAnswer[] = dbAnswers?.length ? dbAnswers : MODEL_ANSWERS;
+
+  const [skillFilter, setSkillFilter] = useState<"all" | "writing" | "speaking" | "reading" | "listening">("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const answers = skillFilter === "all"
-    ? MODEL_ANSWERS
-    : getAnswersBySkill(skillFilter);
+    ? allAnswers
+    : allAnswers.filter((a) => a.skill === skillFilter);
 
   return (
-    <DashboardShell title="Model Answers" subtitle="Band-scored essays and speaking samples">
+    <DashboardShell title="Model Answers" subtitle="Band-scored essays, speaking samples, and reading/listening guides">
       <div className="space-y-6">
         {/* Skill Filter */}
-        <div className="flex gap-2">
-          {(["all", "writing", "speaking"] as const).map((skill) => (
+        <div className="flex flex-wrap gap-2">
+          {(["all", "writing", "speaking", "reading", "listening"] as const).map((skill) => (
             <Button
               key={skill}
               variant={skillFilter === skill ? "hero" : "soft"}
               size="pill"
               onClick={() => setSkillFilter(skill)}
             >
+              {skill === "reading" && <BookOpen className="mr-1 h-4 w-4" />}
+              {skill === "listening" && <Headphones className="mr-1 h-4 w-4" />}
               {skill.charAt(0).toUpperCase() + skill.slice(1)}
             </Button>
           ))}
@@ -55,7 +62,10 @@ function ModelAnswersPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <Badge className={cn(
-                        answer.skill === "writing" ? "bg-orange-500/10 text-orange-500" : "bg-purple-500/10 text-purple-500",
+                        answer.skill === "writing" ? "bg-orange-500/10 text-orange-500" :
+                        answer.skill === "speaking" ? "bg-purple-500/10 text-purple-500" :
+                        answer.skill === "reading" ? "bg-green-500/10 text-green-500" :
+                        "bg-blue-500/10 text-blue-500",
                       )}>
                         {answer.skill}
                       </Badge>

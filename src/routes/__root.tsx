@@ -117,6 +117,11 @@ function RootShell({ children }: { children: ReactNode }) {
             __html: `try{var t=localStorage.getItem("iea_theme");if(t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var s=localStorage.getItem("iea_font_size"),m={"small":"14px","medium":"16px","large":"18px"};if(s&&m[s])document.documentElement.style.fontSize=m[s]}catch(e){}`,
+          }}
+        />
         <HeadContent />
       </head>
       <body>

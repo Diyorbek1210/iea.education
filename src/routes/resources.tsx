@@ -133,6 +133,15 @@ function ResourcesPage() {
                 rel="noopener noreferrer"
                 className="rounded-3xl bg-card p-5 shadow-card transition-all hover:shadow-soft group"
               >
+                {resource.thumbnail && (
+                  <div className="mb-3 overflow-hidden rounded-2xl">
+                    <img
+                      src={resource.thumbnail}
+                      alt={resource.title}
+                      className="h-32 w-full object-cover transition-transform group-hover:scale-105"
+                    />
+                  </div>
+                )}
                 <div className="flex items-start gap-3">
                   <div className={cn("mt-0.5", TYPE_COLORS[resource.type])}>
                     <Icon className="h-5 w-5" />

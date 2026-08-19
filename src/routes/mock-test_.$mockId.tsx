@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Volume2, Square, Loader2, Headphones, BookOpen, PenLine, Mic } from "lucide-react";
@@ -20,14 +20,14 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   estimateWritten,
   listeningBand,
-  mockTests,
+  mockTests as staticMockTests,
   readingBand,
   type FillQuestion,
   type McQuestion,
 } from "@/data/mockTest";
 import { scoreMockPerformance } from "@/lib/aiScoring";
 import { useAuth } from "@/lib/auth";
-import { addMockResult, levelForBand, markMockTestCompleted, updateUserProfile } from "@/lib/db";
+import { addMockResult, levelForBand, listMockTests, markMockTestCompleted, updateUserProfile } from "@/lib/db";
 import type { AiFeedback, AiSkillFeedback } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -205,6 +205,9 @@ function MockTestRunPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { speak, stop: stopSpeech, isSpeaking, supported: ttsSupported } = useSpeechSynthesis();
+
+  const { data: dbMockTests } = useQuery({ queryKey: ["mock-tests"], queryFn: listMockTests });
+  const mockTests = dbMockTests?.length ? dbMockTests : staticMockTests;
 
   const mockSet = mockTests.find((m) => m.id === mockId);
   const mockIndex = mockSet ? mockTests.findIndex((m) => m.id === mockId) : -1;

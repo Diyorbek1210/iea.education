@@ -47,7 +47,7 @@ function calculateOverall(listening: number, reading: number, writing: number, s
 }
 
 function BandCalculatorPage() {
-  const [scores, setScores] = useState([5.0, 5.0, 5.0, 5.0]);
+  const [scores, setScores] = useState<[number, number, number, number]>([5.0, 5.0, 5.0, 5.0]);
   const [showGuide, setShowGuide] = useState(false);
 
   const overall = useMemo(
@@ -67,7 +67,7 @@ function BandCalculatorPage() {
 
   const setScore = (index: number, value: number) => {
     setScores((prev) => {
-      const next = [...prev];
+      const next = [...prev] as [number, number, number, number];
       next[index] = value;
       return next;
     });
@@ -92,7 +92,7 @@ function BandCalculatorPage() {
               <div key={skill} className="rounded-2xl border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className={cn("text-sm font-bold", SKILL_COLORS[idx])}>{skill}</span>
-                  <span className="text-xl font-extrabold text-foreground">{scores[idx].toFixed(1)}</span>
+                  <span className="text-xl font-extrabold text-foreground">{scores[idx]!.toFixed(1)}</span>
                 </div>
                 <input
                   type="range"
@@ -127,8 +127,8 @@ function BandCalculatorPage() {
             {SKILL_NAMES.map((skill, idx) => (
               <div key={skill} className="flex items-center gap-3">
                 <span className={cn("w-24 text-sm font-semibold", SKILL_COLORS[idx])}>{skill}</span>
-                <Progress value={(scores[idx] / 9) * 100} className="h-3 flex-1" />
-                <span className="w-10 text-right text-sm font-bold text-foreground">{scores[idx].toFixed(1)}</span>
+                <Progress value={((scores[idx] ?? 0) / 9) * 100} className="h-3 flex-1" />
+                <span className="w-10 text-right text-sm font-bold text-foreground">{scores[idx]!.toFixed(1)}</span>
               </div>
             ))}
           </div>

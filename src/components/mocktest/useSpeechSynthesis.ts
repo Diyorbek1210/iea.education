@@ -2,27 +2,22 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { synthesizeSpeech } from "@/lib/tts";
 
-function pickEnglishVoice(lang?: string): SpeechSynthesisVoice | undefined {
+function pickEnglishVoice(): SpeechSynthesisVoice | undefined {
   const voices = window.speechSynthesis.getVoices();
-  const prefix = lang?.split("-")[0] ?? "en";
   return (
-    voices.find((v) => v.lang === lang && /google|natural|online/i.test(v.name)) ??
-    voices.find((v) => v.lang === lang) ??
-    voices.find((v) => /^en/i.test(v.lang) && /google|natural|online/i.test(v.name)) ??
+    voices.find((v) => /^en-US/i.test(v.lang) && /google|natural|online/i.test(v.name)) ??
     voices.find((v) => /^en-US/i.test(v.lang)) ??
     voices.find((v) => /^en/i.test(v.lang))
   );
 }
 
-export function useSpeechSynthesis(accentLang?: string) {
+export function useSpeechSynthesis() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const browserSupported = typeof window !== "undefined" && "speechSynthesis" in window;
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const resumeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const requestIdRef = useRef(0);
-  const langRef = useRef(accentLang);
-  langRef.current = accentLang;
 
   useEffect(() => {
     if (!browserSupported) return;
@@ -46,11 +41,11 @@ export function useSpeechSynthesis(accentLang?: string) {
       clearResumeTimer();
 
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = langRef.current ?? "en-GB";
+      utterance.lang = "en-US";
       utterance.rate = 0.95;
       utterance.pitch = 1;
       utterance.volume = 1;
-      const voice = pickEnglishVoice(langRef.current);
+      const voice = pickEnglishVoice();
       if (voice) utterance.voice = voice;
 
       utterance.onstart = () => {

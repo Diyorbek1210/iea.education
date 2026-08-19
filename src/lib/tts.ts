@@ -18,9 +18,6 @@ export const synthesizeSpeech = createServerFn({ method: "POST" })
     return { text: data.text.slice(0, 4500) };
   })
   .handler(async ({ data }) => {
-    // `vite dev` doesn't load plain (non-VITE_-prefixed) .env vars into process.env —
-    // only the production build (via nitro/Cloudflare) does that automatically. This
-    // branch is dev-only and dead-code-eliminated from the production bundle.
     if (import.meta.env.DEV && !process.env["GOOGLE_TTS_API_KEY"]) {
       const dotenv = await import("dotenv");
       dotenv.config();

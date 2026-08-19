@@ -11,8 +11,8 @@ const SIZE_MAP: Record<FontSize, string> = {
 };
 
 function getStored(): FontSize {
-  if (typeof window === "undefined") return "medium";
-  return (localStorage.getItem(FONT_SIZE_KEY) as FontSize) || "medium";
+  if (typeof window === "undefined") return "small";
+  return (localStorage.getItem(FONT_SIZE_KEY) as FontSize) || "small";
 }
 
 export function useFontSize() {
@@ -21,9 +21,6 @@ export function useFontSize() {
   useEffect(() => {
     document.documentElement.style.fontSize = SIZE_MAP[fontSize];
     localStorage.setItem(FONT_SIZE_KEY, fontSize);
-    return () => {
-      document.documentElement.style.fontSize = "";
-    };
   }, [fontSize]);
 
   const setFontSize = useCallback((s: FontSize) => setFontSizeState(s), []);

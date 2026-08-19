@@ -52,20 +52,13 @@ function SettingsPage() {
   });
 
   const existingPlan = plans.find((p) => p.userId === user?.uid);
-  const existingConfig = existingPlan?.config as {
-    targetBand?: number;
-    currentBand?: number;
-    examDate?: string;
-    studyHoursPerDay?: number;
-    weakSkills?: string[];
-  } | undefined;
 
   const [editingPlan, setEditingPlan] = useState(false);
-  const [targetBand, setTargetBand] = useState<number>(existingConfig?.targetBand ?? 6.5);
-  const [currentBand, setCurrentBand] = useState<number>(existingConfig?.currentBand ?? 5.0);
-  const [examDate, setExamDate] = useState(existingConfig?.examDate ?? "");
-  const [weakSkills, setWeakSkills] = useState<string[]>(existingConfig?.weakSkills ?? []);
-  const [studyHours, setStudyHours] = useState(existingConfig?.studyHoursPerDay ?? 2);
+  const [targetBand, setTargetBand] = useState<number>(existingPlan?.targetBand ?? 6.5);
+  const [currentBand, setCurrentBand] = useState<number>(existingPlan?.currentBand ?? 5.0);
+  const [examDate, setExamDate] = useState(existingPlan?.examDate ?? "");
+  const [weakSkills, setWeakSkills] = useState<string[]>(existingPlan?.weakSkills ?? []);
+  const [studyHours, setStudyHours] = useState(existingPlan?.studyHoursPerDay ?? 2);
   const [savingPlan, setSavingPlan] = useState(false);
 
   function toggleSkill(skill: string) {
@@ -89,7 +82,16 @@ function SettingsPage() {
         studyHoursPerDay: studyHours,
       };
       const plan = generateStudyPlan(config);
-      await addStudyPlan({ ...plan, userId: user.uid });
+      await addStudyPlan({
+        userId: user.uid,
+        targetBand: plan.config.targetBand,
+        examDate: plan.config.examDate,
+        currentBand: plan.config.currentBand,
+        weakSkills: plan.config.weakSkills,
+        studyHoursPerDay: plan.config.studyHoursPerDay,
+        createdAt: plan.createdAt,
+        weekSchedule: plan.weekSchedule,
+      });
       queryClient.invalidateQueries({ queryKey: ["study-plans"] });
       toast.success("Study plan saved!");
       setEditingPlan(false);
@@ -176,28 +178,28 @@ function SettingsPage() {
               <div className="flex items-center gap-2 text-sm">
                 <Target className="h-4 w-4 shrink-0 text-primary" />
                 <span className="text-muted-foreground">Target:</span>
-                <span className="font-bold text-foreground">Band {existingConfig?.targetBand}</span>
+                <span className="font-bold text-foreground">Band {existingPlan?.targetBand}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Zap className="h-4 w-4 shrink-0 text-primary" />
                 <span className="text-muted-foreground">Current:</span>
-                <span className="font-bold text-foreground">Band {existingConfig?.currentBand}</span>
+                <span className="font-bold text-foreground">Band {existingPlan?.currentBand}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 shrink-0 text-primary" />
                 <span className="text-muted-foreground">Hours/day:</span>
-                <span className="font-bold text-foreground">{existingConfig?.studyHoursPerDay}h</span>
+                <span className="font-bold text-foreground">{existingPlan?.studyHoursPerDay}h</span>
               </div>
-              {existingConfig?.examDate && (
+              {existingPlan?.examDate && (
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 shrink-0 text-primary" />
                   <span className="text-muted-foreground">Exam:</span>
-                  <span className="font-bold text-foreground">{existingConfig.examDate}</span>
+                  <span className="font-bold text-foreground">{existingPlan.examDate}</span>
                 </div>
               )}
-              {existingConfig?.weakSkills && existingConfig.weakSkills.length > 0 && (
+              {existingPlan?.weakSkills && existingPlan.weakSkills.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  {existingConfig.weakSkills.map((s) => (
+                  {existingPlan.weakSkills.map((s) => (
                     <Badge key={s} variant="secondary" className="capitalize">{s}</Badge>
                   ))}
                 </div>

@@ -4,9 +4,9 @@ import { CheckCircle2, ClipboardCheck, Lock, PlayCircle } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
-import { mockTests } from "@/data/mockTest";
+import { mockTests as staticMockTests } from "@/data/mockTest";
 import { useAuth } from "@/lib/auth";
-import { listMockResults } from "@/lib/db";
+import { listMockResults, listMockTests } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/mock-test")({
@@ -29,11 +29,13 @@ export const Route = createFileRoute("/mock-test")({
 
 function MockTestListPage() {
   const { user } = useAuth();
+  const { data: dbMockTests } = useQuery({ queryKey: ["mock-tests"], queryFn: listMockTests });
   const { data: results = [] } = useQuery({
     queryKey: ["mock-results"],
     queryFn: listMockResults,
   });
 
+  const mockTests = dbMockTests?.length ? dbMockTests : staticMockTests;
   const completed = new Set(user?.completedMockTests ?? []);
   const myResults = results.filter((r) => r.userId === user?.uid);
 

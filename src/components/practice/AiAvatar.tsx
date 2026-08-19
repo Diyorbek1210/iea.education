@@ -22,9 +22,9 @@ function getAvatarUrl(seed: string): string {
 export function AiAvatar({ emotion, size = 200 }: AiAvatarProps) {
   const [svgContent, setSvgContent] = useState<string>("");
   const containerRef = useRef<HTMLDivElement>(null);
-  const blinkTimerRef = useRef<ReturnType<typeof setTimeout>>();
-  const lookTimerRef = useRef<ReturnType<typeof setInterval>>();
-  const lookFrameRef = useRef<number>();
+  const blinkTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const lookTimerRef = useRef<ReturnType<typeof setInterval>>(null);
+  const lookFrameRef = useRef<number>(null);
 
   // Load the SVG and animate eyes
   useEffect(() => {
@@ -113,9 +113,9 @@ export function AiAvatar({ emotion, size = 200 }: AiAvatarProps) {
     lookFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      clearTimeout(blinkTimerRef.current);
-      clearInterval(lookTimerRef.current);
-      cancelAnimationFrame(lookFrameRef.current);
+      if (blinkTimerRef.current) clearTimeout(blinkTimerRef.current);
+      if (lookTimerRef.current) clearInterval(lookTimerRef.current);
+      if (lookFrameRef.current) cancelAnimationFrame(lookFrameRef.current);
     };
   }, [svgContent]);
 

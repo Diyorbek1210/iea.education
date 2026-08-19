@@ -4,13 +4,11 @@ const STATIC_ASSETS = [
   "/dashboard",
   "/vocabulary",
   "/practice",
-  "/writing-generator",
   "/mock-test",
   "/analytics",
   "/study-plan",
   "/task-practice",
   "/model-answers",
-  "/pronunciation",
   "/band-calculator",
   "/resources",
   "/requirements",
@@ -37,6 +35,11 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+  if (url.hostname.includes("firestore.googleapis.com") || url.hostname.includes("firebaseio.com")) {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
