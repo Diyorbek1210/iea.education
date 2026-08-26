@@ -3,7 +3,7 @@ services:
     name: fluent-path
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npm run build && ln -s .output dist
     startCommand: node .output/server/index.mjs
     envVars:
       - key: NODE_ENV
