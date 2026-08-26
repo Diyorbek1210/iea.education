@@ -39,6 +39,7 @@ export default defineConfig({
     }),
     nitro({
       preset: "node-server",
+      noExternals: false,
     }),
     react(),
   ],
