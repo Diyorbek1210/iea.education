@@ -79,7 +79,7 @@ export const SPEAKING_MODES: SpeakingModeConfig[] = [
       "What are the advantages and disadvantages of living in a city?",
       "How has the way people work changed in recent years?",
       "Do you think people today care more about the environment?",
-      "What role shouldparents play in their children's education?",
+      "What role should parents play in their children's education?",
     ],
   },
 ];
@@ -92,7 +92,8 @@ interface FluencyStats {
   fillerRate: number;
 }
 
-const FILLER_PATTERNS = /\b(um|uh|like|you know|sort of|kind of|basically|actually|well|so|I mean)\b/gi;
+const FILLER_PATTERNS =
+  /\b(um|uh|like|you know|sort of|kind of|basically|actually|well|so|I mean)\b/gi;
 
 export function analyzeFluency(transcript: string, durationSeconds: number): FluencyStats {
   const words = transcript.trim().split(/\s+/).filter(Boolean);
@@ -128,7 +129,12 @@ export function SpeakingModeSelector({
                 : "border-border hover:border-primary/50",
             )}
           >
-            <Icon className={cn("h-5 w-5", selectedPart === mode.part ? "text-primary" : "text-muted-foreground")} />
+            <Icon
+              className={cn(
+                "h-5 w-5",
+                selectedPart === mode.part ? "text-primary" : "text-muted-foreground",
+              )}
+            />
             <p className="mt-2 font-bold text-foreground">{mode.label}</p>
             <p className="text-xs text-muted-foreground">{mode.description}</p>
           </button>
@@ -139,12 +145,14 @@ export function SpeakingModeSelector({
 }
 
 export function FluencyAnalysisPanel({ stats }: { stats: FluencyStats }) {
-  const wpmRating = stats.wordsPerMinute >= 120 && stats.wordsPerMinute <= 180
-    ? "Good"
-    : stats.wordsPerMinute < 120
-      ? "Too slow"
-      : "Very fast";
-  const fillerRating = stats.fillerRate <= 3 ? "Excellent" : stats.fillerRate <= 8 ? "Good" : "Needs improvement";
+  const wpmRating =
+    stats.wordsPerMinute >= 120 && stats.wordsPerMinute <= 180
+      ? "Good"
+      : stats.wordsPerMinute < 120
+        ? "Too slow"
+        : "Very fast";
+  const fillerRating =
+    stats.fillerRate <= 3 ? "Excellent" : stats.fillerRate <= 8 ? "Good" : "Needs improvement";
 
   return (
     <div className="rounded-2xl bg-card p-4 shadow-card">
@@ -153,7 +161,9 @@ export function FluencyAnalysisPanel({ stats }: { stats: FluencyStats }) {
         <div>
           <p className="text-xs text-muted-foreground">Words per minute</p>
           <p className="text-lg font-extrabold text-foreground">{stats.wordsPerMinute}</p>
-          <Badge variant={wpmRating === "Good" ? "default" : "secondary"} className="text-[10px]">{wpmRating}</Badge>
+          <Badge variant={wpmRating === "Good" ? "default" : "secondary"} className="text-[10px]">
+            {wpmRating}
+          </Badge>
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Total words</p>
@@ -162,7 +172,9 @@ export function FluencyAnalysisPanel({ stats }: { stats: FluencyStats }) {
         <div>
           <p className="text-xs text-muted-foreground">Filler words</p>
           <p className="text-lg font-extrabold text-foreground">{stats.fillerWords}</p>
-          <Badge variant={stats.fillerRate <= 3 ? "default" : "secondary"} className="text-[10px]">{fillerRating}</Badge>
+          <Badge variant={stats.fillerRate <= 3 ? "default" : "secondary"} className="text-[10px]">
+            {fillerRating}
+          </Badge>
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Filler rate</p>

@@ -148,3 +148,30 @@ export interface SkillStats {
   bestScore: number;
   recentTrend: "improving" | "declining" | "stable";
 }
+
+/* ------------------------------------------------------------------ *
+ * Community
+ * ------------------------------------------------------------------ */
+
+export type ThreadCategory = "tips" | "question" | "experience" | "resource";
+
+export interface CommunityReply {
+  id: string;
+  author: string;
+  authorEmail: string | undefined;
+  content: string;
+  createdAt: string;
+  likes: number;
+}
+
+export interface CommunityThread {
+  id: string;
+  title: string;
+  author: string;
+  authorEmail: string | undefined;
+  category: ThreadCategory;
+  content: string;
+  replies: CommunityReply[];
+  likes: number;
+  createdAt: string;
+}

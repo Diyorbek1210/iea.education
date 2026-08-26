@@ -11,7 +11,8 @@ export const Route = createFileRoute("/notifications")({
     meta: [
       { title: "Notifications — IEA" },
       { name: "description", content: "View your notifications and reminders." },
-    ],
+      {}
+    ]
   }),
   component: NotificationsPage,
 });

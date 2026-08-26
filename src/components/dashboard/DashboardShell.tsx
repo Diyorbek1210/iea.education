@@ -1,5 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
+  Award,
   BarChart3,
   Bot,
   BookOpen,
@@ -38,6 +39,7 @@ const nav = [
   { to: "/practice", label: "Practice with AI", icon: Bot },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/community", label: "Community", icon: Users },
+  { to: "/certificates", label: "Certificates", icon: Award },
 ] as const;
 
 export function DashboardShell({
@@ -153,7 +155,9 @@ export function DashboardShell({
           </div>
         </header>
 
-        <main id="main-content" className="p-5 lg:p-8" tabIndex={-1}>{children}</main>
+        <main id="main-content" className="p-5 lg:p-8" tabIndex={-1}>
+          {children}
+        </main>
       </div>
     </div>
   );

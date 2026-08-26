@@ -266,3 +266,23 @@
   0% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-20px); }
 }
+
+/* Print styles for certificate */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  aside, header, nav {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #certificate {
+    border: 2px solid oklch(0.53 0.212 262.3) !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

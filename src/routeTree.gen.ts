@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as BandCalculatorRouteImport } from './routes/band-calculator'
+import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -49,6 +50,11 @@ const AnalyticsRoute = AnalyticsRouteImport.update({
 const BandCalculatorRoute = BandCalculatorRouteImport.update({
   id: '/band-calculator',
   path: '/band-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificatesRoute = CertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityRoute = CommunityRouteImport.update({
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/analytics': typeof AnalyticsRoute
   '/band-calculator': typeof BandCalculatorRoute
+  '/certificates': typeof CertificatesRoute
   '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/analytics': typeof AnalyticsRoute
   '/band-calculator': typeof BandCalculatorRoute
+  '/certificates': typeof CertificatesRoute
   '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/analytics': typeof AnalyticsRoute
   '/band-calculator': typeof BandCalculatorRoute
+  '/certificates': typeof CertificatesRoute
   '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analytics'
     | '/band-calculator'
+    | '/certificates'
     | '/community'
     | '/dashboard'
     | '/leaderboard'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analytics'
     | '/band-calculator'
+    | '/certificates'
     | '/community'
     | '/dashboard'
     | '/leaderboard'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analytics'
     | '/band-calculator'
+    | '/certificates'
     | '/community'
     | '/dashboard'
     | '/leaderboard'
@@ -284,6 +296,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AnalyticsRoute: typeof AnalyticsRoute
   BandCalculatorRoute: typeof BandCalculatorRoute
+  CertificatesRoute: typeof CertificatesRoute
   CommunityRoute: typeof CommunityRoute
   DashboardRoute: typeof DashboardRoute
   LeaderboardRoute: typeof LeaderboardRoute
@@ -331,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/band-calculator'
       fullPath: '/band-calculator'
       preLoaderRoute: typeof BandCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificates': {
+      id: '/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof CertificatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/community': {
@@ -460,6 +480,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AnalyticsRoute: AnalyticsRoute,
   BandCalculatorRoute: BandCalculatorRoute,
+  CertificatesRoute: CertificatesRoute,
   CommunityRoute: CommunityRoute,
   DashboardRoute: DashboardRoute,
   LeaderboardRoute: LeaderboardRoute,

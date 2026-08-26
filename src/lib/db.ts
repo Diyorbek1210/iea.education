@@ -21,7 +21,12 @@ import { IELTS_RESOURCES } from "@/data/resources";
 import { BADGES, type BadgeDef } from "@/data/badges";
 import { VOCABULARY, type VocabWord, type VocabTopic } from "@/data/vocabulary";
 import { MODEL_ANSWERS, type ModelAnswer } from "@/data/modelAnswers";
-import { COUNTRY_REQUIREMENTS, POPULAR_UNIVERSITIES, type CountryRequirement, type UniversityRequirement } from "@/data/requirements";
+import {
+  COUNTRY_REQUIREMENTS,
+  POPULAR_UNIVERSITIES,
+  type CountryRequirement,
+  type UniversityRequirement,
+} from "@/data/requirements";
 import type { MockTestSet } from "@/data/mockTests/types";
 import {
   applyStreak,
@@ -33,6 +38,8 @@ import {
 } from "./gamification";
 import type {
   ActivityType,
+  CommunityThread,
+  CommunityReply,
   Level,
   MockResult,
   PlacementQuestion,
@@ -84,6 +91,177 @@ function read<T>(key: string, fallback: T): T {
 function write<T>(key: string, value: T) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+/* ------------------------------------------------------------------ *
+ * Firestore Seed — write ALL static data to Firestore in one call.
+ * Run once to populate the database, then all list*() functions
+ * read from Firestore directly.
+ * ------------------------------------------------------------------ */
+
+export interface SeedProgress {
+  collection: string;
+  count: number;
+  status: "done" | "error";
+  error?: string;
+}
+
+export async function seedAllDataToFirestore(): Promise<SeedProgress[]> {
+  if (!isFirebaseConfigured || !db) {
+    throw new Error("Firebase is not configured. Cannot seed Firestore.");
+  }
+
+  const results: SeedProgress[] = [];
+
+  // 1. Placement questions
+  try {
+    const existing = await getDocs(collection(db, "placementQuestions"));
+    if (existing.empty) {
+      for (const q of seedPlacementQuestions) {
+        const { id, ...rest } = q;
+        await setDoc(doc(db, "placementQuestions", id), rest);
+      }
+    }
+    results.push({
+      collection: "placementQuestions",
+      count: seedPlacementQuestions.length,
+      status: "done",
+    });
+  } catch (e) {
+    results.push({ collection: "placementQuestions", count: 0, status: "error", error: String(e) });
+  }
+
+  // 2. Resources
+  try {
+    const existing = await getDocs(collection(db, "resources"));
+    if (existing.empty) {
+      const seeded = IELTS_RESOURCES.map((r, i) => ({
+        ...r,
+        sourceType: "link" as const,
+        thumbnail: "",
+        order: i,
+        createdAt: new Date().toISOString(),
+      }));
+      for (const res of seeded) {
+        const { id, ...rest } = res;
+        await setDoc(doc(db, "resources", id), rest);
+      }
+    }
+    results.push({ collection: "resources", count: IELTS_RESOURCES.length, status: "done" });
+  } catch (e) {
+    results.push({ collection: "resources", count: 0, status: "error", error: String(e) });
+  }
+
+  // 3. Vocabulary
+  try {
+    const existing = await getDocs(collection(db, "vocabulary"));
+    if (existing.empty) {
+      const seeded = VOCABULARY.map((w, i) => ({ ...w, id: `v${i + 1}` }));
+      for (const w of seeded) {
+        const { id, ...rest } = w;
+        await setDoc(doc(db, "vocabulary", id), rest);
+      }
+    }
+    results.push({ collection: "vocabulary", count: VOCABULARY.length, status: "done" });
+  } catch (e) {
+    results.push({ collection: "vocabulary", count: 0, status: "error", error: String(e) });
+  }
+
+  // 4. Model answers
+  try {
+    const existing = await getDocs(collection(db, "modelAnswers"));
+    if (existing.empty) {
+      for (const a of MODEL_ANSWERS) {
+        await setDoc(doc(db, "modelAnswers", a.id), { ...a });
+      }
+    }
+    results.push({ collection: "modelAnswers", count: MODEL_ANSWERS.length, status: "done" });
+  } catch (e) {
+    results.push({ collection: "modelAnswers", count: 0, status: "error", error: String(e) });
+  }
+
+  // 5. Country requirements
+  try {
+    const existing = await getDocs(collection(db, "countryRequirements"));
+    if (existing.empty) {
+      const seeded = COUNTRY_REQUIREMENTS.map((r, i) => ({ ...r, id: `cr${i + 1}` }));
+      for (const r of seeded) {
+        const { id, ...rest } = r;
+        await setDoc(doc(db, "countryRequirements", id), rest);
+      }
+    }
+    results.push({
+      collection: "countryRequirements",
+      count: COUNTRY_REQUIREMENTS.length,
+      status: "done",
+    });
+  } catch (e) {
+    results.push({
+      collection: "countryRequirements",
+      count: 0,
+      status: "error",
+      error: String(e),
+    });
+  }
+
+  // 6. University requirements
+  try {
+    const existing = await getDocs(collection(db, "universityRequirements"));
+    if (existing.empty) {
+      const seeded = POPULAR_UNIVERSITIES.map((r, i) => ({ ...r, id: `ur${i + 1}` }));
+      for (const r of seeded) {
+        const { id, ...rest } = r;
+        await setDoc(doc(db, "universityRequirements", id), rest);
+      }
+    }
+    results.push({
+      collection: "universityRequirements",
+      count: POPULAR_UNIVERSITIES.length,
+      status: "done",
+    });
+  } catch (e) {
+    results.push({
+      collection: "universityRequirements",
+      count: 0,
+      status: "error",
+      error: String(e),
+    });
+  }
+
+  // 7. Mock tests
+  try {
+    const existing = await getDocs(collection(db, "mockTests"));
+    if (existing.empty) {
+      const { mockTests: staticMockTests } = await import("@/data/mockTest");
+      for (const m of staticMockTests) {
+        await setDoc(doc(db, "mockTests", m.id), { ...m });
+      }
+      results.push({ collection: "mockTests", count: staticMockTests.length, status: "done" });
+    } else {
+      results.push({ collection: "mockTests", count: 0, status: "done" });
+    }
+  } catch (e) {
+    results.push({ collection: "mockTests", count: 0, status: "error", error: String(e) });
+  }
+
+  // 8. Community threads (seed data)
+  try {
+    const existing = await getDocs(collection(db, "communityThreads"));
+    if (existing.empty) {
+      for (const thread of SEED_THREADS) {
+        const { replies, ...rest } = thread;
+        await setDoc(doc(db, "communityThreads", thread.id), rest);
+        for (const reply of replies) {
+          await addDoc(collection(db, "communityThreads", thread.id, "replies"), reply);
+        }
+      }
+    }
+    results.push({ collection: "communityThreads", count: SEED_THREADS.length, status: "done" });
+  } catch (e) {
+    results.push({ collection: "communityThreads", count: 0, status: "error", error: String(e) });
+  }
+
+  return results;
 }
 
 const seedPlacementQuestions: PlacementQuestion[] = staticPlacementQuestions.map(
@@ -312,12 +490,17 @@ export async function listResources(): Promise<ResourceDoc[]> {
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ResourceDoc, "id">) }));
 }
 
-export async function addResource(resource: Omit<ResourceDoc, "id" | "createdAt" | "order">): Promise<void> {
+export async function addResource(
+  resource: Omit<ResourceDoc, "id" | "createdAt" | "order">,
+): Promise<void> {
   const now = new Date().toISOString();
   if (!isFirebaseConfigured || !db) {
     const existing = read<ResourceDoc[]>(KEYS.resources, []);
     const maxOrder = existing.reduce((max, r) => Math.max(max, r.order), -1);
-    write(KEYS.resources, [...existing, { ...resource, id: crypto.randomUUID(), order: maxOrder + 1, createdAt: now }]);
+    write(KEYS.resources, [
+      ...existing,
+      { ...resource, id: crypto.randomUUID(), order: maxOrder + 1, createdAt: now },
+    ]);
     return;
   }
   const snap = await getDocs(collection(db, "resources"));
@@ -328,10 +511,16 @@ export async function addResource(resource: Omit<ResourceDoc, "id" | "createdAt"
   await addDoc(collection(db, "resources"), { ...resource, order: maxOrder + 1, createdAt: now });
 }
 
-export async function updateResource(id: string, data: Partial<Omit<ResourceDoc, "id" | "createdAt">>): Promise<void> {
+export async function updateResource(
+  id: string,
+  data: Partial<Omit<ResourceDoc, "id" | "createdAt">>,
+): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     const existing = read<ResourceDoc[]>(KEYS.resources, []);
-    write(KEYS.resources, existing.map((r) => (r.id === id ? { ...r, ...data } : r)));
+    write(
+      KEYS.resources,
+      existing.map((r) => (r.id === id ? { ...r, ...data } : r)),
+    );
     return;
   }
   await updateDoc(doc(db, "resources", id), data);
@@ -341,7 +530,9 @@ export async function deleteResource(id: string): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     const existing = read<ResourceDoc[]>(KEYS.resources, []);
     const filtered = existing.filter((r) => r.id !== id);
-    filtered.forEach((r, i) => { r.order = i; });
+    filtered.forEach((r, i) => {
+      r.order = i;
+    });
     write(KEYS.resources, filtered);
     return;
   }
@@ -526,7 +717,9 @@ export async function listWritingSubmissions(): Promise<WritingSubmission[]> {
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<WritingSubmission, "id">) }));
 }
 
-export async function addWritingSubmission(submission: Omit<WritingSubmission, "id">): Promise<string> {
+export async function addWritingSubmission(
+  submission: Omit<WritingSubmission, "id">,
+): Promise<string> {
   if (!isFirebaseConfigured || !db) {
     const id = crypto.randomUUID();
     write(WRITING_KEY, [{ id, ...submission }, ...read<WritingSubmission[]>(WRITING_KEY, [])]);
@@ -607,10 +800,16 @@ export async function addVocabWord(word: Omit<VocabWordDoc, "id">): Promise<void
   await addDoc(collection(db, "vocabulary"), word);
 }
 
-export async function updateVocabWord(id: string, data: Partial<Omit<VocabWordDoc, "id">>): Promise<void> {
+export async function updateVocabWord(
+  id: string,
+  data: Partial<Omit<VocabWordDoc, "id">>,
+): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     const existing = read<VocabWordDoc[]>(VOCAB_KEY, []);
-    write(VOCAB_KEY, existing.map((w) => (w.id === id ? { ...w, ...data } : w)));
+    write(
+      VOCAB_KEY,
+      existing.map((w) => (w.id === id ? { ...w, ...data } : w)),
+    );
     return;
   }
   await updateDoc(doc(db, "vocabulary", id), data);
@@ -618,7 +817,10 @@ export async function updateVocabWord(id: string, data: Partial<Omit<VocabWordDo
 
 export async function deleteVocabWord(id: string): Promise<void> {
   if (!isFirebaseConfigured || !db) {
-    write(VOCAB_KEY, read<VocabWordDoc[]>(VOCAB_KEY, []).filter((w) => w.id !== id));
+    write(
+      VOCAB_KEY,
+      read<VocabWordDoc[]>(VOCAB_KEY, []).filter((w) => w.id !== id),
+    );
     return;
   }
   await deleteDoc(doc(db, "vocabulary", id));
@@ -645,9 +847,7 @@ export async function listModelAnswers(): Promise<ModelAnswerDoc[]> {
   if (!isFirebaseConfigured || !db) return seedLocalModelAnswers();
   const snap = await getDocs(query(collection(db, "modelAnswers"), orderBy("title", "asc")));
   if (snap.empty) {
-    await Promise.all(
-      MODEL_ANSWERS.map((a) => setDoc(doc(db!, "modelAnswers", a.id), { ...a })),
-    );
+    await Promise.all(MODEL_ANSWERS.map((a) => setDoc(doc(db!, "modelAnswers", a.id), { ...a })));
     return MODEL_ANSWERS;
   }
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ModelAnswerDoc, "id">) }));
@@ -662,10 +862,16 @@ export async function addModelAnswer(answer: Omit<ModelAnswerDoc, "id">): Promis
   await addDoc(collection(db, "modelAnswers"), answer);
 }
 
-export async function updateModelAnswer(id: string, data: Partial<Omit<ModelAnswerDoc, "id">>): Promise<void> {
+export async function updateModelAnswer(
+  id: string,
+  data: Partial<Omit<ModelAnswerDoc, "id">>,
+): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     const existing = read<ModelAnswerDoc[]>(MODEL_ANSWER_KEY, []);
-    write(MODEL_ANSWER_KEY, existing.map((a) => (a.id === id ? { ...a, ...data } : a)));
+    write(
+      MODEL_ANSWER_KEY,
+      existing.map((a) => (a.id === id ? { ...a, ...data } : a)),
+    );
     return;
   }
   await updateDoc(doc(db, "modelAnswers", id), data);
@@ -673,7 +879,10 @@ export async function updateModelAnswer(id: string, data: Partial<Omit<ModelAnsw
 
 export async function deleteModelAnswer(id: string): Promise<void> {
   if (!isFirebaseConfigured || !db) {
-    write(MODEL_ANSWER_KEY, read<ModelAnswerDoc[]>(MODEL_ANSWER_KEY, []).filter((a) => a.id !== id));
+    write(
+      MODEL_ANSWER_KEY,
+      read<ModelAnswerDoc[]>(MODEL_ANSWER_KEY, []).filter((a) => a.id !== id),
+    );
     return;
   }
   await deleteDoc(doc(db, "modelAnswers", id));
@@ -712,10 +921,14 @@ function seedLocalUniversityRequirements(): UniversityRequirementDoc[] {
 
 export async function listCountryRequirements(): Promise<CountryRequirementDoc[]> {
   if (!isFirebaseConfigured || !db) return seedLocalCountryRequirements();
-  const snap = await getDocs(query(collection(db, "countryRequirements"), orderBy("country", "asc")));
+  const snap = await getDocs(
+    query(collection(db, "countryRequirements"), orderBy("country", "asc")),
+  );
   if (snap.empty) {
     const seeded = COUNTRY_REQUIREMENTS.map((r, i) => ({ ...r, id: `cr${i + 1}` }));
-    await Promise.all(seeded.map(({ id, ...rest }) => setDoc(doc(db!, "countryRequirements", id), rest)));
+    await Promise.all(
+      seeded.map(({ id, ...rest }) => setDoc(doc(db!, "countryRequirements", id), rest)),
+    );
     return seeded;
   }
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<CountryRequirementDoc, "id">) }));
@@ -730,10 +943,16 @@ export async function addCountryRequirement(req: Omit<CountryRequirementDoc, "id
   await addDoc(collection(db, "countryRequirements"), req);
 }
 
-export async function updateCountryRequirement(id: string, data: Partial<Omit<CountryRequirementDoc, "id">>): Promise<void> {
+export async function updateCountryRequirement(
+  id: string,
+  data: Partial<Omit<CountryRequirementDoc, "id">>,
+): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     const existing = read<CountryRequirementDoc[]>(COUNTRY_REQ_KEY, []);
-    write(COUNTRY_REQ_KEY, existing.map((r) => (r.id === id ? { ...r, ...data } : r)));
+    write(
+      COUNTRY_REQ_KEY,
+      existing.map((r) => (r.id === id ? { ...r, ...data } : r)),
+    );
     return;
   }
   await updateDoc(doc(db, "countryRequirements", id), data);
@@ -741,7 +960,10 @@ export async function updateCountryRequirement(id: string, data: Partial<Omit<Co
 
 export async function deleteCountryRequirement(id: string): Promise<void> {
   if (!isFirebaseConfigured || !db) {
-    write(COUNTRY_REQ_KEY, read<CountryRequirementDoc[]>(COUNTRY_REQ_KEY, []).filter((r) => r.id !== id));
+    write(
+      COUNTRY_REQ_KEY,
+      read<CountryRequirementDoc[]>(COUNTRY_REQ_KEY, []).filter((r) => r.id !== id),
+    );
     return;
   }
   await deleteDoc(doc(db, "countryRequirements", id));
@@ -749,16 +971,25 @@ export async function deleteCountryRequirement(id: string): Promise<void> {
 
 export async function listUniversityRequirements(): Promise<UniversityRequirementDoc[]> {
   if (!isFirebaseConfigured || !db) return seedLocalUniversityRequirements();
-  const snap = await getDocs(query(collection(db, "universityRequirements"), orderBy("university", "asc")));
+  const snap = await getDocs(
+    query(collection(db, "universityRequirements"), orderBy("university", "asc")),
+  );
   if (snap.empty) {
     const seeded = POPULAR_UNIVERSITIES.map((r, i) => ({ ...r, id: `ur${i + 1}` }));
-    await Promise.all(seeded.map(({ id, ...rest }) => setDoc(doc(db!, "universityRequirements", id), rest)));
+    await Promise.all(
+      seeded.map(({ id, ...rest }) => setDoc(doc(db!, "universityRequirements", id), rest)),
+    );
     return seeded;
   }
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<UniversityRequirementDoc, "id">) }));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...(d.data() as Omit<UniversityRequirementDoc, "id">),
+  }));
 }
 
-export async function addUniversityRequirement(req: Omit<UniversityRequirementDoc, "id">): Promise<void> {
+export async function addUniversityRequirement(
+  req: Omit<UniversityRequirementDoc, "id">,
+): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     const existing = read<UniversityRequirementDoc[]>(UNI_REQ_KEY, []);
     write(UNI_REQ_KEY, [...existing, { ...req, id: crypto.randomUUID() }]);
@@ -767,10 +998,16 @@ export async function addUniversityRequirement(req: Omit<UniversityRequirementDo
   await addDoc(collection(db, "universityRequirements"), req);
 }
 
-export async function updateUniversityRequirement(id: string, data: Partial<Omit<UniversityRequirementDoc, "id">>): Promise<void> {
+export async function updateUniversityRequirement(
+  id: string,
+  data: Partial<Omit<UniversityRequirementDoc, "id">>,
+): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     const existing = read<UniversityRequirementDoc[]>(UNI_REQ_KEY, []);
-    write(UNI_REQ_KEY, existing.map((r) => (r.id === id ? { ...r, ...data } : r)));
+    write(
+      UNI_REQ_KEY,
+      existing.map((r) => (r.id === id ? { ...r, ...data } : r)),
+    );
     return;
   }
   await updateDoc(doc(db, "universityRequirements", id), data);
@@ -778,7 +1015,10 @@ export async function updateUniversityRequirement(id: string, data: Partial<Omit
 
 export async function deleteUniversityRequirement(id: string): Promise<void> {
   if (!isFirebaseConfigured || !db) {
-    write(UNI_REQ_KEY, read<UniversityRequirementDoc[]>(UNI_REQ_KEY, []).filter((r) => r.id !== id));
+    write(
+      UNI_REQ_KEY,
+      read<UniversityRequirementDoc[]>(UNI_REQ_KEY, []).filter((r) => r.id !== id),
+    );
     return;
   }
   await deleteDoc(doc(db, "universityRequirements", id));
@@ -807,9 +1047,7 @@ export async function listMockTests(): Promise<MockTestSet[]> {
   const snap = await getDocs(query(collection(db, "mockTests"), orderBy("order", "asc")));
   if (snap.empty) {
     const { mockTests: staticMockTests } = await import("@/data/mockTest");
-    await Promise.all(
-      staticMockTests.map((m) => setDoc(doc(db!, "mockTests", m.id), { ...m })),
-    );
+    await Promise.all(staticMockTests.map((m) => setDoc(doc(db!, "mockTests", m.id), { ...m })));
     return staticMockTests;
   }
   return snap.docs.map((d) => d.data() as MockTestSet);
@@ -827,7 +1065,10 @@ export async function addMockTest(mock: MockTestSet): Promise<void> {
 export async function updateMockTest(id: string, data: Partial<MockTestSet>): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     const existing = read<MockTestSet[]>(MOCK_TEST_KEY, []);
-    write(MOCK_TEST_KEY, existing.map((m) => (m.id === id ? { ...m, ...data } : m)));
+    write(
+      MOCK_TEST_KEY,
+      existing.map((m) => (m.id === id ? { ...m, ...data } : m)),
+    );
     return;
   }
   await updateDoc(doc(db, "mockTests", id), data);
@@ -835,8 +1076,239 @@ export async function updateMockTest(id: string, data: Partial<MockTestSet>): Pr
 
 export async function deleteMockTest(id: string): Promise<void> {
   if (!isFirebaseConfigured || !db) {
-    write(MOCK_TEST_KEY, read<MockTestSet[]>(MOCK_TEST_KEY, []).filter((m) => m.id !== id));
+    write(
+      MOCK_TEST_KEY,
+      read<MockTestSet[]>(MOCK_TEST_KEY, []).filter((m) => m.id !== id),
+    );
     return;
   }
   await deleteDoc(doc(db, "mockTests", id));
+}
+
+/* ------------------------------------------------------------------ *
+ * Community Threads & Replies
+ * ------------------------------------------------------------------ */
+
+const COMMUNITY_KEY = "iea_community_threads";
+
+const SEED_THREADS: CommunityThread[] = [
+  {
+    id: "t1",
+    title: "How I improved from Band 6 to 7.5 in Writing",
+    author: "Admin",
+    authorEmail: "diyorbekmuzaffarovich4@gmail.com",
+    category: "experience",
+    content:
+      "I focused on Task Response and Coherence. Here are my top 3 tips:\n\n1. Always spend 5 minutes planning before writing\n2. Use discourse markers to connect paragraphs\n3. Write a clear thesis statement in your introduction\n\nThe biggest game changer was timing - I practiced writing 250 words in exactly 40 minutes until it became natural.",
+    replies: [
+      {
+        id: "r1",
+        author: "Ahmed K.",
+        authorEmail: undefined,
+        content:
+          "Great tips! The planning phase is so underrated. I always rush into writing and it shows.",
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        likes: 5,
+      },
+      {
+        id: "r2",
+        author: "Li Wei",
+        authorEmail: undefined,
+        content: "Can you share more about discourse markers? I struggle with cohesion.",
+        createdAt: new Date(Date.now() - 43200000).toISOString(),
+        likes: 3,
+      },
+    ],
+    likes: 24,
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+  },
+  {
+    id: "t2",
+    title: "Best resources for Listening Section 4?",
+    author: "Raj P.",
+    authorEmail: undefined,
+    category: "question",
+    content:
+      "I keep losing marks in Section 4 because the academic vocabulary is so dense. Does anyone have tips or resources specifically for this section? I'm currently scoring 6.5 in Listening overall but Section 4 brings me down.",
+    replies: [
+      {
+        id: "r3",
+        author: "Emma T.",
+        authorEmail: undefined,
+        content:
+          "Try the BBC podcasts - they have similar academic content. Also, practice note-taking while listening to TED talks.",
+        createdAt: new Date(Date.now() - 7200000).toISOString(),
+        likes: 8,
+      },
+    ],
+    likes: 12,
+    createdAt: new Date(Date.now() - 259200000).toISOString(),
+  },
+  {
+    id: "t3",
+    title: "Speaking Part 2 - Use the full 1 minute preparation",
+    author: "Yuki H.",
+    authorEmail: undefined,
+    category: "tips",
+    content:
+      "Many candidates waste the 1-minute preparation time. Here's my method:\n\n- 20 seconds: Read all bullet points carefully\n- 20 seconds: Jot down keywords for each bullet\n- 20 seconds: Plan your opening sentence\n\nThis gives you a clear structure and prevents you from going off-topic during the 2-minute speech.",
+    replies: [],
+    likes: 18,
+    createdAt: new Date(Date.now() - 345600000).toISOString(),
+  },
+];
+
+function seedLocalCommunity(): CommunityThread[] {
+  const existing = read<CommunityThread[] | null>(COMMUNITY_KEY, null);
+  if (existing && existing.length) return existing;
+  write(COMMUNITY_KEY, SEED_THREADS);
+  return SEED_THREADS;
+}
+
+export async function listCommunityThreads(): Promise<CommunityThread[]> {
+  if (!isFirebaseConfigured || !db) return seedLocalCommunity();
+  const snap = await getDocs(
+    query(collection(db, "communityThreads"), orderBy("createdAt", "desc")),
+  );
+  if (snap.empty) {
+    for (const thread of SEED_THREADS) {
+      const { replies, ...rest } = thread;
+      await setDoc(doc(db!, "communityThreads", thread.id), rest);
+      for (const reply of replies) {
+        await addDoc(collection(db!, "communityThreads", thread.id, "replies"), reply);
+      }
+    }
+    return SEED_THREADS;
+  }
+  const threads: CommunityThread[] = [];
+  for (const d of snap.docs) {
+    const data = d.data() as Omit<CommunityThread, "id" | "replies">;
+    const repliesSnap = await getDocs(
+      query(collection(db, "communityThreads", d.id, "replies"), orderBy("createdAt", "asc")),
+    );
+    const replies = repliesSnap.docs.map((r) => ({
+      id: r.id,
+      ...(r.data() as Omit<CommunityReply, "id">),
+    }));
+    threads.push({ id: d.id, ...data, replies });
+  }
+  return threads;
+}
+
+export async function createCommunityThread(
+  thread: Omit<CommunityThread, "id" | "replies" | "likes" | "createdAt">,
+): Promise<CommunityThread> {
+  const now = new Date().toISOString();
+  const id = crypto.randomUUID();
+  const full: CommunityThread = { ...thread, id, replies: [], likes: 0, createdAt: now };
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<CommunityThread[]>(COMMUNITY_KEY, []);
+    write(COMMUNITY_KEY, [full, ...existing]);
+    return full;
+  }
+  const ref = await addDoc(collection(db, "communityThreads"), {
+    title: thread.title,
+    author: thread.author,
+    authorEmail: thread.authorEmail,
+    category: thread.category,
+    content: thread.content,
+    likes: 0,
+    createdAt: now,
+  });
+  return { ...full, id: ref.id };
+}
+
+export async function addCommunityReply(
+  threadId: string,
+  reply: Omit<CommunityReply, "id" | "likes" | "createdAt">,
+): Promise<CommunityReply> {
+  const now = new Date().toISOString();
+  const id = crypto.randomUUID();
+  const full: CommunityReply = { ...reply, id, likes: 0, createdAt: now };
+  if (!isFirebaseConfigured || !db) {
+    const threads = read<CommunityThread[]>(COMMUNITY_KEY, []);
+    write(
+      COMMUNITY_KEY,
+      threads.map((t) => (t.id === threadId ? { ...t, replies: [...t.replies, full] } : t)),
+    );
+    return full;
+  }
+  const ref = await addDoc(collection(db, "communityThreads", threadId, "replies"), {
+    author: reply.author,
+    authorEmail: reply.authorEmail,
+    content: reply.content,
+    likes: 0,
+    createdAt: now,
+  });
+  return { ...full, id: ref.id };
+}
+
+export async function toggleCommunityThreadLike(threadId: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const threads = read<CommunityThread[]>(COMMUNITY_KEY, []);
+    write(
+      COMMUNITY_KEY,
+      threads.map((t) => (t.id === threadId ? { ...t, likes: t.likes + 1 } : t)),
+    );
+    return;
+  }
+  const snap = await getDoc(doc(db, "communityThreads", threadId));
+  if (snap.exists()) {
+    const data = snap.data() as { likes?: number };
+    await updateDoc(doc(db, "communityThreads", threadId), { likes: (data.likes ?? 0) + 1 });
+  }
+}
+
+export async function toggleCommunityReplyLike(threadId: string, replyId: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const threads = read<CommunityThread[]>(COMMUNITY_KEY, []);
+    write(
+      COMMUNITY_KEY,
+      threads.map((t) =>
+        t.id === threadId
+          ? {
+              ...t,
+              replies: t.replies.map((r) => (r.id === replyId ? { ...r, likes: r.likes + 1 } : r)),
+            }
+          : t,
+      ),
+    );
+    return;
+  }
+  const snap = await getDoc(doc(db, "communityThreads", threadId, "replies", replyId));
+  if (snap.exists()) {
+    const data = snap.data() as { likes?: number };
+    await updateDoc(doc(db, "communityThreads", threadId, "replies", replyId), {
+      likes: (data.likes ?? 0) + 1,
+    });
+  }
+}
+
+export async function deleteCommunityThread(threadId: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(
+      COMMUNITY_KEY,
+      read<CommunityThread[]>(COMMUNITY_KEY, []).filter((t) => t.id !== threadId),
+    );
+    return;
+  }
+  const repliesSnap = await getDocs(collection(db, "communityThreads", threadId, "replies"));
+  for (const r of repliesSnap.docs) {
+    await deleteDoc(r.ref);
+  }
+  await deleteDoc(doc(db, "communityThreads", threadId));
+}
+
+export async function deleteCommunityReply(threadId: string, replyId: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const threads = read<CommunityThread[]>(COMMUNITY_KEY, []);
+    write(
+      COMMUNITY_KEY,
+      threads.map((t) =>
+        t.id === threadId ? { ...t, replies: t.replies.filter((r) => r.id !== replyId) } : t,
+      ),
+    );
+    return;
+  }
+  await deleteDoc(doc(db, "communityThreads", threadId, "replies", replyId));
 }
