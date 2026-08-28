@@ -8,11 +8,15 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Provider } from "react-redux";
 
 import appCss from "../styles.css?url";
 
 import { AuthProvider } from "../lib/auth";
 import { Toaster } from "../components/ui/sonner";
+import { getStore } from "../store";
+import { initAuth } from "../store/slices/authSlice";
+import { applyTheme, applyFontSize } from "../store/slices/settingsSlice";
 
 function NotFoundComponent() {
   return (
@@ -131,20 +135,28 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const store = getStore();
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
-  }, []);
+    const theme = store.getState().settings.theme;
+    applyTheme(theme);
+    applyFontSize(store.getState().settings.fontSize);
+    void store.dispatch(initAuth());
+    return () => {};
+  }, [store]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-center" richColors />
-      </AuthProvider>
-    </QueryClientProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <Toaster position="top-center" richColors />
+        </AuthProvider>
+      </QueryClientProvider>
+    </Provider>
   );
 }

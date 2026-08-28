@@ -1,29 +1,21 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
-type FontSize = "small" | "medium" | "large";
-
-const FONT_SIZE_KEY = "iea_font_size";
-
-const SIZE_MAP: Record<FontSize, string> = {
-  small: "14px",
-  medium: "16px",
-  large: "18px",
-};
-
-function getStored(): FontSize {
-  if (typeof window === "undefined") return "small";
-  return (localStorage.getItem(FONT_SIZE_KEY) as FontSize) || "small";
-}
+import { useAppDispatch, useAppSelector } from "@/store";
+import {
+  applyFontSize,
+  setFontSize as setFontSizeAction,
+  type FontSize,
+} from "@/store/slices/settingsSlice";
 
 export function useFontSize() {
-  const [fontSize, setFontSizeState] = useState<FontSize>(getStored);
+  const fontSize = useAppSelector((s) => s.settings.fontSize);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    document.documentElement.style.fontSize = SIZE_MAP[fontSize];
-    localStorage.setItem(FONT_SIZE_KEY, fontSize);
+    applyFontSize(fontSize);
   }, [fontSize]);
 
-  const setFontSize = useCallback((s: FontSize) => setFontSizeState(s), []);
+  const setFontSize = useCallback((s: FontSize) => dispatch(setFontSizeAction(s)), [dispatch]);
 
   return { fontSize, setFontSize };
 }

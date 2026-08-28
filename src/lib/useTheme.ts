@@ -1,30 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
-type Theme = "light" | "dark" | "system";
-
-const THEME_KEY = "iea_theme";
-
-function getSystemTheme(): "light" | "dark" {
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "system";
-  return (localStorage.getItem(THEME_KEY) as Theme) || "system";
-}
-
-function applyTheme(theme: Theme) {
-  const resolved = theme === "system" ? getSystemTheme() : theme;
-  document.documentElement.classList.toggle("dark", resolved === "dark");
-}
+import { useAppDispatch, useAppSelector } from "@/store";
+import { applyTheme, setTheme as setThemeAction, type Theme } from "@/store/slices/settingsSlice";
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(getStoredTheme);
+  const theme = useAppSelector((s) => s.settings.theme);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     applyTheme(theme);
-    localStorage.setItem(THEME_KEY, theme);
   }, [theme]);
 
   useEffect(() => {
@@ -35,7 +19,7 @@ export function useTheme() {
     return () => mq.removeEventListener("change", handler);
   }, [theme]);
 
-  const setTheme = useCallback((t: Theme) => setThemeState(t), []);
+  const setTheme = useCallback((t: Theme) => dispatch(setThemeAction(t)), [dispatch]);
 
   return { theme, setTheme };
 }

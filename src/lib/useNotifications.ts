@@ -1,68 +1,38 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
 
-export interface AppNotification {
-  id: string;
-  type: "streak" | "badge" | "exam" | "reminder" | "milestone" | "info";
-  title: string;
-  message: string;
-  date: string;
-  read: boolean;
-  actionUrl?: string;
-}
+import { useAppDispatch, useAppSelector } from "@/store";
+import {
+  addNotification as addAction,
+  clearAll as clearAllAction,
+  markAllRead as markAllReadAction,
+  markAsRead as markAsReadAction,
+  removeNotification as removeAction,
+  type AppNotification,
+  type NewNotification,
+} from "@/store/slices/notificationsSlice";
 
-const NOTIF_KEY = "iea_notifications";
-
-function load(): AppNotification[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(NOTIF_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function save(notifs: AppNotification[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(NOTIF_KEY, JSON.stringify(notifs));
-}
+export type { AppNotification };
 
 export function useNotifications() {
-  const [notifications, setNotifications] = useState<AppNotification[]>(load);
-
-  useEffect(() => {
-    save(notifications);
-  }, [notifications]);
+  const notifications = useAppSelector((s) => s.notifications.notifications);
+  const dispatch = useAppDispatch();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const addNotification = useCallback(
-    (n: Omit<AppNotification, "id" | "date" | "read">) => {
-      const notif: AppNotification = {
-        ...n,
-        id: crypto.randomUUID(),
-        date: new Date().toISOString(),
-        read: false,
-      };
-      setNotifications((prev) => [notif, ...prev].slice(0, 50));
+    (n: NewNotification) => {
+      dispatch(addAction(n));
     },
-    [],
+    [dispatch],
   );
 
-  const markAsRead = useCallback((id: string) => {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  }, []);
+  const markAsRead = useCallback((id: string) => dispatch(markAsReadAction(id)), [dispatch]);
 
-  const markAllRead = useCallback(() => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  }, []);
+  const markAllRead = useCallback(() => dispatch(markAllReadAction()), [dispatch]);
 
-  const clearAll = useCallback(() => {
-    setNotifications([]);
-  }, []);
+  const clearAll = useCallback(() => dispatch(clearAllAction()), [dispatch]);
 
-  const removeNotification = useCallback((id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  }, []);
+  const removeNotification = useCallback((id: string) => dispatch(removeAction(id)), [dispatch]);
 
   return {
     notifications,
