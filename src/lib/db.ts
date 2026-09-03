@@ -14,20 +14,20 @@ import {
   where,
 } from "firebase/firestore";
 
-import { auth, db, isFirebaseConfigured } from "@/firebaseConfig";
+import { auth, db, isFirebaseConfigured } from "@/shared/config/firebase";
 import { deleteAuthUser } from "./authAdmin";
-import { placementQuestions as staticPlacementQuestions } from "@/data/placement";
-import { IELTS_RESOURCES } from "@/data/resources";
-import { BADGES, type BadgeDef } from "@/data/badges";
-import { VOCABULARY, type VocabWord, type VocabTopic } from "@/data/vocabulary";
-import { MODEL_ANSWERS, type ModelAnswer } from "@/data/modelAnswers";
+import { placementQuestions as staticPlacementQuestions } from "@/shared/data/placement";
+import { IELTS_RESOURCES } from "@/shared/data/resources";
+import { BADGES, type BadgeDef } from "@/shared/data/badges";
+import { VOCABULARY, type VocabWord, type VocabTopic } from "@/shared/data/vocabulary";
+import { MODEL_ANSWERS, type ModelAnswer } from "@/shared/data/modelAnswers";
 import {
   COUNTRY_REQUIREMENTS,
   POPULAR_UNIVERSITIES,
   type CountryRequirement,
   type UniversityRequirement,
-} from "@/data/requirements";
-import type { MockTestSet } from "@/data/mockTests/types";
+} from "@/shared/data/requirements";
+import type { MockTestSet } from "@/shared/data/mockTests/types";
 import {
   applyStreak,
   applyWeeklyReset,
@@ -48,7 +48,7 @@ import type {
   StudyPlanRecord,
   UserProfile,
   WritingSubmission,
-} from "./types";
+} from "@/shared/types/types";
 
 /* ------------------------------------------------------------------ *
  * Level calculation based on IELTS overall band score
@@ -232,7 +232,7 @@ export async function seedAllDataToFirestore(): Promise<SeedProgress[]> {
   try {
     const existing = await getDocs(collection(db, "mockTests"));
     if (existing.empty) {
-      const { mockTests: staticMockTests } = await import("@/data/mockTest");
+      const { mockTests: staticMockTests } = await import("@/shared/data/mockTest");
       for (const m of staticMockTests) {
         await setDoc(doc(db, "mockTests", m.id), { ...m });
       }
@@ -1040,13 +1040,13 @@ export async function listMockTests(): Promise<MockTestSet[]> {
   if (!isFirebaseConfigured || !db) {
     const local = seedLocalMockTests();
     if (local.length) return local;
-    const { mockTests: staticMockTests } = await import("@/data/mockTest");
+    const { mockTests: staticMockTests } = await import("@/shared/data/mockTest");
     write(MOCK_TEST_KEY, staticMockTests);
     return staticMockTests;
   }
   const snap = await getDocs(query(collection(db, "mockTests"), orderBy("order", "asc")));
   if (snap.empty) {
-    const { mockTests: staticMockTests } = await import("@/data/mockTest");
+    const { mockTests: staticMockTests } = await import("@/shared/data/mockTest");
     await Promise.all(staticMockTests.map((m) => setDoc(doc(db!, "mockTests", m.id), { ...m })));
     return staticMockTests;
   }

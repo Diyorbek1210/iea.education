@@ -1,4 +1,4 @@
-import type { VocabWord } from "@/data/vocabulary";
+import type { VocabWord } from "@/shared/data/vocabulary";
 
 export interface SrsCard {
   word: string;

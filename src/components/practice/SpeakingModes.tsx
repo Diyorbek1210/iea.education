@@ -12,10 +12,10 @@ import {
   MessagesSquare,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
+import { cn } from "@/shared/lib/utils";
 
 export type SpeakingPart = 1 | 2 | 3;
 

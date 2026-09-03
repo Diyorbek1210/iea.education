@@ -5,10 +5,10 @@ import {
   signInWithEmailAndPassword,
   signOut as fbSignOut,
 } from "firebase/auth";
-import { ADMIN_EMAIL, ADMIN_PASSWORD, auth, isFirebaseConfigured } from "@/firebaseConfig";
+import { ADMIN_EMAIL, ADMIN_PASSWORD, auth, isFirebaseConfigured } from "@/shared/config/firebase";
 import { createUserProfile, getUserProfile, recordActivity } from "@/lib/db";
 import { DEFAULT_DAILY_GOAL, weekStartKey } from "@/lib/gamification";
-import type { UserProfile } from "@/lib/types";
+import type { UserProfile } from "@/shared/types/types";
 
 const SESSION_KEY = "iea_session_uid";
 const ADMIN_KEY = "iea_session_admin";

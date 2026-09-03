@@ -3,11 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, ClipboardCheck, Lock, PlayCircle } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
-import { mockTests as staticMockTests } from "@/data/mockTest";
+import { Button } from "@/shared/ui/button";
+import { mockTests as staticMockTests } from "@/shared/data/mockTest";
 import { useAuth } from "@/lib/auth";
 import { listMockResults, listMockTests } from "@/lib/db";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/mock-test")({
   head: () => ({

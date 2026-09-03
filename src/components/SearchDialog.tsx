@@ -15,10 +15,10 @@ import {
   Bot,
   X,
 } from "lucide-react";
-import { VOCABULARY } from "@/data/vocabulary";
-import { ESSAY_TOPICS } from "@/data/essayTopics";
-import { IELTS_RESOURCES } from "@/data/resources";
-import { cn } from "@/lib/utils";
+import { VOCABULARY } from "@/shared/data/vocabulary";
+import { ESSAY_TOPICS } from "@/shared/data/essayTopics";
+import { IELTS_RESOURCES } from "@/shared/data/resources";
+import { cn } from "@/shared/lib/utils";
 
 interface SearchItem {
   id: string;

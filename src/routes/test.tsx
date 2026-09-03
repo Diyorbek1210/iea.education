@@ -13,12 +13,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { levelDescription, levelFromScore } from "@/data/placement";
+} from "@/shared/ui/alert-dialog";
+import { Button } from "@/shared/ui/button";
+import { Progress } from "@/shared/ui/progress";
+import { levelDescription, levelFromScore } from "@/shared/data/placement";
 import { listPlacementQuestions } from "@/lib/db";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/test")({
   head: () => ({

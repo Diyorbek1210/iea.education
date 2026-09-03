@@ -5,7 +5,7 @@ import { Crown, Medal } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { listMockResults } from "@/lib/db";
 import { useAuth } from "@/lib/auth";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({

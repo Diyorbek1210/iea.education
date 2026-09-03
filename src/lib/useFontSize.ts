@@ -1,11 +1,11 @@
 import { useCallback, useEffect } from "react";
 
-import { useAppDispatch, useAppSelector } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/app/store";
 import {
   applyFontSize,
   setFontSize as setFontSizeAction,
   type FontSize,
-} from "@/store/slices/settingsSlice";
+} from "@/app/store/slices/settingsSlice";
 
 export function useFontSize() {
   const fontSize = useAppSelector((s) => s.settings.fontSize);

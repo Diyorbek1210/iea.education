@@ -1,4 +1,4 @@
-import type { Level } from "@/lib/types";
+import type { Level } from "@/shared/types/types";
 
 export interface Question {
   q: string;

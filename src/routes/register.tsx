@@ -5,17 +5,17 @@ import { z } from "zod";
 import { Calendar, BookOpen, Clock, Target, ChevronRight, ChevronLeft } from "lucide-react";
 
 import { Logo } from "@/components/Logo";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
 import { useAuth } from "@/lib/auth";
 import { addStudyPlan } from "@/lib/db";
 import {
   generateStudyPlan,
   type SkillType,
   type StudyPlanConfig,
-} from "@/data/studyPlan";
-import { cn } from "@/lib/utils";
+} from "@/shared/data/studyPlan";
+import { cn } from "@/shared/lib/utils";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Please enter your full name").max(100),

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Bell, Check, CheckCheck, Trash2, Flame, Trophy, Calendar, Target, Info } from "lucide-react";
 import { useNotifications, type AppNotification } from "@/lib/useNotifications";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 const TYPE_ICONS: Record<AppNotification["type"], typeof Bell> = {
   streak: Flame,

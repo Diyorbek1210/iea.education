@@ -16,14 +16,14 @@ import {
 import { toast } from "sonner";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { listStudyPlans, addStudyPlan, deleteStudyPlan } from "@/lib/db";
 import { useTheme } from "@/lib/useTheme";
 import { useFontSize } from "@/lib/useFontSize";
-import { generateStudyPlan, type SkillType } from "@/data/studyPlan";
-import { cn } from "@/lib/utils";
+import { generateStudyPlan, type SkillType } from "@/shared/data/studyPlan";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({

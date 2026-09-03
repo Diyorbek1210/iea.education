@@ -15,10 +15,10 @@ import {
 import { toast } from "sonner";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 import { useAuth } from "@/lib/auth";
-import { ADMIN_EMAIL } from "@/firebaseConfig";
+import { ADMIN_EMAIL } from "@/shared/config/firebase";
 import {
   listCommunityThreads,
   createCommunityThread,
@@ -28,8 +28,8 @@ import {
   deleteCommunityThread,
   deleteCommunityReply,
 } from "@/lib/db";
-import type { CommunityThread, CommunityReply, ThreadCategory } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import type { CommunityThread, CommunityReply, ThreadCategory } from "@/shared/types/types";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/community")({
   head: () => ({

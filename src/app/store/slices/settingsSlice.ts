@@ -13,8 +13,8 @@ export const SIZE_MAP: Record<FontSize, string> = {
 };
 
 function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "system";
-  return (localStorage.getItem(THEME_KEY) as Theme) || "system";
+  if (typeof window === "undefined") return "light";
+  return (localStorage.getItem(THEME_KEY) as Theme) || "light";
 }
 
 function getStoredFontSize(): FontSize {

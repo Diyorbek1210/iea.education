@@ -13,10 +13,10 @@ import { Provider } from "react-redux";
 import appCss from "../styles.css?url";
 
 import { AuthProvider } from "../lib/auth";
-import { Toaster } from "../components/ui/sonner";
-import { getStore } from "../store";
-import { initAuth } from "../store/slices/authSlice";
-import { applyTheme, applyFontSize } from "../store/slices/settingsSlice";
+import { Toaster } from "../shared/ui/sonner";
+import { getStore } from "../app/store";
+import { initAuth } from "../app/store/slices/authSlice";
+import { applyTheme, applyFontSize } from "../app/store/slices/settingsSlice";
 
 function NotFoundComponent() {
   return (
@@ -115,7 +115,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem("iea_theme");if(t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`,
+            __html: `try{var t=localStorage.getItem("iea_theme");if(t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme:dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`,
           }}
         />
         <script

@@ -11,14 +11,14 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import { useAuth } from "@/lib/auth";
 import { listStudyPlans } from "@/lib/db";
-import { type StudyTask, type SkillType, type DayOfWeek, DAY_LABELS } from "@/data/studyPlan";
-import { cn } from "@/lib/utils";
-import type { StudyPlanRecord } from "@/lib/types";
+import { type StudyTask, type SkillType, type DayOfWeek, DAY_LABELS } from "@/shared/data/studyPlan";
+import { cn } from "@/shared/lib/utils";
+import type { StudyPlanRecord } from "@/shared/types/types";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({

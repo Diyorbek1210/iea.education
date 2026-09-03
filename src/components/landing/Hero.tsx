@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles, Users } from "lucide-react";
 
 import heroStudent from "@/assets/hero-student.jpg";
 import { Logo } from "@/components/Logo";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 
 export function Hero() {
   return (

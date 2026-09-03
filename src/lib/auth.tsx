@@ -1,8 +1,8 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
-import { useAppDispatch, useAppSelector } from "@/store";
-import { initAuth, refreshUser, signIn, signOut, signUp } from "@/store/slices/authSlice";
-import type { UserProfile } from "./types";
+import { useAppDispatch, useAppSelector } from "@/app/store";
+import { initAuth, refreshUser, signIn, signOut, signUp } from "@/app/store/slices/authSlice";
+import type { UserProfile } from "@/shared/types/types";
 
 interface AuthContextValue {
   user: UserProfile | null;

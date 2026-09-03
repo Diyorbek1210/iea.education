@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { useAppDispatch, useAppSelector } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/app/store";
 import {
   addNotification as addAction,
   clearAll as clearAllAction,
@@ -9,7 +9,7 @@ import {
   removeNotification as removeAction,
   type AppNotification,
   type NewNotification,
-} from "@/store/slices/notificationsSlice";
+} from "@/app/store/slices/notificationsSlice";
 
 export type { AppNotification };
 

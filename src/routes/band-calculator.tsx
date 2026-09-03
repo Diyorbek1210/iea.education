@@ -3,10 +3,10 @@ import { useState, useMemo } from "react";
 import { Calculator, Info, TrendingUp, ArrowRight, RotateCcw } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/band-calculator")({
   head: () => ({

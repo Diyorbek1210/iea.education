@@ -12,15 +12,15 @@ import {
 } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 import {
   COUNTRY_REQUIREMENTS,
   POPULAR_UNIVERSITIES,
   type CountryRequirement,
-} from "@/data/requirements";
+} from "@/shared/data/requirements";
 import { listCountryRequirements, listUniversityRequirements } from "@/lib/db";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/requirements")({
   head: () => ({

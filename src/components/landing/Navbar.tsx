@@ -3,7 +3,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 import { Logo } from "@/components/Logo";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { useAuth } from "@/lib/auth";
 
 const links = [

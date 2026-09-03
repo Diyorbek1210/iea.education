@@ -2,9 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Bell, CheckCheck, Trash2, Flame, Trophy, Calendar, Target, Info } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { useNotifications, type AppNotification } from "@/lib/useNotifications";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/notifications")({
   head: () => ({

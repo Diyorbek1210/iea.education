@@ -1,4 +1,4 @@
-import type { AiCriterion, AiSkillFeedback } from "@/lib/types";
+import type { AiCriterion, AiSkillFeedback } from "@/shared/types/types";
 
 export const WRITING_CRITERIA_LABELS = [
   "Task Response",

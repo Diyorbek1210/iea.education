@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 
-import { useAppDispatch, useAppSelector } from "@/store";
-import { applyTheme, setTheme as setThemeAction, type Theme } from "@/store/slices/settingsSlice";
+import { useAppDispatch, useAppSelector } from "@/app/store";
+import { applyTheme, setTheme as setThemeAction, type Theme } from "@/app/store/slices/settingsSlice";
 
 export function useTheme() {
   const theme = useAppSelector((s) => s.settings.theme);

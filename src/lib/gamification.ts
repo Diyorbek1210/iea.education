@@ -1,5 +1,5 @@
-import { BADGES, type BadgeDef } from "@/data/badges";
-import type { ActivityType, UserProfile } from "./types";
+import { BADGES, type BadgeDef } from "@/shared/data/badges";
+import type { ActivityType, UserProfile } from "@/shared/types/types";
 
 export const XP_REWARDS = {
   GAME_BASE: 5,

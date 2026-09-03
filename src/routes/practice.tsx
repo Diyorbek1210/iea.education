@@ -20,10 +20,10 @@ import { toast } from "sonner";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { AiAvatar, type AvatarEmotion } from "@/components/practice/AiAvatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Textarea } from "@/shared/ui/textarea";
+import { Progress } from "@/shared/ui/progress";
 import { useSpeechSynthesis } from "@/components/mocktest/useSpeechSynthesis";
 import { chatWithAi } from "@/lib/aiChat";
 import {
@@ -33,7 +33,7 @@ import {
   analyzeFluency,
   type SpeakingPart,
 } from "@/components/practice/SpeakingModes";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/practice")({
   head: () => ({

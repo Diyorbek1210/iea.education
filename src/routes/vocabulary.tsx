@@ -16,10 +16,10 @@ import {
 } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { VOCABULARY, VOCAB_TOPICS, type VocabWord, type VocabTopic } from "@/data/vocabulary";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
+import { VOCABULARY, VOCAB_TOPICS, type VocabWord, type VocabTopic } from "@/shared/data/vocabulary";
 import { listVocabulary } from "@/lib/db";
 import {
   getSrsCard,
@@ -27,7 +27,7 @@ import {
   getWordsForReview,
   getSrsStats,
 } from "@/lib/spacedRepetition";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/vocabulary")({
   head: () => ({

@@ -33,19 +33,19 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/shared/ui/select";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 
 import { Logo } from "@/components/Logo";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/ui/chart";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Textarea } from "@/shared/ui/textarea";
 import { useAuth } from "@/lib/auth";
-import { ADMIN_EMAIL } from "@/firebaseConfig";
+import { ADMIN_EMAIL } from "@/shared/config/firebase";
 import {
   addPlacementQuestion,
   addResource,
@@ -83,15 +83,15 @@ import {
   seedAllDataToFirestore,
   type SeedProgress,
 } from "@/lib/db";
-import type { Level, ResourceDoc } from "@/lib/types";
+import type { Level, ResourceDoc } from "@/shared/types/types";
 import type {
   VocabWordDoc,
   ModelAnswerDoc,
   CountryRequirementDoc,
   UniversityRequirementDoc,
 } from "@/lib/db";
-import type { MockTestSet } from "@/data/mockTest";
-import { cn } from "@/lib/utils";
+import type { MockTestSet } from "@/shared/data/mockTest";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({

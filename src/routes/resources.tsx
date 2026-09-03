@@ -15,10 +15,10 @@ import {
 } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 import { listResources } from "@/lib/db";
-import { cn } from "@/lib/utils";
-import type { ResourceDoc } from "@/lib/types";
+import { cn } from "@/shared/lib/utils";
+import type { ResourceDoc } from "@/shared/types/types";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({

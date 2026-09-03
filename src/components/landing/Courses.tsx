@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { BookMarked, Headphones, Mic, PenLine, Sparkles } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 
 const courses = [
   {

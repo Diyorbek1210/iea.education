@@ -1,6 +1,6 @@
 import { GraduationCap } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 export function Logo({ className }: { className?: string }) {
   return (

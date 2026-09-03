@@ -22,20 +22,20 @@ import {
 import { toast } from "sonner";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
 import {
   ESSAY_TOPICS,
   ESSAY_TYPES,
   getRandomTopic,
   type EssayType,
   type EssayTopic,
-} from "@/data/essayTopics";
-import { WRITING_TASK2_RUBRIC, ESSAY_CHECKLIST } from "@/data/essayRubric";
+} from "@/shared/data/essayTopics";
+import { WRITING_TASK2_RUBRIC, ESSAY_CHECKLIST } from "@/shared/data/essayRubric";
 import { useAuth } from "@/lib/auth";
 import { addWritingSubmission } from "@/lib/db";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 import {
   generateListeningQuestions,
   generateSpeakingQuestions,

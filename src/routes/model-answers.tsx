@@ -4,11 +4,11 @@ import { useState } from "react";
 import { BookOpen, Headphones, Star, ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MODEL_ANSWERS, getAnswersByCategory, getAnswersBySkill, type ModelAnswer } from "@/data/modelAnswers";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { MODEL_ANSWERS, getAnswersByCategory, getAnswersBySkill, type ModelAnswer } from "@/shared/data/modelAnswers";
 import { listModelAnswers } from "@/lib/db";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/model-answers")({
   head: () => ({

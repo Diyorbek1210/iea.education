@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Mic, Square, Volume2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import type { SpeakingQuestion } from "@/data/mockTest";
+import { Button } from "@/shared/ui/button";
+import { Textarea } from "@/shared/ui/textarea";
+import type { SpeakingQuestion } from "@/shared/data/mockTest";
 import { useSpeechSynthesis } from "./useSpeechSynthesis";
 
 interface SpeechRecognitionResultLike {

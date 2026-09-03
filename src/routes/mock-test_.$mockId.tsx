@@ -12,11 +12,11 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/shared/ui/accordion";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Progress } from "@/shared/ui/progress";
+import { Textarea } from "@/shared/ui/textarea";
 import {
   estimateWritten,
   listeningBand,
@@ -24,12 +24,12 @@ import {
   readingBand,
   type FillQuestion,
   type McQuestion,
-} from "@/data/mockTest";
+} from "@/shared/data/mockTest";
 import { scoreMockPerformance } from "@/lib/aiScoring";
 import { useAuth } from "@/lib/auth";
 import { addMockResult, levelForBand, listMockTests, markMockTestCompleted, updateUserProfile } from "@/lib/db";
-import type { AiFeedback, AiSkillFeedback } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import type { AiFeedback, AiSkillFeedback } from "@/shared/types/types";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/mock-test_/$mockId")({
   head: () => ({

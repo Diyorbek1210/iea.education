@@ -27,13 +27,13 @@ import {
 } from "recharts";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
 import { useAuth } from "@/lib/auth";
 import { listMockResults } from "@/lib/db";
 import { useQuery } from "@tanstack/react-query";
-import type { SkillType } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import type { SkillType } from "@/shared/types/types";
+import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({

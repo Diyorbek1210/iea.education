@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ClipboardCheck, TrendingDown, TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
   ChartContainer,
   ChartLegend,
@@ -10,10 +10,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart";
-import { mockTests } from "@/data/mockTest";
-import type { MockResult } from "@/lib/types";
-import { cn } from "@/lib/utils";
+} from "@/shared/ui/chart";
+import { mockTests } from "@/shared/data/mockTest";
+import type { MockResult } from "@/shared/types/types";
+import { cn } from "@/shared/lib/utils";
 
 const chartConfig = {
   overall: { label: "Overall", color: "var(--color-chart-1)" },
