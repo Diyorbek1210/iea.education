@@ -22,7 +22,7 @@ export const uploadToR2 = createServerFn({ method: "POST" })
       fileBase64: z.string(),
       fileName: z.string(),
       contentType: z.string(),
-      folder: z.enum(["resources"]),
+      folder: z.enum(["resources", "shadowing"]),
     }),
   )
   .handler(async ({ data }) => {

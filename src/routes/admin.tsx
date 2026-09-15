@@ -25,15 +25,13 @@ import {
   ThumbsUp,
   Shield,
   Send,
+  Repeat2,
+  Youtube,
+  Captions,
+  Loader2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 
@@ -81,9 +79,15 @@ import {
   updateResource,
   uploadResourceFile,
   seedAllDataToFirestore,
+  listShadowingClips,
+  addShadowingClip,
+  updateShadowingClip,
+  deleteShadowingClip,
+  uploadShadowingFile,
   type SeedProgress,
 } from "@/lib/db";
-import type { Level, ResourceDoc } from "@/shared/types/types";
+import type { Level, ResourceDoc, ShadowingClip, ShadowingSegment } from "@/shared/types/types";
+import { extractYouTubeTranscript, extractYouTubeVideoId } from "@/lib/shadowing";
 import type {
   VocabWordDoc,
   ModelAnswerDoc,
@@ -117,6 +121,7 @@ type Tab =
   | "requirements"
   | "mock-tests"
   | "community"
+  | "shadowing"
   | "seed";
 
 const tabs: { id: Tab; label: string; icon: typeof Users }[] = [
@@ -130,6 +135,7 @@ const tabs: { id: Tab; label: string; icon: typeof Users }[] = [
   { id: "model-answers", label: "Model Answers", icon: FileText },
   { id: "requirements", label: "Requirements", icon: Target },
   { id: "community", label: "Community", icon: MessageSquare },
+  { id: "shadowing", label: "Shadowing", icon: Repeat2 },
   { id: "seed", label: "Seed Data", icon: Database },
 ];
 
@@ -2727,9 +2733,505 @@ function AdminPage() {
           )}
 
           {tab === "seed" && <SeedSection queryClient={queryClient} />}
+          {tab === "shadowing" && <ShadowingAdminSection queryClient={queryClient} />}
         </main>
       </div>
     </div>
+  );
+}
+
+function timestampToSeconds(ts: string): number | null {
+  const match = ts.trim().match(/^(\d{1,2}):(\d{2}):(\d{2})[,.](\d{1,3})$/);
+  if (match) {
+    const h = Number(match[1]!);
+    const m = Number(match[2]!);
+    const s = Number(match[3]!);
+    const ms = Number(match[4]!.padEnd(3, "0"));
+    return h * 3600 + m * 60 + s + ms / 1000;
+  }
+  const short = ts.trim().match(/^(\d{1,2}):(\d{2})[,.](\d{1,3})$/);
+  if (short) {
+    const m = Number(short[1]!);
+    const s = Number(short[2]!);
+    const ms = Number(short[3]!.padEnd(3, "0"));
+    return m * 60 + s + ms / 1000;
+  }
+  return null;
+}
+
+function parseSrt(text: string): ShadowingSegment[] {
+  const out: ShadowingSegment[] = [];
+  for (const block of text.split(/\n{2,}/)) {
+    const lines = block
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    const timeLine = lines.find((l) => l.includes("-->"));
+    if (!timeLine) continue;
+    const [fromRaw, toRaw] = timeLine.split("-->").map((p) => p.trim());
+    const start = timestampToSeconds(fromRaw ?? "");
+    const end = timestampToSeconds(toRaw ?? "");
+    if (start === null || end === null || end <= start) continue;
+    const text = lines
+      .slice(lines.indexOf(timeLine) + 1)
+      .join(" ")
+      .replace(/<[^>]*>/g, "")
+      .trim();
+    if (!text) continue;
+    out.push({ start, end, text });
+  }
+  return out;
+}
+
+function plainTextToSegments(text: string): ShadowingSegment[] {
+  const lines = text
+    .split("\n")
+    .map((l) => l.replace(/<[^>]*>/g, "").trim())
+    .filter(Boolean);
+  let cursor = 0;
+  const out: ShadowingSegment[] = [];
+  for (const line of lines) {
+    const words = line.split(/\s+/).length || 1;
+    const duration = Math.max(1.2, words / 2.5);
+    out.push({ start: cursor, end: cursor + duration, text: line });
+    cursor += duration + 0.4;
+  }
+  return out;
+}
+
+function ShadowingAdminSection({
+  queryClient,
+}: {
+  queryClient: ReturnType<typeof useQueryClient>;
+}) {
+  const { data: clips = [] } = useQuery({
+    queryKey: ["shadowing-clips"],
+    queryFn: listShadowingClips,
+  });
+
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    sourceType: "youtube" as "youtube" | "file",
+    url: "",
+    thumbnail: "",
+  });
+  const [segments, setSegments] = useState<ShadowingSegment[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [fetching, setFetching] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [subtitlesMode, setSubtitlesMode] = useState<"srt" | "plain">("srt");
+  const [subtitlesText, setSubtitlesText] = useState("");
+  const [parsing, setParsing] = useState(false);
+
+  function resetForm() {
+    setForm({ title: "", description: "", sourceType: "youtube", url: "", thumbnail: "" });
+    setSegments([]);
+    setEditingId(null);
+    setFile(null);
+    setSubtitlesText("");
+  }
+
+  function editClip(clip: ShadowingClip) {
+    setEditingId(clip.id);
+    setForm({
+      title: clip.title,
+      description: clip.description,
+      sourceType: clip.sourceType,
+      url: clip.url,
+      thumbnail: clip.thumbnail,
+    });
+    setSegments(clip.segments.map((s) => ({ ...s })));
+  }
+
+  async function fetchYouTubeSubtitles() {
+    if (!extractYouTubeVideoId(form.url)) {
+      toast.error("Paste a valid YouTube URL first (watch, youtu.be, shorts...).");
+      return;
+    }
+    setFetching(true);
+    try {
+      const res = await extractYouTubeTranscript({ data: { url: form.url } });
+      setForm((prev) => ({
+        ...prev,
+        sourceType: "youtube",
+        url: `https://www.youtube.com/watch?v=${res.videoId}`,
+        title: prev.title.trim() || res.title,
+        thumbnail: prev.thumbnail || res.thumbnail,
+      }));
+      setSegments(res.segments);
+      toast.success(`Extracted ${res.segments.length} phrases from the subtitles.`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not fetch subtitles for this video.");
+    } finally {
+      setFetching(false);
+    }
+  }
+
+  async function handleFileUpload(f: File | null) {
+    if (!f) return;
+    setUploading(true);
+    try {
+      const url = await uploadShadowingFile(f);
+      setForm((prev) => ({ ...prev, sourceType: "file", url }));
+      setFile(f);
+      toast.success("File uploaded. Now add its subtitles below.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "File upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function parseSubtitles() {
+    if (!subtitlesText.trim()) {
+      toast.error("Paste subtitle content first.");
+      return;
+    }
+    setParsing(true);
+    try {
+      const parsed =
+        subtitlesMode === "srt" ? parseSrt(subtitlesText) : plainTextToSegments(subtitlesText);
+      if (parsed.length === 0) {
+        toast.error("Nothing could be parsed. Check the format (SRT or one phrase per line).");
+        return;
+      }
+      setSegments(parsed);
+      toast.success(`${parsed.length} phrases imported. You can adjust them below.`);
+    } finally {
+      setParsing(false);
+    }
+  }
+
+  function updateSegment(index: number, patch: Partial<ShadowingSegment>) {
+    setSegments((prev) => prev.map((s, i) => (i === index ? { ...s, ...patch } : s)));
+  }
+
+  async function submit() {
+    if (!form.title.trim()) {
+      toast.error("Title is required.");
+      return;
+    }
+    if (!form.url.trim()) {
+      toast.error("Provide a YouTube link or upload a file.");
+      return;
+    }
+    if (segments.length === 0) {
+      toast.error("Add at least one subtitle phrase for the clip.");
+      return;
+    }
+    const payload = {
+      title: form.title.trim(),
+      description: form.description.trim(),
+      sourceType: form.sourceType,
+      url: form.url.trim(),
+      thumbnail: form.thumbnail.trim(),
+      segments: segments
+        .filter((s) => s.text.trim())
+        .map((s) => ({ start: s.start, end: s.end, text: s.text.trim() })),
+    };
+    try {
+      if (editingId) {
+        await updateShadowingClip(editingId, payload);
+        toast.success("Shadowing clip updated.");
+      } else {
+        await addShadowingClip(payload);
+        toast.success("Shadowing clip added.");
+      }
+      resetForm();
+      queryClient.invalidateQueries({ queryKey: ["shadowing-clips"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save the clip.");
+    }
+  }
+
+  async function removeClip(id: string) {
+    await deleteShadowingClip(id);
+    if (editingId === id) resetForm();
+    queryClient.invalidateQueries({ queryKey: ["shadowing-clips"] });
+    toast.success("Shadowing clip deleted.");
+  }
+
+  return (
+    <section className="mt-6 grid gap-6 lg:grid-cols-[420px_1fr]">
+      <div className="space-y-6">
+        <div className="rounded-3xl bg-card p-6 shadow-card">
+          <h2 className="text-base font-bold text-foreground">
+            {editingId ? "Edit shadowing clip" : "Add a shadowing clip"}
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Clips are used in Practice → Shadowing. Students listen to the original, repeat each
+            phrase, then get AI feedback.
+          </p>
+
+          <div className="mt-4 space-y-4">
+            <div>
+              <Label>Title</Label>
+              <Input
+                className="mt-1.5"
+                value={form.title}
+                maxLength={120}
+                placeholder="e.g. TED talk: The power of vulnerability"
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <Label>Source</Label>
+              <div className="mt-1.5 flex gap-2">
+                <Button
+                  type="button"
+                  variant={form.sourceType === "youtube" ? "hero" : "soft"}
+                  size="pill"
+                  className="flex-1"
+                  onClick={() => setForm({ ...form, sourceType: "youtube" })}
+                >
+                  <Youtube className="mr-2 h-4 w-4" /> YouTube
+                </Button>
+                <Button
+                  type="button"
+                  variant={form.sourceType === "file" ? "hero" : "soft"}
+                  size="pill"
+                  className="flex-1"
+                  onClick={() => setForm({ ...form, sourceType: "file" })}
+                >
+                  <Upload className="mr-2 h-4 w-4" /> Upload file
+                </Button>
+              </div>
+            </div>
+
+            {form.sourceType === "youtube" ? (
+              <div>
+                <Label>YouTube URL</Label>
+                <Input
+                  className="mt-1.5"
+                  value={form.url}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  onChange={(e) => setForm({ ...form, url: e.target.value })}
+                />
+                <Button
+                  type="button"
+                  variant="soft"
+                  size="pill"
+                  className="mt-2 w-full"
+                  onClick={fetchYouTubeSubtitles}
+                  disabled={fetching}
+                >
+                  {fetching ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Fetching subtitles...
+                    </>
+                  ) : (
+                    <>
+                      <Captions className="mr-2 h-4 w-4" /> Fetch subtitles automatically
+                    </>
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <Label>Video / audio file</Label>
+                <Input
+                  className="mt-1.5"
+                  type="file"
+                  accept="audio/*,video/*,.mp3,.mp4,.m4a,.webm,.ogg,.wav"
+                  disabled={uploading}
+                  onChange={(e) => handleFileUpload(e.target.files?.[0] ?? null)}
+                />
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  {uploading
+                    ? "Uploading..."
+                    : file
+                      ? `Uploaded: ${file.name}`
+                      : "Uploaded media is hosted on Cloudflare R2."}
+                </p>
+              </div>
+            )}
+
+            <div className="rounded-2xl border border-border p-4">
+              <Label>Subtitles / transcript</Label>
+              <p className="mt-1 text-xs text-muted-foreground">
+                The subtitles define the phrases students repeat one by one.
+              </p>
+              <div className="mt-2 flex gap-2">
+                <Button
+                  type="button"
+                  variant={subtitlesMode === "srt" ? "hero" : "soft"}
+                  size="pill"
+                  className="flex-1"
+                  onClick={() => setSubtitlesMode("srt")}
+                >
+                  SRT file
+                </Button>
+                <Button
+                  type="button"
+                  variant={subtitlesMode === "plain" ? "hero" : "soft"}
+                  size="pill"
+                  className="flex-1"
+                  onClick={() => setSubtitlesMode("plain")}
+                >
+                  Plain text
+                </Button>
+              </div>
+              <Textarea
+                className="mt-2 font-mono text-xs"
+                rows={5}
+                placeholder={
+                  subtitlesMode === "srt"
+                    ? "1\n00:00:00,500 --> 00:00:04,000\nHello everyone, welcome..."
+                    : "One phrase per line for each subtitle.\nThe second phrase goes here."
+                }
+                value={subtitlesText}
+                onChange={(e) => setSubtitlesText(e.target.value)}
+              />
+              <Button
+                type="button"
+                variant="soft"
+                size="pill"
+                className="mt-2 w-full"
+                onClick={parseSubtitles}
+                disabled={parsing}
+              >
+                {parsing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing...
+                  </>
+                ) : (
+                  <>
+                    <Captions className="mr-2 h-4 w-4" /> Generate phrases
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div>
+              <Label>Thumbnail URL (optional)</Label>
+              <Input
+                className="mt-1.5"
+                value={form.thumbnail}
+                placeholder="https://..."
+                onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
+              />
+            </div>
+
+            {segments.length > 0 && (
+              <div className="rounded-2xl border border-border p-4">
+                <div className="flex items-center justify-between">
+                  <Label>Phrases ({segments.length})</Label>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setSegments([])}>
+                    Clear
+                  </Button>
+                </div>
+                <div className="mt-2 max-h-72 space-y-2 overflow-y-auto">
+                  {segments.map((seg, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="w-6 shrink-0 text-[10px] font-bold text-muted-foreground">
+                        {i + 1}
+                      </span>
+                      <Input
+                        className="w-20 shrink-0 text-xs"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        aria-label="Start seconds"
+                        value={seg.start}
+                        onChange={(e) => updateSegment(i, { start: Number(e.target.value) })}
+                      />
+                      <span className="text-xs text-muted-foreground">–</span>
+                      <Input
+                        className="w-20 shrink-0 text-xs"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        aria-label="End seconds"
+                        value={seg.end}
+                        onChange={(e) => updateSegment(i, { end: Number(e.target.value) })}
+                      />
+                      <Input
+                        className="min-w-0 flex-1 text-xs"
+                        placeholder="Phrase text"
+                        value={seg.text}
+                        onChange={(e) => updateSegment(i, { text: e.target.value })}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSegments((prev) => prev.filter((_, idx) => idx !== i))}
+                      >
+                        <Trash2 className="h-3 w-3 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <Button variant="hero" size="pill" className="flex-1" onClick={submit}>
+                {editingId ? "Save changes" : "Add clip"}
+              </Button>
+              {editingId && (
+                <Button variant="ghost" size="pill" onClick={resetForm}>
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+        {clips.length === 0 && (
+          <p className="p-8 text-center text-sm text-muted-foreground">
+            No shadowing clips yet. Add your first one on the left.
+          </p>
+        )}
+        {clips.map((clip) => (
+          <div key={clip.id} className="border-b border-border p-4 last:border-0">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={cn(
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+                      clip.sourceType === "youtube"
+                        ? "bg-red-500/10 text-red-500"
+                        : "bg-primary/10 text-primary",
+                    )}
+                  >
+                    {clip.sourceType === "youtube" ? (
+                      <Youtube className="h-4 w-4" />
+                    ) : (
+                      <Upload className="h-4 w-4" />
+                    )}
+                  </span>
+                  <p className="truncate text-sm font-bold text-foreground">{clip.title}</p>
+                </div>
+                {clip.description && (
+                  <p className="mt-1 truncate text-xs text-muted-foreground">{clip.description}</p>
+                )}
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {clip.segments.length} phrases ·{" "}
+                  {clip.segments.length > 0
+                    ? `${Math.max(...clip.segments.map((s) => s.end))}s duration`
+                    : ""}
+                </p>
+              </div>
+              <div className="flex shrink-0 gap-1">
+                <Button variant="ghost" size="sm" onClick={() => editClip(clip)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => removeClip(clip.id)}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

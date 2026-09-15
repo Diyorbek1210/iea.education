@@ -6,14 +6,10 @@ import {
   Square,
   Loader2,
   Clock,
-  Volume2,
-  CheckCircle2,
-  XCircle,
   ArrowRight,
   RotateCcw,
   MessageSquare,
-  CreditCard,
-  MessagesSquare,
+  Repeat2,
   Bot,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -33,6 +29,7 @@ import {
   analyzeFluency,
   type SpeakingPart,
 } from "@/components/practice/SpeakingModes";
+import { ShadowingPractice } from "@/components/practice/ShadowingPractice";
 import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/practice")({
@@ -45,30 +42,12 @@ export const Route = createFileRoute("/practice")({
   component: PracticePage,
 });
 
-type PracticeMode = "freestyle" | "speaking-part" | "pronunciation";
+type PracticeMode = "freestyle" | "speaking-part" | "shadowing";
 
 interface ChatMessage {
   role: "user" | "model";
   text: string;
 }
-
-const PRONUNCIATION_SENTENCES = [
-  "The weather has been absolutely beautiful this week.",
-  "I would like to book a table for two at seven o'clock.",
-  "Could you please repeat that? I didn't quite catch it.",
-  "The university offers a wide range of postgraduate courses.",
-  "She has been working on her thesis for the past six months.",
-  "I believe that education is the key to a better future.",
-  "The concert was thoroughly enjoyed by everyone in the audience.",
-  "He managed to complete the marathon despite the heavy rain.",
-  "The government should invest more in public transportation.",
-  "Environmental protection is everyone's responsibility.",
-  "I am particularly interested in artificial intelligence and robotics.",
-  "The museum houses an impressive collection of modern art.",
-  "Globalization has had a significant impact on local cultures.",
-  "Technology continues to revolutionize the way we communicate.",
-  "Sustainable development is crucial for future generations.",
-];
 
 function getSpeechRecognitionCtor() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,25 +70,6 @@ function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${m}:${String(s).padStart(2, "0")}`;
-}
-
-function computeWordAccuracy(
-  original: string,
-  spoken: string,
-): { accuracy: number; matched: string[]; missed: string[] } {
-  const normalize = (s: string) =>
-    s
-      .toLowerCase()
-      .replace(/[^\w\s]/g, "")
-      .split(/\s+/)
-      .filter(Boolean);
-  const origWords = normalize(original);
-  const spokenWords = normalize(spoken);
-  const spokenSet = new Set(spokenWords);
-  const matched = origWords.filter((w) => spokenSet.has(w));
-  const missed = origWords.filter((w) => !spokenSet.has(w));
-  const accuracy = origWords.length > 0 ? Math.round((matched.length / origWords.length) * 100) : 0;
-  return { accuracy, matched, missed };
 }
 
 /* ====== SPEAKING PART PRACTICE ====== */
@@ -423,216 +383,6 @@ function SpeakingPartPractice({ onBack }: { onBack: () => void }) {
   );
 }
 
-/* ====== PRONUNCIATION PRACTICE ====== */
-
-function PronunciationPractice() {
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [recording, setRecording] = useState(false);
-  const [interimText, setInterimText] = useState("");
-  const [spokenText, setSpokenText] = useState("");
-  const [result, setResult] = useState<{
-    accuracy: number;
-    matched: string[];
-    missed: string[];
-  } | null>(null);
-  const [sttSupported, setSttSupported] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recognitionRef = useRef<any>(null);
-  const transcriptRef = useRef("");
-
-  const sentence = PRONUNCIATION_SENTENCES[currentIdx]!;
-
-  useEffect(() => {
-    setSttSupported(getSpeechRecognitionCtor() !== undefined);
-  }, []);
-
-  function startRecording() {
-    const Ctor = getSpeechRecognitionCtor();
-    if (!Ctor) {
-      toast.error("Speech recognition not supported in this browser.");
-      return;
-    }
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch {
-        /* ignore */
-      }
-      recognitionRef.current = null;
-    }
-    transcriptRef.current = "";
-    setInterimText("");
-    setSpokenText("");
-    setResult(null);
-
-    try {
-      const recognition = new Ctor();
-      recognitionRef.current = recognition;
-      recognition.lang = "en-US";
-      recognition.continuous = false;
-      recognition.interimResults = true;
-
-      recognition.onresult = (event: { results: SpeechRecognitionResultList }) => {
-        let interim = "";
-        for (let i = 0; i < event.results.length; i++) {
-          const r = event.results[i]!;
-          if (r.isFinal) {
-            transcriptRef.current += r[0]!.transcript + " ";
-          } else {
-            interim += r[0]!.transcript;
-          }
-        }
-        setInterimText(interim);
-      };
-
-      recognition.onerror = () => {};
-
-      recognition.onend = () => {
-        recognitionRef.current = null;
-        setRecording(false);
-        const final = transcriptRef.current.trim();
-        if (final) {
-          setInterimText("");
-          setSpokenText(final);
-          setResult(computeWordAccuracy(sentence, final));
-        }
-      };
-
-      recognition.start();
-      setRecording(true);
-    } catch {
-      setRecording(false);
-    }
-  }
-
-  function stopRecording() {
-    recognitionRef.current?.stop();
-    recognitionRef.current = null;
-    setRecording(false);
-  }
-
-  function nextSentence() {
-    setCurrentIdx((prev) => (prev + 1) % PRONUNCIATION_SENTENCES.length);
-    setSpokenText("");
-    setResult(null);
-    setInterimText("");
-  }
-
-  return (
-    <div className="flex flex-col items-center gap-6 py-4 max-w-lg mx-auto">
-      <div className="w-full flex items-center justify-between">
-        <Badge variant="secondary">Pronunciation Practice</Badge>
-        <span className="text-sm text-muted-foreground">
-          Sentence {currentIdx + 1} / {PRONUNCIATION_SENTENCES.length}
-        </span>
-      </div>
-
-      <div className="w-full rounded-2xl bg-card p-6 shadow-card text-center">
-        <p className="text-xs text-muted-foreground mb-2">Read this sentence aloud:</p>
-        <p className="text-lg font-bold text-foreground leading-relaxed">{sentence}</p>
-      </div>
-
-      <Button
-        variant="soft"
-        size="pill"
-        onClick={() => {
-          toast.info(sentence);
-        }}
-      >
-        <Volume2 className="mr-2 h-4 w-4" /> Listen
-      </Button>
-
-      <div className="flex flex-col items-center gap-3">
-        <Button
-          variant={recording ? "destructive" : "hero"}
-          size="lg"
-          className="h-16 w-16 rounded-full shadow-lg"
-          onClick={recording ? stopRecording : startRecording}
-          disabled={!sttSupported}
-        >
-          {recording ? <Square className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
-        </Button>
-        <p className="text-xs text-muted-foreground">
-          {recording
-            ? "Tap to stop"
-            : sttSupported
-              ? "Tap to start reading"
-              : "Not supported in this browser"}
-        </p>
-      </div>
-
-      {recording && interimText && (
-        <div className="w-full rounded-xl bg-secondary/50 p-3">
-          <p className="text-sm text-muted-foreground italic">{interimText}...</p>
-        </div>
-      )}
-
-      {result && (
-        <div className="w-full space-y-4">
-          <div
-            className={cn(
-              "rounded-2xl p-6 shadow-card text-center",
-              result.accuracy >= 80
-                ? "bg-green-500/10"
-                : result.accuracy >= 50
-                  ? "bg-amber-500/10"
-                  : "bg-red-500/10",
-            )}
-          >
-            <p className="text-4xl font-extrabold text-foreground">{result.accuracy}%</p>
-            <p className="text-sm text-muted-foreground mt-1">Accuracy</p>
-            {result.accuracy >= 80 ? (
-              <Badge className="mt-2 bg-green-500/10 text-green-500">
-                <CheckCircle2 className="mr-1 h-3 w-3" /> Great pronunciation!
-              </Badge>
-            ) : result.accuracy >= 50 ? (
-              <Badge className="mt-2 bg-amber-500/10 text-amber-500">Good, keep practicing!</Badge>
-            ) : (
-              <Badge className="mt-2 bg-red-500/10 text-red-500">
-                <XCircle className="mr-1 h-3 w-3" /> Try again
-              </Badge>
-            )}
-          </div>
-
-          <div className="rounded-2xl bg-card p-4 shadow-card">
-            <h4 className="text-xs font-bold text-muted-foreground mb-2">WHAT YOU SAID</h4>
-            <p className="text-sm text-foreground">{spokenText}</p>
-          </div>
-
-          {result.missed.length > 0 && (
-            <div className="rounded-2xl bg-card p-4 shadow-card">
-              <h4 className="text-xs font-bold text-muted-foreground mb-2">WORDS TO PRACTICE</h4>
-              <div className="flex flex-wrap gap-2">
-                {result.missed.map((w, i) => (
-                  <Badge key={i} variant="secondary" className="text-red-500">
-                    {w}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-2">
-            <Button onClick={nextSentence} variant="hero" size="pill" className="flex-1">
-              <ArrowRight className="mr-2 h-4 w-4" /> Next Sentence
-            </Button>
-            <Button
-              onClick={() => {
-                setSpokenText("");
-                setResult(null);
-              }}
-              variant="soft"
-              size="pill"
-            >
-              <RotateCcw className="mr-2 h-4 w-4" /> Retry
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ====== FREESTYLE AI CHAT ====== */
 
 function FreestylePractice() {
@@ -905,13 +655,13 @@ function PracticePage() {
               </p>
             </button>
             <button
-              onClick={() => setMode("pronunciation")}
+              onClick={() => setMode("shadowing")}
               className="rounded-2xl border-2 border-border p-6 text-left transition-all hover:border-primary/50 hover:shadow-card"
             >
-              <Volume2 className="h-6 w-6 text-primary" />
-              <h3 className="mt-3 font-bold text-foreground">Pronunciation</h3>
+              <Repeat2 className="h-6 w-6 text-primary" />
+              <h3 className="mt-3 font-bold text-foreground">Shadowing</h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                Read sentences and check your accuracy
+                Follow a native speaker and repeat — AI scores your pronunciation
               </p>
             </button>
             <button
@@ -926,8 +676,8 @@ function PracticePage() {
         </div>
       ) : mode === "speaking-part" ? (
         <SpeakingPartPractice onBack={() => setMode(null)} />
-      ) : mode === "pronunciation" ? (
-        <PronunciationPractice />
+      ) : mode === "shadowing" ? (
+        <ShadowingPractice />
       ) : (
         <FreestylePractice />
       )}

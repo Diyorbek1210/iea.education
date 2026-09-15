@@ -45,6 +45,7 @@ import type {
   PlacementQuestion,
   PracticeSession,
   ResourceDoc,
+  ShadowingClip,
   StudyPlanRecord,
   UserProfile,
   WritingSubmission,
@@ -76,6 +77,7 @@ const KEYS = {
   modelAnswers: "iea_model_answers",
   countryRequirements: "iea_country_requirements",
   universityRequirements: "iea_university_requirements",
+  shadowing: "iea_shadowing_clips",
 };
 
 function read<T>(key: string, fallback: T): T {
@@ -305,6 +307,19 @@ export async function uploadResourceFile(file: File): Promise<string> {
       fileName: file.name,
       contentType: file.type || "application/octet-stream",
       folder: "resources",
+    },
+  });
+  return objectUrl;
+}
+
+export async function uploadShadowingFile(file: File): Promise<string> {
+  const fileBase64 = await fileToBase64(file);
+  const { objectUrl } = await uploadToR2({
+    data: {
+      fileBase64,
+      fileName: file.name,
+      contentType: file.type || "application/octet-stream",
+      folder: "shadowing",
     },
   });
   return objectUrl;
@@ -562,6 +577,68 @@ export async function moveResource(id: string, direction: "up" | "down"): Promis
   const b = docs[swapIdx]!;
   await updateDoc(a.ref, { order: b.data.order });
   await updateDoc(b.ref, { order: a.data.order });
+}
+
+/* ------------------------------------------------------------------ *
+ * Shadowing clips (admin-managed)
+ * ------------------------------------------------------------------ */
+
+export async function listShadowingClips(): Promise<ShadowingClip[]> {
+  if (!isFirebaseConfigured || !db)
+    return read<ShadowingClip[]>(KEYS.shadowing, []).sort((a, b) => a.order - b.order);
+  const snap = await getDocs(query(collection(db, "shadowingClips"), orderBy("order", "asc")));
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ShadowingClip, "id">) }));
+}
+
+export async function addShadowingClip(
+  clip: Omit<ShadowingClip, "id" | "order" | "createdAt">,
+): Promise<void> {
+  const now = new Date().toISOString();
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<ShadowingClip[]>(KEYS.shadowing, []);
+    const maxOrder = existing.reduce((max, c) => Math.max(max, c.order), -1);
+    write(KEYS.shadowing, [
+      ...existing,
+      { ...clip, id: crypto.randomUUID(), order: maxOrder + 1, createdAt: now },
+    ]);
+    return;
+  }
+  const snap = await getDocs(collection(db, "shadowingClips"));
+  const maxOrder = snap.docs.reduce((max, d) => {
+    const data = d.data() as Omit<ShadowingClip, "id">;
+    return Math.max(max, data.order ?? 0);
+  }, -1);
+  await addDoc(collection(db, "shadowingClips"), {
+    ...clip,
+    order: maxOrder + 1,
+    createdAt: now,
+  });
+}
+
+export async function updateShadowingClip(
+  id: string,
+  data: Partial<Omit<ShadowingClip, "id" | "createdAt">>,
+): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<ShadowingClip[]>(KEYS.shadowing, []);
+    write(
+      KEYS.shadowing,
+      existing.map((c) => (c.id === id ? { ...c, ...data } : c)),
+    );
+    return;
+  }
+  await updateDoc(doc(db, "shadowingClips", id), data);
+}
+
+export async function deleteShadowingClip(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    write(
+      KEYS.shadowing,
+      read<ShadowingClip[]>(KEYS.shadowing, []).filter((c) => c.id !== id),
+    );
+    return;
+  }
+  await deleteDoc(doc(db, "shadowingClips", id));
 }
 
 /* ------------------------------------------------------------------ *

@@ -139,6 +139,24 @@ export interface StudyPlanRecord {
   weekSchedule: unknown;
 }
 
+export interface ShadowingSegment {
+  start: number;
+  end: number;
+  text: string;
+}
+
+export interface ShadowingClip {
+  id: string;
+  title: string;
+  description: string;
+  sourceType: "youtube" | "file";
+  url: string;
+  thumbnail: string;
+  segments: ShadowingSegment[];
+  order: number;
+  createdAt: string;
+}
+
 export type SkillType = "listening" | "reading" | "writing" | "speaking";
 
 export interface SkillStats {
