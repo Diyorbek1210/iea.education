@@ -26,7 +26,7 @@ import { cn } from "@/shared/lib/utils";
 import { useSpeechSynthesis } from "@/components/mocktest/useSpeechSynthesis";
 import type { ShadowingClip, ShadowingSegment } from "@/shared/types/types";
 import { listShadowingClips } from "@/lib/db";
-import { analyzeShadowing, type ShadowingAnalysis } from "@/lib/shadowing";
+import { analyzeShadowing, extractYouTubeVideoId, type ShadowingAnalysis } from "@/lib/shadowing";
 
 const YT_STATES = { ENDED: 0, PLAYING: 1, PAUSED: 2 };
 
@@ -250,7 +250,7 @@ export function ShadowingPractice() {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const win = window as any;
           const options = {
-            videoId: selected.url.split("/").pop()?.split("?")[0] ?? selected.url,
+            videoId: extractYouTubeVideoId(selected.url) ?? selected.url,
             width: "100%",
             height: "100%",
             playerVars: { playsinline: 1, rel: 0 },
