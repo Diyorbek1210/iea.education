@@ -84,9 +84,21 @@ import {
   updateShadowingClip,
   deleteShadowingClip,
   uploadShadowingFile,
+  listCommunityThreads,
+  addCommunityReply,
+  deleteCommunityThread as deleteCommunityThreadFromDb,
+  deleteCommunityReply as deleteCommunityReplyFromDb,
   type SeedProgress,
 } from "@/lib/db";
-import type { Level, ResourceDoc, ShadowingClip, ShadowingSegment } from "@/shared/types/types";
+import type {
+  CommunityReply,
+  CommunityThread,
+  Level,
+  ResourceDoc,
+  ShadowingClip,
+  ShadowingSegment,
+  ThreadCategory,
+} from "@/shared/types/types";
 import { extractYouTubeTranscript, extractYouTubeVideoId } from "@/lib/shadowing";
 import type {
   VocabWordDoc,
@@ -758,64 +770,11 @@ function AdminPage() {
   }
 
   // Community state
-  interface CommunityThread {
-    id: string;
-    title: string;
-    author: string;
-    authorEmail: string | undefined;
-    category: "tips" | "question" | "experience" | "resource";
-    content: string;
-    replies: CommunityReply[];
-    likes: number;
-    createdAt: string;
-  }
-  interface CommunityReply {
-    id: string;
-    author: string;
-    authorEmail: string | undefined;
-    content: string;
-    createdAt: string;
-    likes: number;
-  }
-  const SEED_COMMUNITY: CommunityThread[] = [
-    {
-      id: "t1",
-      title: "How I improved from Band 6 to 7.5 in Writing",
-      author: "Admin",
-      authorEmail: ADMIN_EMAIL,
-      category: "experience",
-      content:
-        "I focused on Task Response and Coherence. Here are my top 3 tips:\n\n1. Always spend 5 minutes planning before writing\n2. Use discourse markers to connect paragraphs\n3. Write a clear thesis statement in your introduction",
-      replies: [
-        {
-          id: "r1",
-          author: "Ahmed K.",
-          authorEmail: undefined,
-          content: "Great tips! The planning phase is so underrated.",
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          likes: 5,
-        },
-      ],
-      likes: 24,
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-    },
-    {
-      id: "t2",
-      title: "Best resources for Listening Section 4?",
-      author: "Raj P.",
-      authorEmail: undefined,
-      category: "question",
-      content:
-        "I keep losing marks in Section 4 because the academic vocabulary is so dense. Does anyone have tips?",
-      replies: [],
-      likes: 12,
-      createdAt: new Date(Date.now() - 259200000).toISOString(),
-    },
-  ];
-  const [communityThreads, setCommunityThreads] = useState<CommunityThread[]>(SEED_COMMUNITY);
-  const [communityTab, setCommunityTab] = useState<"all" | "tips" | "question" | "experience">(
-    "all",
-  );
+  const { data: communityThreads = [], isLoading: communityLoading } = useQuery({
+    queryKey: ["admin-community-threads"],
+    queryFn: listCommunityThreads,
+  });
+  const [communityTab, setCommunityTab] = useState<"all" | ThreadCategory>("all");
   const [communityReplyText, setCommunityReplyText] = useState("");
   const [selectedCommunityThread, setSelectedCommunityThread] = useState<CommunityThread | null>(
     null,
@@ -826,43 +785,43 @@ function AdminPage() {
       ? communityThreads
       : communityThreads.filter((t) => t.category === communityTab);
 
-  function deleteCommunityThread(id: string) {
-    setCommunityThreads((prev) => prev.filter((t) => t.id !== id));
-    if (selectedCommunityThread?.id === id) setSelectedCommunityThread(null);
-    toast.success("Thread deleted");
+  async function deleteCommunityThread(id: string) {
+    if (!confirm("Delete this thread permanently?")) return;
+    try {
+      await deleteCommunityThreadFromDb(id);
+      if (selectedCommunityThread?.id === id) setSelectedCommunityThread(null);
+      queryClient.invalidateQueries({ queryKey: ["admin-community-threads"] });
+      toast.success("Thread deleted");
+    } catch {
+      toast.error("Failed to delete thread.");
+    }
   }
 
-  function deleteCommunityReply(threadId: string, replyId: string) {
-    setCommunityThreads((prev) =>
-      prev.map((t) =>
-        t.id === threadId ? { ...t, replies: t.replies.filter((r) => r.id !== replyId) } : t,
-      ),
-    );
-    setSelectedCommunityThread((prev) =>
-      prev ? { ...prev, replies: prev.replies.filter((r) => r.id !== replyId) } : prev,
-    );
-    toast.success("Reply deleted");
+  async function deleteCommunityReply(threadId: string, replyId: string) {
+    if (!confirm("Delete this reply permanently?")) return;
+    try {
+      await deleteCommunityReplyFromDb(threadId, replyId);
+      queryClient.invalidateQueries({ queryKey: ["admin-community-threads"] });
+      toast.success("Reply deleted");
+    } catch {
+      toast.error("Failed to delete reply.");
+    }
   }
 
-  function handleCommunityReply() {
+  async function handleCommunityReply() {
     if (!selectedCommunityThread || !communityReplyText.trim()) return;
-    const reply: CommunityReply = {
-      id: crypto.randomUUID(),
-      author: "Admin",
-      authorEmail: ADMIN_EMAIL,
-      content: communityReplyText,
-      createdAt: new Date().toISOString(),
-      likes: 0,
-    };
-    setCommunityThreads((prev) =>
-      prev.map((t) =>
-        t.id === selectedCommunityThread.id ? { ...t, replies: [...t.replies, reply] } : t,
-      ),
-    );
-    setSelectedCommunityThread((prev) =>
-      prev ? { ...prev, replies: [...prev.replies, reply] } : prev,
-    );
-    setCommunityReplyText("");
+    try {
+      await addCommunityReply(selectedCommunityThread.id, {
+        author: "Admin",
+        authorEmail: ADMIN_EMAIL,
+        content: communityReplyText.trim(),
+      });
+      setCommunityReplyText("");
+      queryClient.invalidateQueries({ queryKey: ["admin-community-threads"] });
+      toast.success("Reply posted");
+    } catch {
+      toast.error("Failed to post reply.");
+    }
   }
 
   useEffect(() => {
@@ -2657,7 +2616,7 @@ function AdminPage() {
               ) : (
                 <>
                   <div className="flex flex-wrap gap-2">
-                    {(["all", "tips", "question", "experience"] as const).map((tab) => (
+                    {(["all", "tips", "question", "experience", "resource"] as const).map((tab) => (
                       <Button
                         key={tab}
                         variant={communityTab === tab ? "hero" : "soft"}
@@ -2670,7 +2629,12 @@ function AdminPage() {
                   </div>
 
                   <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                    {filteredCommunityThreads.length === 0 && (
+                    {communityLoading && (
+                      <p className="flex items-center justify-center gap-2 p-8 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Loading threads...
+                      </p>
+                    )}
+                    {!communityLoading && filteredCommunityThreads.length === 0 && (
                       <p className="p-8 text-center text-sm text-muted-foreground">
                         No threads yet.
                       </p>
@@ -3049,16 +3013,16 @@ function ShadowingAdminSection({
               </div>
             )}
 
-            <div className="rounded-2xl border border-border p-4">
+            <div className="rounded-2xl border border-border p-3.5">
               <Label>Subtitles / transcript</Label>
-              <p className="mt-1 text-xs text-muted-foreground">
-                The subtitles define the phrases students repeat one by one.
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
+                Defines the phrases students repeat one by one.
               </p>
-              <div className="mt-2 flex gap-2">
+              <div className="mt-2 flex gap-1.5">
                 <Button
                   type="button"
                   variant={subtitlesMode === "srt" ? "hero" : "soft"}
-                  size="pill"
+                  size="sm"
                   className="flex-1"
                   onClick={() => setSubtitlesMode("srt")}
                 >
@@ -3067,7 +3031,7 @@ function ShadowingAdminSection({
                 <Button
                   type="button"
                   variant={subtitlesMode === "plain" ? "hero" : "soft"}
-                  size="pill"
+                  size="sm"
                   className="flex-1"
                   onClick={() => setSubtitlesMode("plain")}
                 >
@@ -3076,7 +3040,7 @@ function ShadowingAdminSection({
               </div>
               <Textarea
                 className="mt-2 font-mono text-xs"
-                rows={5}
+                rows={3}
                 placeholder={
                   subtitlesMode === "srt"
                     ? "1\n00:00:00,500 --> 00:00:04,000\nHello everyone, welcome..."
@@ -3088,7 +3052,7 @@ function ShadowingAdminSection({
               <Button
                 type="button"
                 variant="soft"
-                size="pill"
+                size="sm"
                 className="mt-2 w-full"
                 onClick={parseSubtitles}
                 disabled={parsing}
