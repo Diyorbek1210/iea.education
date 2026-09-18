@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { geminiFetch } from "@/lib/geminiHttp";
+
 const GEMINI_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
 
@@ -55,7 +57,7 @@ export const chatWithAi = createServerFn({ method: "POST" })
     const timeout = setTimeout(() => controller.abort(), 30_000);
 
     try {
-      const response = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+      const response = await geminiFetch(`${GEMINI_URL}?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

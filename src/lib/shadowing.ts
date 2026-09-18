@@ -11,6 +11,8 @@ import {
 } from "youtube-transcript";
 import type { TranscriptResponse } from "youtube-transcript";
 
+import { geminiFetch } from "@/lib/geminiHttp";
+
 import type { ShadowingSegment } from "@/shared/types/types";
 
 const GEMINI_URL =
@@ -329,28 +331,32 @@ ${spoken}
 
 Provide shadowing feedback. Respond with ONLY a JSON object, no markdown, in exactly this shape:
 {
-  "overallScore": <0 to 100),
+  "overallScore": <0 to 100>,
   "accuracy": <0 to 100>,
   "fluency": <0 to 100>,
   "band": <0 to 9 in steps of 0.5, estimated IELTS Speaking band>,
   "errors": [
     {"expected": "<word or short phrase from the original>", "spoken": "<what the learner said instead (or empty)", "correction": "<true pronunciation/spelling>", "note": "<one short sentence explaining the mistake and how to fix it>"}
   ],
-  "strengths": ["<one or two things the learner did well >"],
+  "strengths": ["<one or two things the learner did well>"],
   "tips": ["<one specific, actionable shadowing tip>", "<another>", "<optionally a third>"]
 }
 Be honest and strict: ignore tiny stopword misses ("a", "the") unless they repeat a lot; focus on words that actually change meaning or pronunciation. List at most 8 errors. Do not inflate scores.`;
     }
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30_000);
+    const timeout = setTimeout(() => controller.abort(), 60_000);
     try {
-      const response = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+      const response = await geminiFetch(`${GEMINI_URL}?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.3, responseMimeType: "application/json" },
+          generationConfig: {
+            temperature: 0.3,
+            responseMimeType: "application/json",
+            thinkingConfig: { thinkingBudget: 0 },
+          },
         }),
         signal: controller.signal,
       });
@@ -359,9 +365,17 @@ Be honest and strict: ignore tiny stopword misses ("a", "the") unless they repea
         throw new Error(`Gemini request failed (${response.status}): ${errBody.slice(0, 300)}`);
       }
       const json = (await response.json()) as {
-        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+        candidates?: Array<{
+          content?: { parts?: Array<{ text?: string; thought?: boolean }> };
+        }>;
       };
-      const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
+      const parts = json.candidates?.[0]?.content?.parts;
+      if (!parts || parts.length === 0) {
+        throw new Error("AI returned no analysis text.");
+      }
+      const text =
+        parts.find((p) => typeof p.text === "string" && p.thought !== true)?.text ??
+        parts[parts.length - 1]?.text;
       if (typeof text !== "string" || !text.trim()) {
         throw new Error("AI returned no analysis text.");
       }

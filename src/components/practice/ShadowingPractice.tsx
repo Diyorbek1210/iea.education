@@ -8,6 +8,7 @@ import {
   ListMusic,
   Loader2,
   Mic,
+  MicOff,
   Pause,
   Play,
   RotateCcw,
@@ -114,6 +115,46 @@ interface PhraseRecord {
   accuracy: WordAccuracy;
 }
 
+/* ====== KARAOKE TEXT ====== */
+
+function HighlightedText({
+  text,
+  startTime,
+  endTime,
+  currentTime,
+  isPlaying,
+}: {
+  text: string;
+  startTime: number;
+  endTime: number;
+  currentTime: number;
+  isPlaying: boolean;
+}) {
+  const words = text.split(/\s+/);
+  const duration = endTime - startTime;
+  const active = isPlaying && duration > 0 && currentTime >= startTime && currentTime <= endTime;
+  const progress = active ? Math.max(0, Math.min(1, (currentTime - startTime) / duration)) : 0;
+  const activeIdx = Math.floor(progress * words.length);
+
+  return (
+    <span className="leading-loose">
+      {words.map((word, i) => (
+        <span
+          key={`${i}-${word}`}
+          className={cn(
+            "inline-block transition-all duration-150",
+            active && i < activeIdx && "text-primary font-semibold",
+            active && i === activeIdx && "text-primary font-bold text-xl scale-110 drop-shadow-sm",
+            (!active || i > activeIdx) && "text-foreground/80",
+          )}
+        >
+          {word}{" "}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 /* ====== CLIP SELECTOR ====== */
 
 function ClipSelector({
@@ -145,11 +186,11 @@ function ClipSelector({
         <button
           key={clip.id}
           onClick={() => onSelect(clip)}
-          className="flex w-full items-center gap-4 rounded-2xl border-2 border-border bg-card p-4 text-left transition-all hover:border-primary/50 hover:shadow-card"
+          className="group flex w-full items-center gap-4 rounded-2xl border-2 border-border bg-card p-4 text-left transition-all duration-200 hover:border-primary/40 hover:shadow-card hover:scale-[1.01] active:scale-[0.99]"
         >
           <span
             className={cn(
-              "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl",
+              "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110",
               clip.sourceType === "youtube"
                 ? "bg-red-500/10 text-red-500"
                 : "bg-primary/10 text-primary",
@@ -173,7 +214,7 @@ function ClipSelector({
               words
             </span>
           </span>
-          <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-1" />
         </button>
       ))}
     </div>
@@ -206,6 +247,7 @@ export function ShadowingPractice() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ytContainerId = "shadowing-yt-player";
   const highlightPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const phraseListRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setSttSupported(getSpeechRecognitionCtor() !== undefined);
@@ -227,6 +269,15 @@ export function ShadowingPractice() {
       setCurrentTime(ytPlayerRef.current.getCurrentTime());
     }
   }, [selected]);
+
+  /* Auto-scroll to current phrase */
+  useEffect(() => {
+    if (!phraseListRef.current) return;
+    const el = phraseListRef.current.querySelector(`[data-phrase-index="${currentIndex}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [currentIndex]);
 
   useEffect(() => {
     if (!selected) return;
@@ -286,7 +337,6 @@ export function ShadowingPractice() {
       };
     }
 
-    // File source: watch the native video element for playback time
     const timer = setInterval(syncFromMediaTime, 300);
     highlightPollRef.current = timer;
     return () => {
@@ -421,14 +471,12 @@ export function ShadowingPractice() {
           }, 200);
         })
         .catch(() => {
-          // Video not playable yet — fall back to TTS so shadowing still works.
           void speak(seg.text);
           toast.info("Playing this phrase with the built-in voice.");
         });
       return;
     }
 
-    // No precise timing available — read the phrase aloud with TTS.
     void speak(seg.text);
   }
 
@@ -489,9 +537,14 @@ export function ShadowingPractice() {
   }
 
   const doneCount = segments.filter((_, i) => hasPrerecognized(i)).length;
+  const isPhraseActive =
+    segment &&
+    hasUsableTiming(segment) &&
+    currentTime >= segment.start &&
+    currentTime <= segment.end;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5 py-2">
+    <div className="mx-auto max-w-6xl space-y-4 px-2 py-2 sm:px-4">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button
@@ -507,166 +560,198 @@ export function ShadowingPractice() {
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> All clips
         </Button>
-        <Badge
-          variant="secondary"
-          className={cn(selected.sourceType === "youtube" ? "text-red-500" : "text-primary")}
-        >
-          {selected.sourceType === "youtube" ? (
-            <>
-              <Youtube className="mr-1 h-3 w-3" /> YouTube
-            </>
-          ) : (
-            <>
-              <FileAudio className="mr-1 h-3 w-3" /> Video / Audio file
-            </>
-          )}
-        </Badge>
-      </div>
-
-      {/* Player */}
-      <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-        {selected.sourceType === "youtube" ? (
-          <div className="aspect-video w-full bg-black">
-            <div id={ytContainerId} className="h-full w-full" />
-          </div>
-        ) : (
-          <video
-            ref={videoRef}
-            src={selected.url}
-            controls
-            preload="metadata"
-            onTimeUpdate={syncFromMediaTime}
-            onEnded={handleEndedVideo}
-            onPause={() => setPlaying(false)}
-            onPlay={() => setPlaying(true)}
-            className="aspect-video w-full bg-black"
-          />
-        )}
-        <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-3">
-          <p className="min-w-0 flex-1 truncate text-sm font-bold text-foreground">
-            {selected.title}
-          </p>
-          <Button
-            variant="soft"
-            size="pill"
-            onClick={() =>
-              playing
-                ? ytPlayerRef.current
-                  ? ytPlayerRef.current.pauseVideo()
-                  : videoRef.current?.pause()
-                : ytPlayerRef.current
-                  ? ytPlayerRef.current.playVideo()
-                  : videoRef.current?.play()
-            }
+        <div className="flex items-center gap-2">
+          <Badge
+            variant="secondary"
+            className={cn(selected.sourceType === "youtube" ? "text-red-500" : "text-primary")}
           >
-            {playing ? <Pause className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />}
-            {playing ? "Pause" : "Play"}
-          </Button>
-          <span className="text-xs tabular-nums text-muted-foreground">
-            {formatTime(currentTime)}
-          </span>
+            {selected.sourceType === "youtube" ? (
+              <>
+                <Youtube className="mr-1 h-3 w-3" /> YouTube
+              </>
+            ) : (
+              <>
+                <FileAudio className="mr-1 h-3 w-3" /> File
+              </>
+            )}
+          </Badge>
         </div>
       </div>
 
-      {/* Phrases */}
-      <div className="rounded-3xl bg-card p-4 shadow-card">
-        <div className="flex items-center justify-between px-1 pb-3">
-          <h3 className="text-sm font-bold text-foreground">
-            Phrases{" "}
-            <span className="font-normal text-muted-foreground">
-              ({doneCount}/{segments.length} recorded)
-            </span>
-          </h3>
-          {doneCount > 0 && (
-            <Progress value={(doneCount / Math.max(1, segments.length)) * 100} className="w-32" />
+      {/* Two-column layout: Video + Subtitles side-by-side on desktop */}
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+        {/* Left: Video Player */}
+        <div className="overflow-hidden rounded-2xl bg-card shadow-card">
+          {selected.sourceType === "youtube" ? (
+            <div className="aspect-video w-full bg-black">
+              <div id={ytContainerId} className="h-full w-full" />
+            </div>
+          ) : (
+            <video
+              ref={videoRef}
+              src={selected.url}
+              controls
+              preload="metadata"
+              onTimeUpdate={syncFromMediaTime}
+              onEnded={handleEndedVideo}
+              onPause={() => setPlaying(false)}
+              onPlay={() => setPlaying(true)}
+              className="aspect-video w-full bg-black"
+            />
           )}
+          <div className="flex items-center gap-2 border-t border-border px-3 py-2.5 sm:px-4">
+            <p className="min-w-0 flex-1 truncate text-sm font-bold text-foreground">
+              {selected.title}
+            </p>
+            <Button
+              variant="soft"
+              size="pill"
+              onClick={() =>
+                playing
+                  ? ytPlayerRef.current
+                    ? ytPlayerRef.current.pauseVideo()
+                    : videoRef.current?.pause()
+                  : ytPlayerRef.current
+                    ? ytPlayerRef.current.playVideo()
+                    : videoRef.current?.play()
+              }
+            >
+              {playing ? <Pause className="mr-1.5 h-4 w-4" /> : <Play className="mr-1.5 h-4 w-4" />}
+              {playing ? "Pause" : "Play"}
+            </Button>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              {formatTime(currentTime)}
+            </span>
+          </div>
         </div>
-        <div className="max-h-72 space-y-1.5 overflow-y-auto pr-1">
-          {segments.map((seg, i) => {
-            const rec = records[i];
-            const isCurrent = i === currentIndex;
-            const active =
-              seg.end > seg.start && currentTime >= seg.start && currentTime <= seg.end + 0.3;
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "group flex items-center gap-2 rounded-xl border px-3 py-2 transition-colors",
-                  isCurrent ? "border-primary bg-primary/5" : "border-border",
-                  active && "bg-primary/10",
-                )}
-              >
-                <span
+
+        {/* Right: Subtitles / Phrases list */}
+        <div className="overflow-hidden rounded-2xl bg-card shadow-card">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <h3 className="text-sm font-bold text-foreground">
+              Subtitles
+              <span className="ml-1.5 font-normal text-muted-foreground">
+                {doneCount}/{segments.length}
+              </span>
+            </h3>
+            {doneCount > 0 && (
+              <Progress value={(doneCount / Math.max(1, segments.length)) * 100} className="w-24" />
+            )}
+          </div>
+          <div
+            ref={phraseListRef}
+            className="max-h-[50vh] overflow-y-auto scroll-smooth p-2 lg:max-h-[calc(100vh-320px)]"
+          >
+            {segments.map((seg, i) => {
+              const rec = records[i];
+              const isCurrent = i === currentIndex;
+              const active =
+                seg.end > seg.start && currentTime >= seg.start && currentTime <= seg.end + 0.3;
+              return (
+                <button
+                  key={i}
+                  data-phrase-index={i}
+                  onClick={() => setCurrentIndex(i)}
                   className={cn(
-                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
-                    rec
-                      ? rec.accuracy.accuracy >= 80
-                        ? "bg-success/15 text-success"
-                        : rec.accuracy.accuracy >= 50
-                          ? "bg-warning/15 text-warning"
-                          : "bg-destructive/15 text-destructive"
-                      : "bg-secondary text-secondary-foreground",
+                    "group flex w-full items-start gap-2.5 rounded-xl px-3 py-2.5 text-left transition-all duration-200",
+                    isCurrent
+                      ? "border-l-4 border-primary bg-primary/10 shadow-sm"
+                      : active
+                        ? "bg-primary/5"
+                        : "hover:bg-muted/50",
                   )}
                 >
-                  {i + 1}
-                </span>
-                <button
-                  onClick={() => setCurrentIndex(i)}
-                  className="min-w-0 flex-1 text-left"
-                  title="Select phrase"
-                >
-                  <p
+                  <span
                     className={cn(
-                      "truncate text-sm",
-                      isCurrent ? "font-bold text-foreground" : "text-muted-foreground",
+                      "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-colors",
+                      rec
+                        ? rec.accuracy.accuracy >= 80
+                          ? "bg-success/20 text-success"
+                          : rec.accuracy.accuracy >= 50
+                            ? "bg-warning/20 text-warning"
+                            : "bg-destructive/20 text-destructive"
+                        : isCurrent
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground",
                     )}
                   >
-                    {seg.text}
-                  </p>
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={cn(
+                        "text-sm leading-relaxed transition-all",
+                        isCurrent
+                          ? "font-bold text-foreground"
+                          : "text-muted-foreground group-hover:text-foreground",
+                      )}
+                    >
+                      {seg.text}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1 pt-0.5">
+                    {rec ? (
+                      <CheckCircle2 className="h-4 w-4 text-success" />
+                    ) : seg.end > seg.start ? (
+                      <span className="text-[10px] text-muted-foreground">
+                        {formatTime(seg.start)}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground">TTS</span>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playPhrase(i);
+                      }}
+                      title="Play this phrase"
+                      className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    >
+                      <Volume2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </button>
-                <div className="flex shrink-0 items-center gap-1">
-                  <button
-                    onClick={() => playPhrase(i)}
-                    title="Play this phrase"
-                    className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                  >
-                    <Volume2 className="h-4 w-4" />
-                  </button>
-                  {rec ? (
-                    <CheckCircle2 className="h-4 w-4 text-success" />
-                  ) : seg.end > seg.start ? (
-                    <span className="text-[11px] text-muted-foreground">
-                      {formatTime(seg.start)}
-                    </span>
-                  ) : (
-                    <span className="text-[11px] text-muted-foreground">—</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Current phrase practice */}
+      {/* Current phrase practice — full width */}
       {segment && (
-        <div className="rounded-3xl bg-card p-5 shadow-card">
+        <div className="rounded-2xl bg-card p-4 shadow-card sm:p-6">
           <div className="flex items-center justify-between">
             <Badge variant="secondary">
               Phrase {currentIndex + 1} / {segments.length}
             </Badge>
-            <span className="text-xs text-muted-foreground">
-              {segment.end > segment.start
-                ? `${formatTime(segment.start)} – ${formatTime(segment.end)}`
-                : "no precise timing — listen with the built-in voice"}
-            </span>
+            <div className="flex items-center gap-2">
+              {recording && (
+                <span className="flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-bold text-destructive">
+                  <span className="h-2 w-2 rounded-full bg-destructive animate-pulse-dot" />
+                  Recording
+                </span>
+              )}
+              <span className="text-xs text-muted-foreground">
+                {segment.end > segment.start
+                  ? `${formatTime(segment.start)} – ${formatTime(segment.end)}`
+                  : "TTS playback"}
+              </span>
+            </div>
           </div>
 
-          <p className="mt-3 text-center text-lg font-bold text-foreground leading-relaxed">
-            {segment.text}
-          </p>
+          {/* Karaoke highlighted phrase */}
+          <div className="my-5 text-center text-lg font-bold sm:text-xl md:text-2xl">
+            <HighlightedText
+              text={segment.text}
+              startTime={segment.start}
+              endTime={segment.end}
+              currentTime={currentTime}
+              isPlaying={!!isPhraseActive}
+            />
+          </div>
 
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
+          {/* Action buttons */}
+          <div className="flex flex-wrap justify-center gap-2">
             <Button variant="soft" size="pill" onClick={() => playPhrase(currentIndex)}>
               <Play className="mr-2 h-4 w-4" /> Listen
             </Button>
@@ -675,10 +760,11 @@ export function ShadowingPractice() {
               size="pill"
               onClick={recording ? stopRecognition : beginRecording}
               disabled={!sttSupported && !recording}
+              className={cn(recording && "animate-pulse")}
             >
               {recording ? (
                 <>
-                  <Square className="mr-2 h-4 w-4" /> Stop recording
+                  <Square className="mr-2 h-4 w-4" /> Stop
                 </>
               ) : (
                 <>
@@ -703,16 +789,21 @@ export function ShadowingPractice() {
             </Button>
           </div>
 
+          {/* Interim transcript */}
           {recording && interimText && (
-            <div className="mt-4 rounded-xl bg-secondary/50 p-3">
-              <p className="text-sm text-muted-foreground italic">{interimText}...</p>
+            <div className="mt-4 rounded-xl border border-dashed border-primary/30 bg-primary/5 p-3">
+              <p className="text-center text-sm text-muted-foreground italic">
+                {interimText}
+                <span className="animate-pulse">|</span>
+              </p>
             </div>
           )}
 
+          {/* Result */}
           {record && (
             <div
               className={cn(
-                "mt-4 rounded-xl p-3 text-center",
+                "mt-4 rounded-xl p-4 text-center transition-colors",
                 record.accuracy.accuracy >= 80
                   ? "bg-success/10"
                   : record.accuracy.accuracy >= 50
@@ -720,10 +811,21 @@ export function ShadowingPractice() {
                     : "bg-destructive/10",
               )}
             >
-              <p className="text-2xl font-extrabold text-foreground">{record.accuracy.accuracy}%</p>
+              <p
+                className={cn(
+                  "text-3xl font-extrabold",
+                  record.accuracy.accuracy >= 80
+                    ? "text-success"
+                    : record.accuracy.accuracy >= 50
+                      ? "text-warning"
+                      : "text-destructive",
+                )}
+              >
+                {record.accuracy.accuracy}%
+              </p>
               <p className="text-xs text-muted-foreground">phrase accuracy</p>
               {record.transcript && (
-                <p className="mt-1 text-sm italic text-muted-foreground">"{record.transcript}"</p>
+                <p className="mt-2 text-sm italic text-muted-foreground">"{record.transcript}"</p>
               )}
               {record.accuracy.missed.length > 0 && (
                 <div className="mt-2 flex flex-wrap justify-center gap-1.5">
@@ -737,6 +839,7 @@ export function ShadowingPractice() {
             </div>
           )}
 
+          {/* Navigation */}
           <div className="mt-4 flex justify-between gap-2">
             <Button
               variant="ghost"
@@ -759,12 +862,12 @@ export function ShadowingPractice() {
       )}
 
       {/* AI analysis */}
-      <div className="rounded-3xl bg-card p-5 shadow-card">
+      <div className="rounded-2xl bg-card p-4 shadow-card sm:p-6">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-bold text-foreground">AI Shadowing Analysis</h3>
             <p className="text-xs text-muted-foreground">
-              Get a score, pronunciation errors and tips on your shadowing.
+              Get pronunciation errors, scores and tips.
             </p>
           </div>
           <Button
@@ -779,7 +882,7 @@ export function ShadowingPractice() {
               </>
             ) : (
               <>
-                <Sparkles className="mr-2 h-4 w-4" /> Analyze with AI
+                <Sparkles className="mr-2 h-4 w-4" /> Analyze
               </>
             )}
           </Button>
@@ -791,7 +894,7 @@ export function ShadowingPractice() {
               <ScoreBox label="Overall" value={analysis.overallScore} suffix="%" />
               <ScoreBox label="Accuracy" value={analysis.accuracy} suffix="%" />
               <ScoreBox label="Fluency" value={analysis.fluency} suffix="%" />
-              <ScoreBox label="Estimated band" value={analysis.band} suffix="" />
+              <ScoreBox label="Band" value={analysis.band} suffix="" />
             </div>
 
             {analysis.errors.length > 0 && (
@@ -844,7 +947,7 @@ export function ShadowingPractice() {
                 <ul className="mt-2 space-y-1.5">
                   {analysis.tips.map((t, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-foreground">
-                      <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                       {t}
                     </li>
                   ))}
@@ -869,8 +972,8 @@ export function ShadowingPractice() {
       </div>
 
       {!sttSupported && (
-        <p className="text-center text-xs text-muted-foreground">
-          Speech recognition isn't supported in this browser, so you cannot record your voice here.
+        <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+          <MicOff className="h-3 w-3" /> Speech recognition is not supported in this browser.
         </p>
       )}
     </div>
