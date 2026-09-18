@@ -137,20 +137,25 @@ function HighlightedText({
   const activeIdx = Math.floor(progress * words.length);
 
   return (
-    <span className="leading-loose">
-      {words.map((word, i) => (
-        <span
-          key={`${i}-${word}`}
-          className={cn(
-            "inline-block transition-all duration-150",
-            active && i < activeIdx && "text-primary font-semibold",
-            active && i === activeIdx && "text-primary font-bold text-xl scale-110 drop-shadow-sm",
-            (!active || i > activeIdx) && "text-foreground/80",
-          )}
-        >
-          {word}{" "}
-        </span>
-      ))}
+    <span className="inline-flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+      {words.map((word, i) => {
+        const completed = active && i < activeIdx;
+        const current = active && i === activeIdx;
+        return (
+          <span
+            key={`${i}-${word}`}
+            className={cn(
+              "inline-block whitespace-nowrap rounded-md px-1 py-0.5 transition-all duration-150",
+              completed && "bg-primary/15 text-primary font-semibold",
+              current && "bg-primary text-primary-foreground font-semibold shadow-sm",
+              !active && "text-foreground/75",
+              active && i > activeIdx && "text-muted-foreground/70",
+            )}
+          >
+            {word}
+          </span>
+        );
+      })}
     </span>
   );
 }
@@ -544,9 +549,9 @@ export function ShadowingPractice() {
     currentTime <= segment.end;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 px-2 py-2 sm:px-4">
+    <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-col gap-2 px-1 py-1 lg:h-[calc(100dvh-148px)] sm:px-2">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <Button
           variant="ghost"
           size="sm"
@@ -579,33 +584,36 @@ export function ShadowingPractice() {
       </div>
 
       {/* Two-column layout: Video + Subtitles side-by-side on desktop */}
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+      <div className="grid min-h-0 flex-1 gap-2 lg:min-h-[340px] lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         {/* Left: Video Player */}
-        <div className="overflow-hidden rounded-2xl bg-card shadow-card">
+        <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl bg-card shadow-card">
           {selected.sourceType === "youtube" ? (
-            <div className="aspect-video w-full bg-black">
+            <div className="min-h-0 flex-1 bg-black">
               <div id={ytContainerId} className="h-full w-full" />
             </div>
           ) : (
-            <video
-              ref={videoRef}
-              src={selected.url}
-              controls
-              preload="metadata"
-              onTimeUpdate={syncFromMediaTime}
-              onEnded={handleEndedVideo}
-              onPause={() => setPlaying(false)}
-              onPlay={() => setPlaying(true)}
-              className="aspect-video w-full bg-black"
-            />
+            <div className="min-h-0 flex-1 bg-black">
+              <video
+                ref={videoRef}
+                src={selected.url}
+                controls
+                preload="metadata"
+                onTimeUpdate={syncFromMediaTime}
+                onEnded={handleEndedVideo}
+                onPause={() => setPlaying(false)}
+                onPlay={() => setPlaying(true)}
+                className="h-full w-full bg-black object-contain"
+              />
+            </div>
           )}
-          <div className="flex items-center gap-2 border-t border-border px-3 py-2.5 sm:px-4">
+          <div className="flex items-center gap-2 border-t border-border px-3 py-1.5 sm:px-4">
             <p className="min-w-0 flex-1 truncate text-sm font-bold text-foreground">
               {selected.title}
             </p>
             <Button
               variant="soft"
-              size="pill"
+              size="sm"
+              className="rounded-full px-3.5"
               onClick={() =>
                 playing
                   ? ytPlayerRef.current
@@ -616,7 +624,11 @@ export function ShadowingPractice() {
                     : videoRef.current?.play()
               }
             >
-              {playing ? <Pause className="mr-1.5 h-4 w-4" /> : <Play className="mr-1.5 h-4 w-4" />}
+              {playing ? (
+                <Pause className="mr-1.5 h-3.5 w-3.5" />
+              ) : (
+                <Play className="mr-1.5 h-3.5 w-3.5" />
+              )}
               {playing ? "Pause" : "Play"}
             </Button>
             <span className="text-xs tabular-nums text-muted-foreground">
@@ -626,21 +638,21 @@ export function ShadowingPractice() {
         </div>
 
         {/* Right: Subtitles / Phrases list */}
-        <div className="overflow-hidden rounded-2xl bg-card shadow-card">
-          <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <h3 className="text-sm font-bold text-foreground">
+        <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl bg-card shadow-card">
+          <div className="flex items-center justify-between border-b border-border px-3 py-2">
+            <h3 className="text-xs font-bold text-foreground">
               Subtitles
               <span className="ml-1.5 font-normal text-muted-foreground">
                 {doneCount}/{segments.length}
               </span>
             </h3>
             {doneCount > 0 && (
-              <Progress value={(doneCount / Math.max(1, segments.length)) * 100} className="w-24" />
+              <Progress value={(doneCount / Math.max(1, segments.length)) * 100} className="w-20" />
             )}
           </div>
           <div
             ref={phraseListRef}
-            className="max-h-[50vh] overflow-y-auto scroll-smooth p-2 lg:max-h-[calc(100vh-320px)]"
+            className="min-h-0 flex-1 space-y-0.5 overflow-y-auto scroll-smooth p-1.5"
           >
             {segments.map((seg, i) => {
               const rec = records[i];
@@ -653,9 +665,9 @@ export function ShadowingPractice() {
                   data-phrase-index={i}
                   onClick={() => setCurrentIndex(i)}
                   className={cn(
-                    "group flex w-full items-start gap-2.5 rounded-xl px-3 py-2.5 text-left transition-all duration-200",
+                    "group flex w-full items-start gap-2 rounded-lg px-2 py-1.5 text-left transition-all duration-200",
                     isCurrent
-                      ? "border-l-4 border-primary bg-primary/10 shadow-sm"
+                      ? "bg-primary/10 shadow-sm"
                       : active
                         ? "bg-primary/5"
                         : "hover:bg-muted/50",
@@ -663,7 +675,7 @@ export function ShadowingPractice() {
                 >
                   <span
                     className={cn(
-                      "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-colors",
+                      "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors mt-0.5",
                       rec
                         ? rec.accuracy.accuracy >= 80
                           ? "bg-success/20 text-success"
@@ -680,7 +692,7 @@ export function ShadowingPractice() {
                   <div className="min-w-0 flex-1">
                     <p
                       className={cn(
-                        "text-sm leading-relaxed transition-all",
+                        "text-[13px] leading-snug transition-all",
                         isCurrent
                           ? "font-bold text-foreground"
                           : "text-muted-foreground group-hover:text-foreground",
@@ -691,7 +703,7 @@ export function ShadowingPractice() {
                   </div>
                   <div className="flex shrink-0 items-center gap-1 pt-0.5">
                     {rec ? (
-                      <CheckCircle2 className="h-4 w-4 text-success" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-success" />
                     ) : seg.end > seg.start ? (
                       <span className="text-[10px] text-muted-foreground">
                         {formatTime(seg.start)}
@@ -705,9 +717,9 @@ export function ShadowingPractice() {
                         playPhrase(i);
                       }}
                       title="Play this phrase"
-                      className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                      className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                     >
-                      <Volume2 className="h-3.5 w-3.5" />
+                      <Volume2 className="h-3 w-3" />
                     </button>
                   </div>
                 </button>
@@ -717,258 +729,282 @@ export function ShadowingPractice() {
         </div>
       </div>
 
-      {/* Current phrase practice — full width */}
-      {segment && (
-        <div className="rounded-2xl bg-card p-4 shadow-card sm:p-6">
-          <div className="flex items-center justify-between">
-            <Badge variant="secondary">
-              Phrase {currentIndex + 1} / {segments.length}
-            </Badge>
-            <div className="flex items-center gap-2">
-              {recording && (
-                <span className="flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-bold text-destructive">
-                  <span className="h-2 w-2 rounded-full bg-destructive animate-pulse-dot" />
-                  Recording
+      {/* Practice panel: phrase card + AI analysis, below the subtitles */}
+      <div className="grid gap-2 lg:grid-cols-2">
+        {segment && (
+          <div className="flex min-h-0 flex-col rounded-2xl bg-card p-3 shadow-card">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  aria-label="Previous phrase"
+                  disabled={currentIndex === 0}
+                  onClick={() => currentIndex > 0 && setCurrentIndex((prev) => prev - 1)}
+                  className="flex h-6 w-6 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-40"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                </button>
+                <Badge variant="secondary">
+                  Phrase {currentIndex + 1} / {segments.length}
+                </Badge>
+                <button
+                  type="button"
+                  aria-label="Next phrase"
+                  disabled={currentIndex >= segments.length - 1}
+                  onClick={goNext}
+                  className="flex h-6 w-6 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-40"
+                >
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                {recording && (
+                  <span className="flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-0.5 text-[11px] font-bold text-destructive">
+                    <span className="h-2 w-2 rounded-full bg-destructive animate-pulse-dot" />
+                    Recording
+                  </span>
+                )}
+                <span className="text-[11px] text-muted-foreground">
+                  {segment.end > segment.start
+                    ? `${formatTime(segment.start)} – ${formatTime(segment.end)}`
+                    : "TTS playback"}
                 </span>
-              )}
-              <span className="text-xs text-muted-foreground">
-                {segment.end > segment.start
-                  ? `${formatTime(segment.start)} – ${formatTime(segment.end)}`
-                  : "TTS playback"}
-              </span>
+              </div>
             </div>
-          </div>
 
-          {/* Karaoke highlighted phrase */}
-          <div className="my-5 text-center text-lg font-bold sm:text-xl md:text-2xl">
-            <HighlightedText
-              text={segment.text}
-              startTime={segment.start}
-              endTime={segment.end}
-              currentTime={currentTime}
-              isPlaying={!!isPhraseActive}
-            />
-          </div>
+            {/* Karaoke highlighted phrase */}
+            <div className="my-2 px-1 text-center text-sm font-bold sm:text-base md:text-lg">
+              <HighlightedText
+                text={segment.text}
+                startTime={segment.start}
+                endTime={segment.end}
+                currentTime={currentTime}
+                isPlaying={!!isPhraseActive}
+              />
+            </div>
 
-          {/* Action buttons */}
-          <div className="flex flex-wrap justify-center gap-2">
-            <Button variant="soft" size="pill" onClick={() => playPhrase(currentIndex)}>
-              <Play className="mr-2 h-4 w-4" /> Listen
-            </Button>
+            {/* Action buttons */}
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button
+                variant="soft"
+                size="sm"
+                className="rounded-full px-4"
+                onClick={() => playPhrase(currentIndex)}
+              >
+                <Play className="mr-1.5 h-3.5 w-3.5" /> Listen
+              </Button>
+              <Button
+                variant={recording ? "destructive" : "hero"}
+                size="sm"
+                className={cn("rounded-full px-4", recording && "animate-pulse")}
+                onClick={recording ? stopRecognition : beginRecording}
+                disabled={!sttSupported && !recording}
+              >
+                {recording ? (
+                  <>
+                    <Square className="mr-1.5 h-3.5 w-3.5" /> Stop
+                  </>
+                ) : (
+                  <>
+                    <Mic className="mr-1.5 h-3.5 w-3.5" /> Repeat phrase
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="soft"
+                size="sm"
+                className="rounded-full px-4"
+                onClick={() => {
+                  stopSpeaking();
+                  stopRecognition();
+                  const copy = { ...records };
+                  delete copy[currentIndex];
+                  setRecords(copy);
+                  setInterimText("");
+                }}
+                disabled={!hasRecord && !recording}
+              >
+                <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Retry
+              </Button>
+            </div>
+
+            {/* Interim transcript */}
+            {recording && interimText && (
+              <div className="mt-2 max-h-[18vh] overflow-y-auto rounded-xl border border-dashed border-primary/30 bg-primary/5 p-2">
+                <p className="text-center text-[13px] text-muted-foreground italic">
+                  {interimText}
+                  <span className="animate-pulse">|</span>
+                </p>
+              </div>
+            )}
+
+            {/* Result */}
+            {record && (
+              <div
+                className={cn(
+                  "mt-2 rounded-xl p-3 text-center transition-colors",
+                  record.accuracy.accuracy >= 80
+                    ? "bg-success/10"
+                    : record.accuracy.accuracy >= 50
+                      ? "bg-warning/10"
+                      : "bg-destructive/10",
+                )}
+              >
+                <p
+                  className={cn(
+                    "text-2xl font-extrabold",
+                    record.accuracy.accuracy >= 80
+                      ? "text-success"
+                      : record.accuracy.accuracy >= 50
+                        ? "text-warning"
+                        : "text-destructive",
+                  )}
+                >
+                  {record.accuracy.accuracy}%
+                </p>
+                <p className="text-[11px] text-muted-foreground">phrase accuracy</p>
+                {record.transcript && (
+                  <p className="mt-1 max-h-[12vh] overflow-y-auto text-[13px] italic text-muted-foreground">
+                    "{record.transcript}"
+                  </p>
+                )}
+                {record.accuracy.missed.length > 0 && (
+                  <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+                    {record.accuracy.missed.map((w, i) => (
+                      <Badge key={i} variant="secondary" className="text-destructive">
+                        {w}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* AI analysis */}
+        <div className="flex min-h-0 flex-col rounded-2xl bg-card p-4 shadow-card">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-bold text-foreground">AI Shadowing Analysis</h3>
+              <p className="text-xs text-muted-foreground">
+                Get pronunciation errors, scores and tips.
+              </p>
+            </div>
             <Button
-              variant={recording ? "destructive" : "hero"}
-              size="pill"
-              onClick={recording ? stopRecognition : beginRecording}
-              disabled={!sttSupported && !recording}
-              className={cn(recording && "animate-pulse")}
+              variant="hero"
+              size="sm"
+              className="rounded-full px-4"
+              onClick={runAnalysis}
+              disabled={analyzing || doneCount === 0}
             >
-              {recording ? (
+              {analyzing ? (
                 <>
-                  <Square className="mr-2 h-4 w-4" /> Stop
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Analyzing...
                 </>
               ) : (
                 <>
-                  <Mic className="mr-2 h-4 w-4" /> Repeat phrase
+                  <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Analyze
                 </>
               )}
             </Button>
-            <Button
-              variant="soft"
-              size="pill"
-              onClick={() => {
-                stopSpeaking();
-                stopRecognition();
-                const copy = { ...records };
-                delete copy[currentIndex];
-                setRecords(copy);
-                setInterimText("");
-              }}
-              disabled={!hasRecord && !recording}
-            >
-              <RotateCcw className="mr-2 h-4 w-4" /> Retry
-            </Button>
           </div>
 
-          {/* Interim transcript */}
-          {recording && interimText && (
-            <div className="mt-4 rounded-xl border border-dashed border-primary/30 bg-primary/5 p-3">
-              <p className="text-center text-sm text-muted-foreground italic">
-                {interimText}
-                <span className="animate-pulse">|</span>
-              </p>
-            </div>
-          )}
-
-          {/* Result */}
-          {record && (
-            <div
-              className={cn(
-                "mt-4 rounded-xl p-4 text-center transition-colors",
-                record.accuracy.accuracy >= 80
-                  ? "bg-success/10"
-                  : record.accuracy.accuracy >= 50
-                    ? "bg-warning/10"
-                    : "bg-destructive/10",
-              )}
-            >
-              <p
-                className={cn(
-                  "text-3xl font-extrabold",
-                  record.accuracy.accuracy >= 80
-                    ? "text-success"
-                    : record.accuracy.accuracy >= 50
-                      ? "text-warning"
-                      : "text-destructive",
-                )}
-              >
-                {record.accuracy.accuracy}%
-              </p>
-              <p className="text-xs text-muted-foreground">phrase accuracy</p>
-              {record.transcript && (
-                <p className="mt-2 text-sm italic text-muted-foreground">"{record.transcript}"</p>
-              )}
-              {record.accuracy.missed.length > 0 && (
-                <div className="mt-2 flex flex-wrap justify-center gap-1.5">
-                  {record.accuracy.missed.map((w, i) => (
-                    <Badge key={i} variant="secondary" className="text-destructive">
-                      {w}
-                    </Badge>
-                  ))}
+          <div className="flex min-h-0 flex-1 flex-col justify-center">
+            {analysis ? (
+              <div className="mx-auto w-full max-h-[36vh] space-y-3 overflow-y-auto pr-1">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <ScoreBox label="Overall" value={analysis.overallScore} suffix="%" />
+                  <ScoreBox label="Accuracy" value={analysis.accuracy} suffix="%" />
+                  <ScoreBox label="Fluency" value={analysis.fluency} suffix="%" />
+                  <ScoreBox label="Band" value={analysis.band} suffix="" />
                 </div>
-              )}
-            </div>
-          )}
 
-          {/* Navigation */}
-          <div className="mt-4 flex justify-between gap-2">
-            <Button
-              variant="ghost"
-              size="pill"
-              onClick={() => currentIndex > 0 && setCurrentIndex((prev) => prev - 1)}
-              disabled={currentIndex === 0}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" /> Previous
-            </Button>
-            <Button
-              variant="ghost"
-              size="pill"
-              onClick={goNext}
-              disabled={currentIndex >= segments.length - 1}
-            >
-              Next <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* AI analysis */}
-      <div className="rounded-2xl bg-card p-4 shadow-card sm:p-6">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h3 className="text-sm font-bold text-foreground">AI Shadowing Analysis</h3>
-            <p className="text-xs text-muted-foreground">
-              Get pronunciation errors, scores and tips.
-            </p>
-          </div>
-          <Button
-            variant="hero"
-            size="pill"
-            onClick={runAnalysis}
-            disabled={analyzing || doneCount === 0}
-          >
-            {analyzing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analyzing...
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-4 w-4" /> Analyze
-              </>
-            )}
-          </Button>
-        </div>
-
-        {analysis && (
-          <div className="mt-5 space-y-5">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <ScoreBox label="Overall" value={analysis.overallScore} suffix="%" />
-              <ScoreBox label="Accuracy" value={analysis.accuracy} suffix="%" />
-              <ScoreBox label="Fluency" value={analysis.fluency} suffix="%" />
-              <ScoreBox label="Band" value={analysis.band} suffix="" />
-            </div>
-
-            {analysis.errors.length > 0 && (
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Errors to fix
-                </h4>
-                <div className="mt-2 space-y-2">
-                  {analysis.errors.map((err, i) => (
-                    <div key={i} className="rounded-xl border border-border p-3">
-                      <div className="flex items-center gap-2 text-sm">
-                        {err.expected && (
-                          <span className="text-xs text-muted-foreground line-through">
-                            {err.expected}
-                          </span>
-                        )}
-                        <ArrowRight className="h-3 w-3 text-foreground" />
-                        <span className="font-bold text-foreground">
-                          {err.spoken || err.correction}
-                        </span>
-                      </div>
-                      {err.note && <p className="mt-1 text-xs text-muted-foreground">{err.note}</p>}
+                {analysis.errors.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                      Errors to fix
+                    </h4>
+                    <div className="mt-2 space-y-1.5">
+                      {analysis.errors.map((err, i) => (
+                        <div key={i} className="rounded-xl border border-border p-2">
+                          <div className="flex items-center gap-2 text-sm">
+                            {err.expected && (
+                              <span className="text-xs text-muted-foreground line-through">
+                                {err.expected}
+                              </span>
+                            )}
+                            <ArrowRight className="h-3 w-3 text-foreground" />
+                            <span className="font-bold text-foreground">
+                              {err.spoken || err.correction}
+                            </span>
+                          </div>
+                          {err.note && (
+                            <p className="mt-1 text-xs text-muted-foreground">{err.note}</p>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
+
+                {analysis.strengths.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                      Strengths
+                    </h4>
+                    <ul className="mt-1.5 space-y-1">
+                      {analysis.strengths.map((s, i) => (
+                        <li key={i} className="flex items-start gap-2 text-[13px] text-foreground">
+                          <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" />
+                          {s}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {analysis.tips.length > 0 && (
+                  <div className="rounded-xl bg-secondary/40 p-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                      Coach's advice
+                    </h4>
+                    <ul className="mt-1.5 space-y-1">
+                      {analysis.tips.map((t, i) => (
+                        <li key={i} className="flex items-start gap-2 text-[13px] text-foreground">
+                          <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <Button
+                  variant="soft"
+                  size="sm"
+                  className="w-full rounded-full"
+                  onClick={() => {
+                    setAnalysis(null);
+                    setRecords({});
+                    setCurrentIndex(0);
+                  }}
+                >
+                  <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Practice again
+                </Button>
+              </div>
+            ) : (
+              <div className="py-3 text-center">
+                <Sparkles className="mx-auto h-5 w-5 text-primary/60" />
+                <p className="mx-auto mt-2 max-w-xs text-xs leading-relaxed text-muted-foreground">
+                  Repeat a phrase, then tap{" "}
+                  <span className="font-semibold text-foreground">Analyze</span> to get your score,
+                  errors and tips.
+                </p>
               </div>
             )}
-
-            {analysis.strengths.length > 0 && (
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Strengths
-                </h4>
-                <ul className="mt-2 space-y-1.5">
-                  {analysis.strengths.map((s, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-foreground">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                      {s}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {analysis.tips.length > 0 && (
-              <div className="rounded-xl bg-secondary/40 p-4">
-                <h4 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Coach's advice
-                </h4>
-                <ul className="mt-2 space-y-1.5">
-                  {analysis.tips.map((t, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-foreground">
-                      <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <Button
-              variant="soft"
-              size="pill"
-              className="w-full"
-              onClick={() => {
-                setAnalysis(null);
-                setRecords({});
-                setCurrentIndex(0);
-              }}
-            >
-              <RotateCcw className="mr-2 h-4 w-4" /> Practice again
-            </Button>
           </div>
-        )}
+        </div>
       </div>
 
       {!sttSupported && (
@@ -983,12 +1019,12 @@ export function ShadowingPractice() {
 function ScoreBox({ label, value, suffix }: { label: string; value: number; suffix: string }) {
   const tone = value >= 80 ? "text-success" : value >= 50 ? "text-warning" : "text-destructive";
   return (
-    <div className="rounded-2xl bg-muted/50 p-4 text-center">
-      <p className={cn("text-3xl font-extrabold", tone)}>
+    <div className="rounded-xl bg-muted/50 p-2.5 text-center">
+      <p className={cn("text-xl font-extrabold", tone)}>
         {value}
         {suffix}
       </p>
-      <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+      <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
         {label}
       </p>
     </div>

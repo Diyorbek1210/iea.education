@@ -682,7 +682,7 @@ function PracticePage() {
         <FreestylePractice />
       )}
 
-      {mode !== null && (
+      {mode !== null && mode !== "shadowing" && (
         <div className="flex justify-center mt-6">
           <Button variant="ghost" size="sm" onClick={() => setMode(null)}>
             ← Back to mode selection
