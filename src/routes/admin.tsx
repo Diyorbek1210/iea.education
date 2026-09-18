@@ -3080,52 +3080,55 @@ function ShadowingAdminSection({
             </div>
 
             {segments.length > 0 && (
-              <div className="rounded-2xl border border-border p-4">
+              <div className="rounded-2xl border border-border p-3.5">
                 <div className="flex items-center justify-between">
                   <Label>Phrases ({segments.length})</Label>
                   <Button type="button" variant="ghost" size="sm" onClick={() => setSegments([])}>
                     Clear
                   </Button>
                 </div>
-                <div className="mt-2 max-h-72 space-y-2 overflow-y-auto">
+                <div className="mt-2 max-h-80 space-y-2 overflow-y-auto">
                   {segments.map((seg, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <span className="w-6 shrink-0 text-[10px] font-bold text-muted-foreground">
-                        {i + 1}
-                      </span>
+                    <div key={i} className="rounded-xl border border-border p-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-bold text-muted-foreground">
+                          {i + 1}
+                        </span>
+                        <Input
+                          className="w-20 shrink-0 text-xs"
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          aria-label="Start seconds"
+                          value={seg.start}
+                          onChange={(e) => updateSegment(i, { start: Number(e.target.value) })}
+                        />
+                        <span className="text-xs text-muted-foreground">–</span>
+                        <Input
+                          className="w-20 shrink-0 text-xs"
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          aria-label="End seconds"
+                          value={seg.end}
+                          onChange={(e) => updateSegment(i, { end: Number(e.target.value) })}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="ml-auto h-8 w-8 shrink-0 p-0"
+                          onClick={() => setSegments((prev) => prev.filter((_, idx) => idx !== i))}
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
                       <Input
-                        className="w-20 shrink-0 text-xs"
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        aria-label="Start seconds"
-                        value={seg.start}
-                        onChange={(e) => updateSegment(i, { start: Number(e.target.value) })}
-                      />
-                      <span className="text-xs text-muted-foreground">–</span>
-                      <Input
-                        className="w-20 shrink-0 text-xs"
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        aria-label="End seconds"
-                        value={seg.end}
-                        onChange={(e) => updateSegment(i, { end: Number(e.target.value) })}
-                      />
-                      <Input
-                        className="min-w-0 flex-1 text-xs"
+                        className="mt-2 w-full text-xs"
                         placeholder="Phrase text"
                         value={seg.text}
                         onChange={(e) => updateSegment(i, { text: e.target.value })}
                       />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSegments((prev) => prev.filter((_, idx) => idx !== i))}
-                      >
-                        <Trash2 className="h-3 w-3 text-destructive" />
-                      </Button>
                     </div>
                   ))}
                 </div>
