@@ -17,6 +17,7 @@ import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as LearnRouteImport } from './routes/learn'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MockTestRouteImport } from './routes/mock-test'
 import { Route as ModelAnswersRouteImport } from './routes/model-answers'
@@ -70,6 +71,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnRoute = LearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
   '/model-answers': typeof ModelAnswersRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
   '/model-answers': typeof ModelAnswersRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/mock-test': typeof MockTestRoute
   '/model-answers': typeof ModelAnswersRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/dashboard'
     | '/leaderboard'
+    | '/learn'
     | '/login'
     | '/mock-test'
     | '/model-answers'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/dashboard'
     | '/leaderboard'
+    | '/learn'
     | '/login'
     | '/mock-test'
     | '/model-answers'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/dashboard'
     | '/leaderboard'
+    | '/learn'
     | '/login'
     | '/mock-test'
     | '/model-answers'
@@ -300,6 +312,7 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   DashboardRoute: typeof DashboardRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  LearnRoute: typeof LearnRoute
   LoginRoute: typeof LoginRoute
   MockTestRoute: typeof MockTestRoute
   ModelAnswersRoute: typeof ModelAnswersRoute
@@ -372,6 +385,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn': {
+      id: '/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LearnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -484,6 +504,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   DashboardRoute: DashboardRoute,
   LeaderboardRoute: LeaderboardRoute,
+  LearnRoute: LearnRoute,
   LoginRoute: LoginRoute,
   MockTestRoute: MockTestRoute,
   ModelAnswersRoute: ModelAnswersRoute,

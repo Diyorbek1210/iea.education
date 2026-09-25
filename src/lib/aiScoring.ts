@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { geminiFetch } from "@/lib/geminiHttp";
+import { geminiFetchWithRetry } from "@/lib/geminiHttp";
 
 import {
   SPEAKING_CRITERIA_LABELS,
@@ -31,7 +31,7 @@ async function callGemini(apiKey: string, prompt: string): Promise<string> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30_000);
   try {
-    const response = await geminiFetch(`${GEMINI_URL}?key=${apiKey}`, {
+    const response = await geminiFetchWithRetry(`${GEMINI_URL}?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

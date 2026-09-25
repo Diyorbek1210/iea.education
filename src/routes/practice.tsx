@@ -422,12 +422,21 @@ function FreestylePractice() {
         setMessages([{ role: "model", text: res.text }]);
         setEmotion("speaking");
         await speak(res.text);
-      } catch {
-        toast.error("Could not reach AI. Check your connection.");
+      } catch (err) {
+        toast.error(aiErrorMessage(err));
       }
       setEmotion("idle");
     })();
   }, [speak]);
+
+  function aiErrorMessage(err: unknown): string {
+    const msg = err instanceof Error ? err.message : "";
+    if (/high demand|overloaded|try again later|unavailable|503/i.test(msg)) {
+      return "AI is temporarily busy. Please try again in a few seconds.";
+    }
+    if (msg && /Gemini|AI|model/i.test(msg)) return msg.slice(0, 160);
+    return "Could not reach AI. Check your connection.";
+  }
 
   const sendToAi = useCallback(
     async (userText: string) => {
@@ -448,8 +457,8 @@ function FreestylePractice() {
         await speak(res.text);
         setEmotion("happy");
         setTimeout(() => setEmotion("idle"), 2000);
-      } catch {
-        toast.error("AI could not respond. Try again.");
+      } catch (err) {
+        toast.error(aiErrorMessage(err));
         setEmotion("idle");
       } finally {
         setProcessing(false);

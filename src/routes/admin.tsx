@@ -10,13 +10,11 @@ import {
   Globe,
   LayoutDashboard,
   LogOut,
-  Menu,
   Pencil,
   Plus,
   Trash2,
   Upload,
   Users,
-  X,
   XCircle,
   BookOpen,
   FileText,
@@ -29,8 +27,12 @@ import {
   Youtube,
   Captions,
   Loader2,
+  Route as RouteIcon,
+  Menu,
+  X,
+  ChevronRight,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
@@ -79,6 +81,11 @@ import {
   updateResource,
   uploadResourceFile,
   seedAllDataToFirestore,
+  listLearningSteps,
+  addLearningStep,
+  updateLearningStep,
+  deleteLearningStep,
+  moveLearningStep,
   listShadowingClips,
   addShadowingClip,
   updateShadowingClip,
@@ -95,6 +102,7 @@ import type {
   CommunityThread,
   Level,
   ResourceDoc,
+  LearningPathStepDoc,
   ShadowingClip,
   ShadowingSegment,
   ThreadCategory,
@@ -107,6 +115,7 @@ import type {
   UniversityRequirementDoc,
 } from "@/lib/db";
 import type { MockTestSet } from "@/shared/data/mockTest";
+import { TECH, TECH_KEYS } from "@/shared/data/learningPath";
 import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/admin")({
@@ -126,6 +135,7 @@ type Tab =
   | "overview"
   | "students"
   | "resources"
+  | "learning-path"
   | "placement"
   | "results"
   | "vocabulary"
@@ -139,10 +149,11 @@ type Tab =
 const tabs: { id: Tab; label: string; icon: typeof Users }[] = [
   { id: "overview", label: "Dashboard", icon: LayoutDashboard },
   { id: "students", label: "Students", icon: Users },
-  { id: "resources", label: "Resources", icon: Globe },
-  { id: "placement", label: "Placement test", icon: ClipboardList },
-  { id: "results", label: "Mock results", icon: GraduationCap },
   { id: "mock-tests", label: "Mock Tests", icon: ClipboardList },
+  { id: "results", label: "Mock results", icon: GraduationCap },
+  { id: "placement", label: "Placement test", icon: ClipboardList },
+  { id: "resources", label: "Resources", icon: Globe },
+  { id: "learning-path", label: "Learning Path", icon: RouteIcon },
   { id: "vocabulary", label: "Vocabulary", icon: BookOpen },
   { id: "model-answers", label: "Model Answers", icon: FileText },
   { id: "requirements", label: "Requirements", icon: Target },
@@ -150,6 +161,107 @@ const tabs: { id: Tab; label: string; icon: typeof Users }[] = [
   { id: "shadowing", label: "Shadowing", icon: Repeat2 },
   { id: "seed", label: "Seed Data", icon: Database },
 ];
+
+const navSections: { label: string; items: { id: Tab; label: string; icon: typeof Users }[] }[] = [
+  { label: "Overview", items: [tabs[0]!] },
+  {
+    label: "Learners",
+    items: ["students", "mock-tests", "results", "placement"].map(
+      (id) => tabs.find((t) => t.id === id)!,
+    ),
+  },
+  {
+    label: "Learning content",
+    items: ["learning-path", "resources", "vocabulary", "model-answers", "requirements", "shadowing"].map(
+      (id) => tabs.find((t) => t.id === id)!,
+    ),
+  },
+  { label: "Community", items: ["community"].map((id) => tabs.find((t) => t.id === id)!) },
+  { label: "System", items: ["seed"].map((id) => tabs.find((t) => t.id === id)!) },
+];
+
+function AdminSidebar({
+  tab,
+  onSelect,
+  onSignOut,
+}: {
+  tab: Tab;
+  onSelect: (tab: Tab) => void;
+  onSignOut: () => void;
+}) {
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex items-center gap-3 px-4 pt-5">
+        <Logo compact />
+        <div className="min-w-0">
+          <p className="truncate text-[12px] font-black uppercase tracking-widest text-ink">
+            IEA Admin
+          </p>
+          <p className="text-[9px] font-black uppercase tracking-[0.25em] text-ink-faint">
+            Control panel
+          </p>
+        </div>
+      </div>
+
+      <nav className="mt-6 flex-1 space-y-6 overflow-y-auto px-3" aria-label="Admin sections">
+        {navSections.map((group) => (
+          <div key={group.label}>
+            <p className="px-2 text-[9px] font-black uppercase tracking-[0.3em] text-ink-faint">
+              {group.label}
+            </p>
+            <div className="mt-2 space-y-1">
+              {group.items.map((item) => {
+                const active = tab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onSelect(item.id)}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "group flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-all duration-300",
+                      active
+                        ? "bg-brand-700 text-white shadow-brand"
+                        : "text-slate-500 hover:bg-brand-50 hover:text-brand-700",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors duration-300",
+                        active
+                          ? "bg-white/15 text-white"
+                          : "bg-slate-100 text-slate-400 group-hover:bg-brand-100 group-hover:text-brand-600",
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
+                    </span>
+                    <span className="truncate text-[11px] font-bold tracking-wide">
+                      {item.label}
+                    </span>
+                    {active && <ChevronRight className="ml-auto h-3.5 w-3.5 text-white/70" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      <div className="border-t border-slate-200/70 p-3">
+        <button
+          type="button"
+          onClick={onSignOut}
+          className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-[11px] font-bold tracking-wide text-rose-500 transition-all duration-300 hover:bg-rose-50"
+        >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-500">
+            <LogOut className="h-4 w-4" />
+          </span>
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
+}
 
 const levelOrder: Level[] = [
   "Beginner",
@@ -176,12 +288,79 @@ const RESOURCE_SKILLS: ResourceDoc["skill"][] = [
   "speaking",
 ];
 
+function SectionTitle({
+  icon: Icon,
+  title,
+  subtitle,
+  action,
+}: {
+  icon?: typeof Users | undefined;
+  title: ReactNode;
+  subtitle?: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      {Icon && (
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-700">
+          <Icon className="h-4 w-4" />
+        </span>
+      )}
+      <div className="min-w-0 flex-1">
+        <h2 className="text-[12px] font-black uppercase tracking-widest text-ink">{title}</h2>
+        {subtitle && <p className="mt-0.5 text-[11px] font-medium text-ink-faint">{subtitle}</p>}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+function Panel({
+  title,
+  icon,
+  subtitle,
+  action,
+  children,
+  className,
+  contentClassName,
+}: {
+  title: ReactNode;
+  icon?: typeof Users | undefined;
+  subtitle?: ReactNode;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+  contentClassName?: string;
+}) {
+  return (
+    <section className={cn("rounded-4xl border border-line bg-white shadow-soft", className)}>
+      <header className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
+        <SectionTitle icon={icon} title={title} subtitle={subtitle} />
+        {action}
+      </header>
+      <div className={cn("p-5 sm:p-6", contentClassName)}>{children}</div>
+    </section>
+  );
+}
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
+  return (
+    <div>
+      <Label className="text-[10px] font-black uppercase tracking-widest text-ink-soft">
+        {label}
+      </Label>
+      <div className="mt-1.5">{children}</div>
+      {hint && <p className="mt-1.5 text-[11px] font-medium text-ink-faint">{hint}</p>}
+    </div>
+  );
+}
+
 function AdminPage() {
   const { isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>("overview");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const { data: users = [] } = useQuery({ queryKey: ["users"], queryFn: listUsers });
   const { data: results = [] } = useQuery({
@@ -191,6 +370,10 @@ function AdminPage() {
   const { data: resources = [] } = useQuery({
     queryKey: ["resources"],
     queryFn: listResources,
+  });
+  const { data: learningSteps = [] } = useQuery({
+    queryKey: ["learning-steps"],
+    queryFn: listLearningSteps,
   });
   const { data: placementQuestions = [] } = useQuery({
     queryKey: ["placement-questions"],
@@ -350,6 +533,73 @@ function AdminPage() {
     } finally {
       setUploadingResource(false);
     }
+  }
+
+  // Learning path form state
+  const emptyLearningStep = {
+    title: "",
+    description: "",
+    lessons: 3,
+    minutes: 60,
+    tech: [] as string[],
+    finish: false,
+  };
+  const [learningStepForm, setLearningStepForm] = useState(emptyLearningStep);
+  const [editingLearningStepId, setEditingLearningStepId] = useState<string | null>(null);
+
+  function editLearningStep(s: LearningPathStepDoc) {
+    setEditingLearningStepId(s.id);
+    setLearningStepForm({
+      title: s.title,
+      description: s.description,
+      lessons: s.lessons,
+      minutes: s.minutes,
+      tech: [...s.tech],
+      finish: !!s.finish,
+    });
+  }
+
+  function resetLearningStepForm() {
+    setLearningStepForm(emptyLearningStep);
+    setEditingLearningStepId(null);
+  }
+
+  async function submitLearningStep() {
+    if (!learningStepForm.title.trim() || !learningStepForm.description.trim()) {
+      toast.error("Title and description are required");
+      return;
+    }
+    const payload = {
+      title: learningStepForm.title.trim(),
+      description: learningStepForm.description.trim(),
+      lessons: Math.max(1, learningStepForm.lessons),
+      minutes: Math.max(1, learningStepForm.minutes),
+      tech: learningStepForm.tech,
+      finish: learningStepForm.finish,
+    };
+    if (editingLearningStepId) {
+      await updateLearningStep(editingLearningStepId, payload);
+      toast.success("Step updated");
+    } else {
+      await addLearningStep(payload);
+      toast.success("Step added");
+    }
+    resetLearningStepForm();
+    queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+  }
+
+  async function removeLearningStep(id: string) {
+    await deleteLearningStep(id);
+    if (editingLearningStepId === id) resetLearningStepForm();
+    queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+    toast.success("Step deleted");
+  }
+
+  function toggleLearningStepTech(key: string) {
+    setLearningStepForm((prev) => ({
+      ...prev,
+      tech: prev.tech.includes(key) ? prev.tech.filter((t) => t !== key) : [...prev.tech, key],
+    }));
   }
 
   // Vocabulary form state
@@ -837,80 +1087,87 @@ function AdminPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-soft">
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-5 shadow-card transition-transform lg:static lg:translate-x-0 lg:shadow-none",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full",
-        )}
-      >
-        <div className="flex flex-wrap items-center gap-2">
-          <Link to="/" onClick={() => setSidebarOpen(false)}>
-            <Logo />
-          </Link>
-          <span className="inline-flex w-fit rounded-full bg-gradient-primary px-3 py-1 text-[11px] font-bold text-primary-foreground">
-            Admin Panel
-          </span>
-        </div>
-
-        <nav className="mt-8 space-y-1">
-          {tabs.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => {
-                setTab(item.id);
-                setSidebarOpen(false);
-              }}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-semibold transition-colors",
-                tab === item.id
-                  ? "bg-gradient-primary text-primary-foreground shadow-card"
-                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              )}
-            >
-              <item.icon className="h-4 w-4" />
-              {item.label}
-            </button>
-          ))}
-        </nav>
-
-        <Button
-          variant="ghost"
-          size="pill"
-          className="mt-auto w-full justify-start"
-          onClick={async () => {
+    <div className="flex min-h-screen bg-surface">
+      {/* Desktop sidebar */}
+      <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-slate-200/70 bg-white md:flex">
+        <AdminSidebar
+          tab={tab}
+          onSelect={setTab}
+          onSignOut={async () => {
             await signOut();
             navigate({ to: "/", replace: true });
           }}
-        >
-          <LogOut className="h-4 w-4" /> Sign out
-        </Button>
+        />
       </aside>
 
-      {sidebarOpen && (
-        <button
-          type="button"
-          aria-label="Close menu"
-          className="fixed inset-0 z-40 bg-foreground/30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+      {/* Mobile drawer */}
+      <div
+        className={cn(
+          "fixed inset-0 z-[60] bg-brand-900/40 backdrop-blur-sm transition-opacity duration-300 md:hidden",
+          menuOpen ? "opacity-100" : "pointer-events-none opacity-0",
+        )}
+        onClick={() => setMenuOpen(false)}
+        aria-hidden="true"
+      />
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-[70] w-[280px] bg-white shadow-lift transition-transform duration-300 md:hidden",
+          menuOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+        aria-label="Mobile menu"
+      >
+        <AdminSidebar
+          tab={tab}
+          onSelect={(next) => {
+            setTab(next);
+            setMenuOpen(false);
+          }}
+          onSignOut={async () => {
+            setMenuOpen(false);
+            await signOut();
+            navigate({ to: "/", replace: true });
+          }}
         />
-      )}
+      </aside>
 
-      <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/85 px-5 py-4 backdrop-blur-md lg:hidden">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-slate-200/70 bg-white/85 px-4 backdrop-blur-xl sm:px-6">
           <button
             type="button"
-            className="rounded-xl border border-border p-2"
-            onClick={() => setSidebarOpen((v) => !v)}
-            aria-label="Toggle sidebar"
+            className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-ink-soft transition-colors hover:bg-brand-50 hover:text-brand-700 md:hidden"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Open menu"
           >
-            {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
-          <span className="text-sm font-bold text-foreground">Admin Panel</span>
+
+          <Link to="/" className="flex items-center gap-2 md:hidden">
+            <Logo compact />
+          </Link>
+          <span className="hidden shrink-0 items-center rounded-full bg-brand-700 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow-brand sm:inline-flex">
+            Admin Panel
+          </span>
+          <span className="hidden text-[10px] font-black uppercase tracking-widest text-ink-faint md:inline-flex">
+            / {tabs.find((t) => t.id === tab)?.label}
+          </span>
+
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={async () => {
+                await signOut();
+                navigate({ to: "/", replace: true });
+              }}
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Sign out</span>
+            </Button>
+          </div>
         </header>
 
-        <main className="mx-auto max-w-6xl px-5 py-8">
+        <div className="min-w-0 flex-1">
+          <main className="mx-auto w-full max-w-6xl animate-fade-up px-4 py-6 sm:px-6 sm:py-8">
           {tab === "overview" && (
             <>
               <div className="grid gap-4 sm:grid-cols-3">
@@ -919,19 +1176,26 @@ function AdminPage() {
                   { label: "Resources", value: resources.length },
                   { label: "Mock attempts", value: results.length },
                 ].map((stat) => (
-                  <div key={stat.label} className="rounded-3xl bg-card p-6 shadow-card">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <div
+                    key={stat.label}
+                    className="animate-fade-up rounded-3xl border border-line bg-white p-6 shadow-soft"
+                  >
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-ink-faint">
                       {stat.label}
                     </p>
-                    <p className="mt-1 text-3xl font-extrabold text-foreground">{stat.value}</p>
+                    <p className="mt-2 text-3xl font-black tracking-tighter text-ink">
+                      {stat.value}
+                    </p>
                   </div>
                 ))}
               </div>
 
               <div className="mt-6 grid gap-6 lg:grid-cols-2">
-                <div className="rounded-3xl bg-card p-6 shadow-card">
-                  <h2 className="text-sm font-bold text-foreground">Students by level</h2>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                <div className="animate-fade-up rounded-3xl border border-line bg-white p-6 shadow-soft [animation-delay:60ms]">
+                  <h2 className="text-sm font-black uppercase tracking-tight text-ink">
+                    Students by level
+                  </h2>
+                  <p className="mt-1 text-xs font-medium text-ink-soft">
                     How many registered students fall into each placement level.
                   </p>
                   <ChartContainer
@@ -959,9 +1223,11 @@ function AdminPage() {
                   </ChartContainer>
                 </div>
 
-                <div className="rounded-3xl bg-card p-6 shadow-card">
-                  <h2 className="text-sm font-bold text-foreground">Average band by skill</h2>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                <div className="animate-fade-up rounded-3xl border border-line bg-white p-6 shadow-soft [animation-delay:100ms]">
+                  <h2 className="text-sm font-black uppercase tracking-tight text-ink">
+                    Average band by skill
+                  </h2>
+                  <p className="mt-1 text-xs font-medium text-ink-soft">
                     Average score across every saved mock test attempt.
                   </p>
                   <ChartContainer
@@ -988,52 +1254,71 @@ function AdminPage() {
           )}
 
           {tab === "students" && (
-            <section className="mt-6 overflow-hidden rounded-3xl bg-card shadow-card">
+            <section className="animate-fade-up overflow-hidden rounded-4xl border border-line bg-white shadow-soft">
+              <div className="border-b border-slate-100 px-5 py-4">
+                <h2 className="text-sm font-black uppercase tracking-tight text-ink">Students</h2>
+                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-faint">
+                  {users.length} registered
+                </p>
+              </div>
               {users.length === 0 && (
                 <p className="p-8 text-center text-sm text-muted-foreground">
                   No students registered yet.
                 </p>
               )}
-              {users.map((student) => (
-                <div
-                  key={student.uid}
-                  className="flex flex-wrap items-center gap-3 border-b border-border px-5 py-4 last:border-0"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-foreground">{student.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{student.email}</p>
-                  </div>
-                  <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
-                    {student.level}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={async () => {
-                      const authDeleted = await deleteUserProfile(student.uid);
-                      queryClient.invalidateQueries({ queryKey: ["users"] });
-                      toast.success("Student removed");
-                      if (!authDeleted) {
-                        toast.warning(
-                          "The Firebase Auth account could not be removed (server key not configured).",
-                        );
-                      }
-                    }}
+              <div className="divide-y divide-slate-100">
+                {users.map((student) => (
+                  <div
+                    key={student.uid}
+                    className="flex flex-wrap items-center gap-3 px-5 py-3.5 transition-colors hover:bg-slate-50/60"
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              ))}
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-[12px] font-black uppercase text-brand-700">
+                      {student.name
+                        .trim()
+                        .split(/\s+/)
+                        .slice(0, 2)
+                        .map((part) => part[0]?.toUpperCase())
+                        .join("") || "?"}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-ink">{student.name}</p>
+                      <p className="truncate text-xs font-medium text-ink-soft">{student.email}</p>
+                    </div>
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-slate-500">
+                      {student.level}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-rose-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                      onClick={async () => {
+                        const authDeleted = await deleteUserProfile(student.uid);
+                        queryClient.invalidateQueries({ queryKey: ["users"] });
+                        toast.success("Student removed");
+                        if (!authDeleted) {
+                          toast.warning(
+                            "The Firebase Auth account could not be removed (server key not configured).",
+                          );
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </section>
           )}
 
           {tab === "resources" && (
             <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
-              <div className="rounded-3xl bg-card p-6 shadow-card">
-                <h2 className="text-base font-bold text-foreground">
-                  {editingResourceId ? "Edit resource" : "Add a resource"}
-                </h2>
-                <div className="mt-4 space-y-3">
+              <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
+                <SectionTitle
+                  icon={Globe}
+                  title={editingResourceId ? "Edit resource" : "Add a resource"}
+                  subtitle="Share links or upload files students can open and study from."
+                />
+                <div className="mt-5 space-y-4">
                   <div>
                     <Label htmlFor="r-title">Title</Label>
                     <Input
@@ -1286,13 +1571,226 @@ function AdminPage() {
             </section>
           )}
 
+          {tab === "learning-path" && (
+            <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
+              <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
+                <SectionTitle
+                  icon={RouteIcon}
+                  title={editingLearningStepId ? "Edit step" : "Add a learning step"}
+                  subtitle="Steps appear as modules on the student Learning Path page."
+                />
+                <div className="mt-5 space-y-4">
+                  <div>
+                    <Label htmlFor="lp-title">Title</Label>
+                    <Input
+                      id="lp-title"
+                      value={learningStepForm.title}
+                      maxLength={120}
+                      onChange={(e) =>
+                        setLearningStepForm({ ...learningStepForm, title: e.target.value })
+                      }
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lp-desc">Description</Label>
+                    <Textarea
+                      id="lp-desc"
+                      value={learningStepForm.description}
+                      maxLength={400}
+                      rows={3}
+                      onChange={(e) =>
+                        setLearningStepForm({ ...learningStepForm, description: e.target.value })
+                      }
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="lp-lessons">Lessons</Label>
+                      <Input
+                        id="lp-lessons"
+                        type="number"
+                        min={1}
+                        value={learningStepForm.lessons}
+                        onChange={(e) =>
+                          setLearningStepForm({
+                            ...learningStepForm,
+                            lessons: Number(e.target.value),
+                          })
+                        }
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="lp-minutes">Minutes</Label>
+                      <Input
+                        id="lp-minutes"
+                        type="number"
+                        min={1}
+                        value={learningStepForm.minutes}
+                        onChange={(e) =>
+                          setLearningStepForm({
+                            ...learningStepForm,
+                            minutes: Number(e.target.value),
+                          })
+                        }
+                        className="mt-1.5"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Skills / tags</Label>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {TECH_KEYS.map((key) => {
+                        const tech = TECH[key];
+                        if (!tech) return null;
+                        const active = learningStepForm.tech.includes(key);
+                        const Icon = tech.icon;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => toggleLearningStepTech(key)}
+                            className={cn(
+                              "flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all",
+                              active
+                                ? "bg-brand-700 text-white shadow-brand"
+                                : "bg-secondary text-secondary-foreground hover:bg-brand-50",
+                            )}
+                          >
+                            <Icon
+                              className="h-3.5 w-3.5"
+                              style={{ color: active ? "#fff" : tech.color }}
+                            />
+                            {tech.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="lp-finish"
+                      type="checkbox"
+                      checked={learningStepForm.finish}
+                      onChange={(e) =>
+                        setLearningStepForm({ ...learningStepForm, finish: e.target.checked })
+                      }
+                      className="h-4 w-4 rounded"
+                    />
+                    <Label htmlFor="lp-finish">Finish milestone (gold crown)</Label>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="hero"
+                      size="pill"
+                      className="flex-1"
+                      onClick={submitLearningStep}
+                    >
+                      {editingLearningStepId ? "Save changes" : "Add step"}
+                    </Button>
+                    {editingLearningStepId && (
+                      <Button variant="ghost" size="pill" onClick={resetLearningStepForm}>
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                {learningSteps.length === 0 && (
+                  <p className="p-8 text-center text-sm text-muted-foreground">
+                    No steps yet. Add the first module.
+                  </p>
+                )}
+                {learningSteps.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 border-b border-border p-4 last:border-0"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-secondary-foreground">
+                      {index + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
+                      <p className="truncate text-xs text-muted-foreground">{item.description}</p>
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
+                          {item.lessons} lessons
+                        </span>
+                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
+                          {item.minutes} min
+                        </span>
+                        {item.tech.map((t) => (
+                          <span
+                            key={t}
+                            className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                        {item.finish && (
+                          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                            Finish
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={index === 0}
+                        onClick={async () => {
+                          await moveLearningStep(item.id, "up");
+                          queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+                        }}
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={index === learningSteps.length - 1}
+                        onClick={async () => {
+                          await moveLearningStep(item.id, "down");
+                          queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+                        }}
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => editLearningStep(item)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          await deleteLearningStep(item.id);
+                          queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+                          toast.success("Step deleted");
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {tab === "placement" && (
             <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
-              <div className="rounded-3xl bg-card p-6 shadow-card">
-                <h2 className="text-base font-bold text-foreground">
-                  {editingQuestionId ? "Edit question" : "Add a placement question"}
-                </h2>
-                <div className="mt-4 space-y-3">
+              <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
+                <SectionTitle
+                  icon={ClipboardList}
+                  title={editingQuestionId ? "Edit question" : "Add a placement question"}
+                  subtitle="Write the question, add 4 options and mark the correct answer."
+                />
+                <div className="mt-5 space-y-4">
                   <div>
                     <Label htmlFor="q-text">Question</Label>
                     <Textarea
@@ -1430,10 +1928,14 @@ function AdminPage() {
                         old.filter((r) => r.id !== result.id),
                       );
                       toast.success("Mock result deleted");
-                      deleteMockResult(result.id, result.userId).catch(() => {
-                        queryClient.invalidateQueries({ queryKey: ["mock-results"] });
-                        toast.error("Failed to delete mock result");
-                      });
+                      deleteMockResult(result.id, result.userId)
+                        .then(() => {
+                          queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+                        })
+                        .catch(() => {
+                          queryClient.invalidateQueries({ queryKey: ["mock-results"] });
+                          toast.error("Failed to delete mock result");
+                        });
                     }}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -2699,6 +3201,7 @@ function AdminPage() {
           {tab === "seed" && <SeedSection queryClient={queryClient} />}
           {tab === "shadowing" && <ShadowingAdminSection queryClient={queryClient} />}
         </main>
+        </div>
       </div>
     </div>
   );

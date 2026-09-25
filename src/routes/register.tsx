@@ -10,11 +10,7 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { useAuth } from "@/lib/auth";
 import { addStudyPlan } from "@/lib/db";
-import {
-  generateStudyPlan,
-  type SkillType,
-  type StudyPlanConfig,
-} from "@/shared/data/studyPlan";
+import { generateStudyPlan, type SkillType, type StudyPlanConfig } from "@/shared/data/studyPlan";
 import { cn } from "@/shared/lib/utils";
 
 const schema = z.object({
@@ -42,7 +38,8 @@ export const Route = createFileRoute("/register")({
       { title: "Create your IEA account" },
       {
         name: "description",
-        content: "Register for free and unlock IEA video lessons, practice tests and IELTS mock exams.",
+        content:
+          "Register for free and unlock IEA video lessons, practice tests and IELTS mock exams.",
       },
       { property: "og:title", content: "Create your IEA account" },
       {
@@ -129,52 +126,70 @@ function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-soft px-5 py-12">
-      <div className="w-full max-w-md">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-5 py-12">
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-200/40 blur-3xl"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[-8rem] left-[-6rem] h-80 w-80 rounded-full bg-accent-200/40 blur-3xl animate-float"
+      />
+      <div className="relative w-full max-w-lg">
         <Link to="/" className="mx-auto flex w-fit">
           <Logo />
         </Link>
 
-        <div className="mt-8 rounded-4xl bg-card p-8 shadow-soft">
+        <div className="mt-8 rounded-5xl border border-slate-200/70 bg-white p-8 shadow-lift">
           {/* Step indicator */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold",
-              step === "account" ? "bg-primary text-primary-foreground" : "bg-primary/20 text-primary",
-            )}>
+          <div className="mb-6 flex items-center gap-3">
+            <div
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-full text-xs font-black",
+                step === "account"
+                  ? "bg-brand-700 text-white shadow-brand"
+                  : "bg-brand-50 text-brand-600",
+              )}
+            >
               1
             </div>
-            <div className={cn(
-              "h-0.5 flex-1 rounded-full",
-              step === "plan" ? "bg-primary" : "bg-secondary",
-            )} />
-            <div className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold",
-              step === "plan" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
-            )}>
+            <div
+              className={cn(
+                "h-0.5 flex-1 rounded-full",
+                step === "plan" ? "bg-brand-600" : "bg-slate-200",
+              )}
+            />
+            <div
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-full text-xs font-black",
+                step === "plan"
+                  ? "bg-brand-700 text-white shadow-brand"
+                  : "bg-slate-100 text-ink-faint",
+              )}
+            >
               2
             </div>
           </div>
 
           {step === "account" ? (
             <>
-              <h1 className="text-2xl font-extrabold text-foreground">Create your account</h1>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <h1 className="text-2xl font-black tracking-tighter text-ink">Create your account</h1>
+              <p className="mt-2 text-sm font-medium text-ink-soft">
                 {level
-                  ? `Your placement result (${score}/20) will be saved to your profile.`
-                  : "Tip: take the placement test first so we can set your level."}
+                  ? `Your test score (${score}/20) will be saved to your profile.`
+                  : "Tip: take the level test first so we can match you with the right programme."}
               </p>
 
               {level ? (
-                <div className="mt-5 rounded-2xl bg-secondary px-5 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-                    Detected level
+                <div className="mt-5 rounded-2xl border border-brand-100 bg-brand-50 px-5 py-4">
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-600">
+                    Level
                   </p>
-                  <p className="text-lg font-extrabold text-secondary-foreground">{level}</p>
+                  <p className="text-lg font-black tracking-tight text-brand-800">{level}</p>
                 </div>
               ) : (
-                <Button asChild variant="soft" size="pill" className="mt-5 w-full">
-                  <Link to="/test">Take the placement test</Link>
+                <Button asChild variant="ghost" size="pill" className="mt-5 w-full">
+                  <Link to="/test">Take the level test</Link>
                 </Button>
               )}
 
@@ -214,25 +229,33 @@ function RegisterPage() {
                     className="mt-1.5"
                   />
                 </div>
-                <Button type="submit" variant="hero" size="pill-lg" className="w-full" disabled={busy}>
-                  {busy ? "Creating account..." : "Continue"}
+                <Button
+                  type="submit"
+                  variant="hero"
+                  size="pill-lg"
+                  className="w-full"
+                  disabled={busy}
+                >
+                  {busy ? "Creating account…" : "Continue"}
                   {!busy && <ChevronRight className="ml-1 h-4 w-4" />}
                 </Button>
               </form>
             </>
           ) : (
             <>
-              <h1 className="text-2xl font-extrabold text-foreground">Set up your study plan</h1>
-              <p className="mt-2 text-sm text-muted-foreground">
-                We'll create a personalized weekly schedule based on your goals.
+              <h1 className="text-2xl font-black tracking-tighter text-ink">
+                Set up your study plan
+              </h1>
+              <p className="mt-2 text-sm font-medium text-ink-soft">
+                We will build a personalised weekly schedule around your goals.
               </p>
 
               <div className="mt-6 space-y-5">
                 {/* Target Band */}
                 <div>
                   <Label className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-primary" />
-                    Target Band Score
+                    <Target className="h-4 w-4 text-brand-600" />
+                    Target band
                   </Label>
                   <div className="grid grid-cols-5 gap-2">
                     {BAND_OPTIONS.map((band) => (
@@ -256,8 +279,8 @@ function RegisterPage() {
                 {/* Current Band */}
                 <div>
                   <Label className="flex items-center gap-2 mb-2">
-                    <BookOpen className="h-4 w-4 text-primary" />
-                    Current Band Score
+                    <BookOpen className="h-4 w-4 text-brand-600" />
+                    Current band
                   </Label>
                   <div className="grid grid-cols-5 gap-2">
                     {BAND_OPTIONS.map((band) => (
@@ -281,14 +304,16 @@ function RegisterPage() {
                 {/* Exam Date */}
                 <div>
                   <Label htmlFor="examDate" className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-primary" />
-                    Exam Date (optional)
+                    <Calendar className="h-4 w-4 text-brand-600" />
+                    Exam date (optional)
                   </Label>
                   <Input
                     id="examDate"
                     type="date"
                     value={planConfig.examDate}
-                    onChange={(e) => setPlanConfig((prev) => ({ ...prev, examDate: e.target.value }))}
+                    onChange={(e) =>
+                      setPlanConfig((prev) => ({ ...prev, examDate: e.target.value }))
+                    }
                     className="mt-1.5"
                     min={new Date().toISOString().slice(0, 10)}
                   />
@@ -297,8 +322,8 @@ function RegisterPage() {
                 {/* Weak Skills */}
                 <div>
                   <Label className="flex items-center gap-2 mb-2">
-                    <BookOpen className="h-4 w-4 text-primary" />
-                    Weak Skills (select all that apply)
+                    <BookOpen className="h-4 w-4 text-brand-600" />
+                    Weak skills (select all that apply)
                   </Label>
                   <div className="grid grid-cols-2 gap-2">
                     {SKILLS.map((skill) => (
@@ -322,15 +347,17 @@ function RegisterPage() {
                 {/* Study Hours */}
                 <div>
                   <Label className="flex items-center gap-2 mb-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    Study Hours Per Day
+                    <Clock className="h-4 w-4 text-brand-600" />
+                    Study hours per day
                   </Label>
                   <div className="grid grid-cols-5 gap-2">
                     {HOURS_OPTIONS.map((hours) => (
                       <button
                         key={hours}
                         type="button"
-                        onClick={() => setPlanConfig((prev) => ({ ...prev, studyHoursPerDay: hours }))}
+                        onClick={() =>
+                          setPlanConfig((prev) => ({ ...prev, studyHoursPerDay: hours }))
+                        }
                         className={cn(
                           "rounded-xl px-3 py-2.5 text-sm font-bold transition-all",
                           planConfig.studyHoursPerDay === hours
@@ -347,7 +374,7 @@ function RegisterPage() {
 
               <div className="mt-6 flex gap-3">
                 <Button
-                  variant="soft"
+                  variant="ghost"
                   size="pill"
                   className="flex-1"
                   onClick={() => setStep("account")}
@@ -363,24 +390,24 @@ function RegisterPage() {
                   onClick={handlePlanSubmit}
                   disabled={busy}
                 >
-                  {busy ? "Saving..." : "Start Learning"}
+                  {busy ? "Saving…" : "Start learning"}
                 </Button>
               </div>
 
               <button
                 onClick={() => navigate({ to: "/dashboard" })}
-                className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-foreground"
+                className="mt-4 w-full text-center text-xs font-bold text-ink-soft hover:text-ink"
               >
-                Skip for now
+                Skip this step
               </button>
             </>
           )}
 
           {step === "account" && (
-            <p className="mt-6 text-center text-sm text-muted-foreground">
+            <p className="mt-6 text-center text-sm font-medium text-ink-soft">
               Already have an account?{" "}
-              <Link to="/login" className="font-semibold text-primary hover:underline">
-                Log in
+              <Link to="/login" className="font-black text-brand-600 hover:text-accent-600">
+                Sign in
               </Link>
             </p>
           )}

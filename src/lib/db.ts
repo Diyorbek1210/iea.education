@@ -18,6 +18,7 @@ import { auth, db, isFirebaseConfigured } from "@/shared/config/firebase";
 import { deleteAuthUser } from "./authAdmin";
 import { placementQuestions as staticPlacementQuestions } from "@/shared/data/placement";
 import { IELTS_RESOURCES } from "@/shared/data/resources";
+import { SEED_LEARNING_STEPS } from "@/shared/data/learningPath";
 import { BADGES, type BadgeDef } from "@/shared/data/badges";
 import { VOCABULARY, type VocabWord, type VocabTopic } from "@/shared/data/vocabulary";
 import { MODEL_ANSWERS, type ModelAnswer } from "@/shared/data/modelAnswers";
@@ -45,6 +46,7 @@ import type {
   PlacementQuestion,
   PracticeSession,
   ResourceDoc,
+  LearningPathStepDoc,
   ShadowingClip,
   StudyPlanRecord,
   UserProfile,
@@ -72,6 +74,7 @@ const KEYS = {
   users: "iea_users",
   mocks: "iea_mock_results",
   resources: "iea_resources",
+  learningPath: "iea_learning_path",
   placement: "iea_placement_questions",
   vocabulary: "iea_vocabulary",
   modelAnswers: "iea_model_answers",
@@ -1388,4 +1391,105 @@ export async function deleteCommunityReply(threadId: string, replyId: string): P
     return;
   }
   await deleteDoc(doc(db, "communityThreads", threadId, "replies", replyId));
+}
+
+/* ------------------------------------------------------------------ *
+ * Learning path steps (admin-managed)
+ * ------------------------------------------------------------------ */
+
+export async function listLearningSteps(): Promise<LearningPathStepDoc[]> {
+  if (!isFirebaseConfigured || !db) {
+    return read<LearningPathStepDoc[]>(KEYS.learningPath, SEED_LEARNING_STEPS).sort(
+      (a, b) => a.order - b.order,
+    );
+  }
+  const snap = await getDocs(query(collection(db, "learningSteps"), orderBy("order", "asc")));
+  if (snap.empty) {
+    const seeded = SEED_LEARNING_STEPS.map((s, i) => ({ ...s, order: i }));
+    for (const step of seeded) {
+      const { id, ...data } = step;
+      await setDoc(doc(db, "learningSteps", id), data);
+    }
+    return seeded;
+  }
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<LearningPathStepDoc, "id">) }));
+}
+
+export async function addLearningStep(
+  step: Omit<LearningPathStepDoc, "id" | "createdAt" | "order">,
+): Promise<void> {
+  const now = new Date().toISOString();
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<LearningPathStepDoc[]>(KEYS.learningPath, []);
+    const maxOrder = existing.reduce((max, s) => Math.max(max, s.order), -1);
+    write(KEYS.learningPath, [
+      ...existing,
+      { ...step, id: crypto.randomUUID(), order: maxOrder + 1, createdAt: now },
+    ]);
+    return;
+  }
+  const snap = await getDocs(collection(db, "learningSteps"));
+  const maxOrder = snap.docs.reduce((max, d) => {
+    const data = d.data() as Omit<LearningPathStepDoc, "id">;
+    return Math.max(max, data.order ?? 0);
+  }, -1);
+  await addDoc(collection(db, "learningSteps"), { ...step, order: maxOrder + 1, createdAt: now });
+}
+
+export async function updateLearningStep(
+  id: string,
+  data: Partial<Omit<LearningPathStepDoc, "id" | "createdAt">>,
+): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<LearningPathStepDoc[]>(KEYS.learningPath, []);
+    write(
+      KEYS.learningPath,
+      existing.map((s) => (s.id === id ? { ...s, ...data } : s)),
+    );
+    return;
+  }
+  await updateDoc(doc(db, "learningSteps", id), data);
+}
+
+export async function deleteLearningStep(id: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<LearningPathStepDoc[]>(KEYS.learningPath, []);
+    const filtered = existing.filter((s) => s.id !== id);
+    filtered.forEach((s, i) => {
+      s.order = i;
+    });
+    write(KEYS.learningPath, filtered);
+    return;
+  }
+  await deleteDoc(doc(db, "learningSteps", id));
+}
+
+export async function moveLearningStep(id: string, direction: "up" | "down"): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    const existing = read<LearningPathStepDoc[]>(KEYS.learningPath, []).sort(
+      (a, b) => a.order - b.order,
+    );
+    const idx = existing.findIndex((s) => s.id === id);
+    if (idx < 0) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= existing.length) return;
+    const temp = existing[idx]!.order;
+    existing[idx]!.order = existing[swapIdx]!.order;
+    existing[swapIdx]!.order = temp;
+    write(KEYS.learningPath, existing);
+    return;
+  }
+  const snap = await getDocs(query(collection(db, "learningSteps"), orderBy("order", "asc")));
+  const docs = snap.docs.map((d) => ({
+    ref: d.ref,
+    data: d.data() as Omit<LearningPathStepDoc, "id">,
+  }));
+  const idx = docs.findIndex((d) => d.ref.id === id);
+  if (idx < 0) return;
+  const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= docs.length) return;
+  const a = docs[idx]!;
+  const b = docs[swapIdx]!;
+  await updateDoc(a.ref, { order: b.data.order });
+  await updateDoc(b.ref, { order: a.data.order });
 }

@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { geminiFetch } from "@/lib/geminiHttp";
+import { geminiFetchWithRetry } from "@/lib/geminiHttp";
+import { scriptedReply } from "@/lib/aiChatFallback";
 
 const GEMINI_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
@@ -26,6 +27,9 @@ export const chatWithAi = createServerFn({ method: "POST" })
       ),
     }),
   )
+  // Graceful degradation (AC-4 pattern): if the live model is overloaded or
+  // unreachable after retries, fall back to a local scripted companion so the
+  // speaking practice never hard-fails for the learner.
   .handler(async ({ data }) => {
     if (!process.env["GEMINI_API_KEY"]) {
       try {
@@ -57,22 +61,27 @@ export const chatWithAi = createServerFn({ method: "POST" })
     const timeout = setTimeout(() => controller.abort(), 30_000);
 
     try {
-      const response = await geminiFetch(`${GEMINI_URL}?key=${apiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents,
-          generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 150,
-          },
-        }),
-        signal: controller.signal,
-      });
+      const response = await geminiFetchWithRetry(
+        `${GEMINI_URL}?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents,
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 150,
+            },
+          }),
+          signal: controller.signal,
+        },
+        4,
+      );
 
       if (!response.ok) {
-        const errBody = await response.text();
-        throw new Error(`Gemini request failed (${response.status}): ${errBody.slice(0, 300)}`);
+        throw new Error(
+          `Gemini request failed (${response.status}): ${(await response.text()).slice(0, 300)}`,
+        );
       }
 
       const json = (await response.json()) as {
@@ -82,6 +91,9 @@ export const chatWithAi = createServerFn({ method: "POST" })
       if (typeof text !== "string") throw new Error("Gemini response had no text part");
 
       return { text };
+    } catch (err) {
+      console.error("[aiChat] Gemini unavailable after retries, serving scripted reply:", err);
+      return { text: scriptedReply(data.messages) };
     } finally {
       clearTimeout(timeout);
     }

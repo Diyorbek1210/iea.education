@@ -11,7 +11,7 @@ import {
 } from "youtube-transcript";
 import type { TranscriptResponse } from "youtube-transcript";
 
-import { geminiFetch } from "@/lib/geminiHttp";
+import { geminiFetchWithRetry } from "@/lib/geminiHttp";
 
 import type { ShadowingSegment } from "@/shared/types/types";
 
@@ -347,7 +347,7 @@ Be honest and strict: ignore tiny stopword misses ("a", "the") unless they repea
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 60_000);
     try {
-      const response = await geminiFetch(`${GEMINI_URL}?key=${apiKey}`, {
+      const response = await geminiFetchWithRetry(`${GEMINI_URL}?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

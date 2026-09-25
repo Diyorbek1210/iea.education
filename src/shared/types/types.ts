@@ -79,6 +79,18 @@ export interface ResourceDoc {
   createdAt: string;
 }
 
+export interface LearningPathStepDoc {
+  id: string;
+  title: string;
+  description: string;
+  lessons: number;
+  minutes: number;
+  tech: string[];
+  finish?: boolean;
+  order: number;
+  createdAt: string;
+}
+
 export interface PlacementQuestion {
   id: string;
   q: string;

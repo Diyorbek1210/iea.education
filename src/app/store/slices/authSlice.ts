@@ -47,6 +47,14 @@ async function loadProfileThunk(uid: string): Promise<UserProfile | null> {
   return getUserProfile(uid);
 }
 
+async function restoreProfile(uid: string): Promise<UserProfile | null> {
+  try {
+    return await loadProfileThunk(uid);
+  } catch {
+    return null;
+  }
+}
+
 export const initAuth = createAsyncThunk(
   "auth/init",
   async (_, { dispatch }) => {
@@ -61,7 +69,7 @@ export const initAuth = createAsyncThunk(
             return;
           }
           const isAdmin = fbUser.email === ADMIN_EMAIL;
-          const profile = await loadProfileThunk(fbUser.uid);
+          const profile = await restoreProfile(fbUser.uid);
           dispatch(setAuth({ user: profile, isAdmin }));
           resolve();
         });
@@ -72,13 +80,13 @@ export const initAuth = createAsyncThunk(
     const uid = window.localStorage.getItem(SESSION_KEY);
     const isAdmin = window.localStorage.getItem(ADMIN_KEY) === "true";
     if (uid) {
-      const profile = await loadProfileThunk(uid);
+      const profile = await restoreProfile(uid);
       dispatch(setAuth({ user: profile, isAdmin }));
     } else {
       dispatch(setAuth({ user: null, isAdmin }));
     }
   },
-  { condition: (_, { getState }) => (getState() as { auth: AuthState }).auth.ready },
+  { condition: (_, { getState }) => !(getState() as { auth: AuthState }).auth.ready },
 );
 
 export const signUp = createAsyncThunk(
@@ -242,6 +250,11 @@ const authSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(initAuth.fulfilled, (state) => {
+      state.loading = false;
+      state.ready = true;
+    });
+    builder.addCase(initAuth.rejected, (state, action) => {
+      if (action.meta.condition) return;
       state.loading = false;
       state.ready = true;
     });

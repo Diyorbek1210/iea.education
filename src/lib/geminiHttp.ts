@@ -52,3 +52,51 @@ export function geminiFetch(
     req.end();
   });
 }
+
+const RETRYABLE_STATUS = new Set([408, 429, 500, 502, 503, 504]);
+
+function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(new DOMException("Aborted", "AbortError"));
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    function onAbort() {
+      clearTimeout(timer);
+      reject(new DOMException("Aborted", "AbortError"));
+    }
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+/**
+ * POSTs to the Gemini API with retry + exponential backoff for transient
+ * failures (network drops and 408/429/5xx — e.g. "model is experiencing
+ * high demand"). Returns the first usable response, or the last failed one
+ * once retries are exhausted so callers can surface the real error.
+ */
+export async function geminiFetchWithRetry(
+  url: string,
+  init: {
+    method?: string;
+    headers?: Record<string, string>;
+    body?: string;
+    signal?: AbortSignal;
+  } = {},
+  retries = 4,
+): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    let response: Response | null = null;
+    try {
+      response = await geminiFetch(url, init);
+      if (response.ok || !RETRYABLE_STATUS.has(response.status)) return response;
+    } catch (err) {
+      if (attempt >= retries || init.signal?.aborted) throw err;
+    }
+    if (attempt >= retries) return response as Response;
+    // Drain the abandoned response so the connection can be reused.
+    response?.arrayBuffer().catch(() => undefined);
+    await sleep(Math.min(700 * 2 ** attempt, 8000), init.signal);
+  }
+}

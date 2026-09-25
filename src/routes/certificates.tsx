@@ -258,69 +258,131 @@ function CertificatesPage() {
           {report ? (
             <div
               id="certificate"
-              className="relative overflow-hidden rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/10 p-8 sm:p-12 print:border-primary print:shadow-none"
+              className="relative overflow-hidden rounded-3xl border-2 border-amber-300/50 bg-gradient-to-br from-amber-50/70 via-[#fffdf6] to-amber-100/40 p-8 sm:p-14 print:border-amber-300 print:shadow-none"
             >
+              {/* Watermarks */}
+              <Award className="pointer-events-none absolute -right-8 -top-8 h-52 w-52 rotate-12 text-amber-500/5" />
+              <Award className="pointer-events-none absolute -bottom-10 -left-10 h-56 w-56 -rotate-12 text-amber-500/5" />
+              <span className="pointer-events-none absolute inset-3 rounded-2xl border border-amber-400/20" />
+
               {/* Decorative corners */}
-              <div className="absolute top-0 left-0 h-16 w-16 border-t-2 border-l-2 border-primary/30 rounded-tl-2xl" />
-              <div className="absolute top-0 right-0 h-16 w-16 border-t-2 border-r-2 border-primary/30 rounded-tr-2xl" />
-              <div className="absolute bottom-0 left-0 h-16 w-16 border-b-2 border-l-2 border-primary/30 rounded-bl-2xl" />
-              <div className="absolute bottom-0 right-0 h-16 w-16 border-b-2 border-r-2 border-primary/30 rounded-br-2xl" />
+              <div className="absolute top-0 left-0 h-16 w-16 border-t-2 border-l-2 border-amber-400/40 rounded-tl-3xl" />
+              <div className="absolute top-0 right-0 h-16 w-16 border-t-2 border-r-2 border-amber-400/40 rounded-tr-3xl" />
+              <div className="absolute bottom-0 left-0 h-16 w-16 border-b-2 border-l-2 border-amber-400/40 rounded-bl-3xl" />
+              <div className="absolute bottom-0 right-0 h-16 w-16 border-b-2 border-r-2 border-amber-400/40 rounded-br-3xl" />
 
-              <div className="text-center space-y-4">
-                <Award className="h-16 w-16 text-primary mx-auto" />
-                <p className="text-xs font-bold tracking-[0.3em] text-muted-foreground uppercase">
+              <div className="relative text-center">
+                {/* Emblem */}
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-[0_8px_20px_-6px_rgba(217,119,6,0.5)]">
+                  <Award className="h-7 w-7" />
+                </div>
+
+                <p className="mt-4 text-[11px] font-bold tracking-[0.4em] text-muted-foreground uppercase">
+                  IEA · IELTS Exam Academy
+                </p>
+                <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
                   Certificate of Achievement
-                </p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground">
-                  IELTS Preparation
                 </h2>
+                <div className="mx-auto mt-4 flex max-w-sm items-center gap-3">
+                  <span className="h-px flex-1 bg-gradient-to-r from-transparent to-amber-400/50" />
+                  <Star className="h-3.5 w-3.5 text-amber-500" fill="currentColor" />
+                  <span className="h-px flex-1 bg-gradient-to-l from-transparent to-amber-400/50" />
+                </div>
 
-                <div className="w-16 h-0.5 bg-primary mx-auto" />
+                <p className="mt-8 text-sm text-muted-foreground">This is to certify that</p>
 
-                <p className="text-sm text-muted-foreground">This is to certify that</p>
-                <p className="text-xl sm:text-2xl font-extrabold text-primary">
-                  {user?.name ?? "Student"}
+                <div className="relative mt-3 inline-block">
+                  <p className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+                    {user?.name ?? "Student"}
+                  </p>
+                  <div className="mx-auto mt-2 h-[2px] w-4/5 rounded-full bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
+                </div>
+
+                <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                  has successfully completed the{" "}
+                  <span className="font-bold text-foreground">IELTS Preparation</span> programme at
+                  the International English Academy, demonstrating outstanding performance across
+                  all four skills — Listening, Reading, Writing and Speaking — and was conferred an
+                  overall band score of
                 </p>
 
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  has successfully completed {report.totalTests} IELTS mock test
-                  {report.totalTests > 1 ? "s" : ""} and achieved
-                </p>
-
-                <p className="text-5xl sm:text-6xl font-extrabold text-foreground">
+                <p className="mt-3 text-5xl font-extrabold tracking-tight text-primary sm:text-6xl">
                   Band {report.bestOverall}
                 </p>
 
-                <div className="flex justify-center gap-8 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Listening</p>
-                    <p className="font-bold text-foreground">{report.avgListening}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Reading</p>
-                    <p className="font-bold text-foreground">{report.avgReading}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Writing</p>
-                    <p className="font-bold text-foreground">{report.avgWriting}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Speaking</p>
-                    <p className="font-bold text-foreground">{report.avgSpeaking}</p>
-                  </div>
+                <div className="mx-auto mt-7 grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-4">
+                  {[
+                    { label: "Listening", value: report.avgListening },
+                    { label: "Reading", value: report.avgReading },
+                    { label: "Writing", value: report.avgWriting },
+                    { label: "Speaking", value: report.avgSpeaking },
+                  ].map((s) => (
+                    <div key={s.label} className="rounded-2xl border border-amber-300/30 bg-white/60 px-3 py-2.5">
+                      <p className="text-lg font-extrabold text-foreground">{s.value}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {s.label}
+                      </p>
+                    </div>
+                  ))}
                 </div>
 
-                <div className="pt-4">
-                  <p className="text-xs text-muted-foreground">
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                  <span>
                     Issued on{" "}
                     {new Date().toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
                     })}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">IEA — IELTS Exam Academy</p>
+                  </span>
+                  <span className="h-3 w-px bg-border" />
+                  <span>
+                    Certificate No.{" "}
+                    {`IEA-${new Date().getFullYear()}-${(user?.uid ?? "STUDENT").slice(0, 6).toUpperCase()}`}
+                  </span>
                 </div>
+
+                {/* Signatures + seal */}
+                <div className="relative mt-12 flex flex-col items-center justify-between gap-10 sm:flex-row sm:items-end sm:gap-6">
+                  <div className="w-48 text-center">
+                    <p className="font-['Segoe_Script','Brush_Script_MT','Lucida_Handwriting',cursive] text-2xl text-foreground/75">
+                      Diyorbek Marakhimov
+                    </p>
+                    <div className="mx-auto mt-2 h-px w-44 bg-slate-900/30" />
+                    <p className="mt-2 text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                      Founder
+                    </p>
+                  </div>
+
+                  {/* Embossed stamp */}
+                  <div className="hidden -rotate-12 sm:block" aria-hidden="true">
+                    <div className="flex h-28 w-28 items-center justify-center rounded-full border-[3px] border-double border-amber-600/70">
+                      <div className="flex h-[5.6rem] w-[5.6rem] items-center justify-center rounded-full border border-amber-600/60">
+                        <div className="text-center">
+                          <Star className="mx-auto h-4 w-4 text-amber-600" fill="currentColor" />
+                          <p className="mt-1 text-[9px] font-black uppercase leading-none tracking-widest text-amber-600">
+                            Verified
+                          </p>
+                          <p className="mt-0.5 text-[8px] font-bold text-amber-600/80">IEA · 2026</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-48 text-center">
+                    <p className="font-['Segoe_Script','Brush_Script_MT','Lucida_Handwriting',cursive] text-2xl text-foreground/75">
+                      Azizbek Mamatqulov
+                    </p>
+                    <div className="mx-auto mt-2 h-px w-44 bg-slate-900/30" />
+                    <p className="mt-2 text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                      Co-Founder
+                    </p>
+                  </div>
+                </div>
+
+                <p className="mx-auto mt-10 max-w-md text-[10px] font-medium uppercase tracking-widest text-amber-600/70">
+                  Certified by the founders of IEA — IELTS Exam Academy
+                </p>
               </div>
             </div>
           ) : (

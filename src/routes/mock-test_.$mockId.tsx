@@ -27,7 +27,7 @@ import {
 } from "@/shared/data/mockTest";
 import { scoreMockPerformance } from "@/lib/aiScoring";
 import { useAuth } from "@/lib/auth";
-import { addMockResult, levelForBand, listMockTests, markMockTestCompleted, updateUserProfile } from "@/lib/db";
+import { addMockResult, levelForBand, listMockResults, listMockTests, markMockTestCompleted, updateUserProfile } from "@/lib/db";
 import type { AiFeedback, AiSkillFeedback } from "@/shared/types/types";
 import { cn } from "@/shared/lib/utils";
 
@@ -207,11 +207,16 @@ function MockTestRunPage() {
   const { speak, stop: stopSpeech, isSpeaking, supported: ttsSupported } = useSpeechSynthesis();
 
   const { data: dbMockTests } = useQuery({ queryKey: ["mock-tests"], queryFn: listMockTests });
+  const { data: results = [] } = useQuery({ queryKey: ["mock-results"], queryFn: listMockResults });
   const mockTests = dbMockTests?.length ? dbMockTests : staticMockTests;
 
   const mockSet = mockTests.find((m) => m.id === mockId);
   const mockIndex = mockSet ? mockTests.findIndex((m) => m.id === mockId) : -1;
   const previousMock = mockIndex > 0 ? mockTests[mockIndex - 1] : null;
+
+  const doneMockIds = new Set(
+    results.filter((r) => r.userId === user?.uid).map((r) => r.mockTestId),
+  );
 
   const [stage, setStage] = useState<Stage>("intro");
 
@@ -256,17 +261,17 @@ function MockTestRunPage() {
       return;
     }
     if (justFinishedRef.current) return;
-    if (user.completedMockTests?.includes(mockSet.id)) {
+    if (doneMockIds.has(mockSet.id)) {
       toast.error("You've already completed this mock test.");
       navigate({ to: "/mock-test" });
       return;
     }
-    if (previousMock && !user.completedMockTests?.includes(previousMock.id)) {
+    if (previousMock && !doneMockIds.has(previousMock.id)) {
       toast.error("Complete the previous mock tests first.");
       navigate({ to: "/mock-test" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, mockSet, previousMock]);
+  }, [user, mockSet, previousMock, results]);
 
   if (!mockSet) return null;
 
@@ -371,8 +376,8 @@ function MockTestRunPage() {
       const newLevel = levelForBand(overall);
       await updateUserProfile(user.uid, { level: newLevel });
       await refresh();
-      queryClient.invalidateQueries({ queryKey: ["mock-results"] });
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      await queryClient.invalidateQueries({ queryKey: ["mock-results"] });
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
       toast.success("Result saved");
     } catch {
       toast.error("Could not save your result");

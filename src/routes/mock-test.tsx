@@ -36,8 +36,8 @@ function MockTestListPage() {
   });
 
   const mockTests = dbMockTests?.length ? dbMockTests : staticMockTests;
-  const completed = new Set(user?.completedMockTests ?? []);
   const myResults = results.filter((r) => r.userId === user?.uid);
+  const completed = new Set(myResults.map((r) => r.mockTestId));
 
   return (
     <DashboardShell
@@ -50,7 +50,9 @@ function MockTestListPage() {
           const previous = index > 0 ? mockTests[index - 1] : null;
           const isUnlocked = index === 0 || (previous ? completed.has(previous.id) : true);
           const isLocked = !isDone && !isUnlocked;
-          const result = myResults.find((r) => r.mockTestId === mock.id);
+          const result = myResults
+            .filter((r) => r.mockTestId === mock.id)
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
 
           return (
             <div
