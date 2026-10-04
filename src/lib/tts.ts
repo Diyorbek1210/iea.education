@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
+import { assertSameOrigin, enforceRateLimit } from "@/lib/server-security";
+
 interface SynthesizeInput {
   text: string;
 }
@@ -18,6 +20,8 @@ export const synthesizeSpeech = createServerFn({ method: "POST" })
     return { text: data.text.slice(0, 4500) };
   })
   .handler(async ({ data }) => {
+    assertSameOrigin();
+    enforceRateLimit("google-tts", 30, 60_000);
     if (import.meta.env.DEV && !process.env["GOOGLE_TTS_API_KEY"]) {
       const dotenv = await import("dotenv");
       dotenv.config();

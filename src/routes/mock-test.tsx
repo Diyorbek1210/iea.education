@@ -32,7 +32,7 @@ function MockTestListPage() {
   const { data: dbMockTests } = useQuery({ queryKey: ["mock-tests"], queryFn: listMockTests });
   const { data: results = [] } = useQuery({
     queryKey: ["mock-results"],
-    queryFn: listMockResults,
+    queryFn: () => listMockResults(user?.uid),
   });
 
   const mockTests = dbMockTests?.length ? dbMockTests : staticMockTests;

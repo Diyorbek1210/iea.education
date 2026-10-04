@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { geminiFetchWithRetry } from "@/lib/geminiHttp";
 import { scriptedReply } from "@/lib/aiChatFallback";
+import { assertSameOrigin, enforceRateLimit } from "@/lib/server-security";
 
 const GEMINI_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
@@ -31,6 +32,8 @@ export const chatWithAi = createServerFn({ method: "POST" })
   // unreachable after retries, fall back to a local scripted companion so the
   // speaking practice never hard-fails for the learner.
   .handler(async ({ data }) => {
+    assertSameOrigin();
+    enforceRateLimit("gemini-chat", 20, 60_000);
     if (!process.env["GEMINI_API_KEY"]) {
       try {
         const dotenv = await import("dotenv");

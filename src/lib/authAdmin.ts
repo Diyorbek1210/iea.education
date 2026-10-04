@@ -1,12 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+
+import {
+  assertSameOrigin,
+  enforceRateLimit,
+  getAuthAdminToken,
+  loadServiceAccountEnv,
+  serverAdminEmail,
+  serverProjectId,
+  verifyAdminIdToken,
+} from "./firebaseAdmin";
 
 /**
  * Server-side Firebase Auth administration.
- * The client SDK can only delete the currently signed-in user's own account,
- * so removing a student from Firebase Auth must happen here, using a service
- * account (FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY in the server env).
- * Everything runs with WebCrypto + REST so it works on Cloudflare Workers too,
- * where the Node firebase-admin SDK cannot run.
+ *
+ * The client SDK can only delete the currently signed-in user's own account, so
+ * removing a student from Firebase Auth happens here, with a service account.
  */
 
 interface DeleteAuthUserInput {
@@ -23,141 +32,36 @@ function isDeleteAuthUserInput(data: unknown): data is DeleteAuthUserInput {
   );
 }
 
-/* ------------------------- small JWT helpers ------------------------- */
-
-// Exported for tests/scripts; only deleteAuthUser is used by the app itself.
-
-export function base64UrlEncode(bytes: Uint8Array): string {
-  let binary = "";
-  for (const b of bytes) binary += String.fromCharCode(b);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-export function base64UrlDecode(input: string): Uint8Array {
-  const b64 = input.replace(/-/g, "+").replace(/_/g, "/");
-  const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
-  const binary = atob(padded);
-  return Uint8Array.from(binary, (c) => c.charCodeAt(0));
-}
-
-export function decodeJwtPart<T>(part: string): T {
-  return JSON.parse(new TextDecoder().decode(base64UrlDecode(part))) as T;
-}
-
-export async function importRsaPrivateKey(pem: string): Promise<CryptoKey> {
-  const cleaned = pem
-    .replace(/\\n/g, "\n")
-    .replace(/-----BEGIN PRIVATE KEY-----/, "")
-    .replace(/-----END PRIVATE KEY-----/, "")
-    .replace(/\s/g, "");
-  const der = Uint8Array.from(atob(cleaned), (c) => c.charCodeAt(0));
-  return crypto.subtle.importKey(
-    "pkcs8",
-    der.buffer as ArrayBuffer,
-    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-}
-
-/* ----------------- verify the caller is the site admin ---------------- */
-
-const GOOGLE_SECURETOKEN_JWKS =
-  "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com";
-
-export async function verifyAdminIdToken(
-  idToken: string,
-  projectId: string,
-  adminEmail: string,
-): Promise<void> {
-  const [headerPart, payloadPart, signaturePart] = idToken.split(".");
-  if (!headerPart || !payloadPart || !signaturePart) {
-    throw new Error("Malformed ID token");
-  }
-
-  const header = decodeJwtPart<{ alg?: string; kid?: string }>(headerPart);
-  const payload = decodeJwtPart<{ iss?: string; aud?: string; exp?: number; email?: string }>(
-    payloadPart,
-  );
-
-  if (header.alg !== "RS256" || !header.kid) throw new Error("Unexpected token algorithm");
-  if (payload.iss !== `https://securetoken.google.com/${projectId}`)
-    throw new Error("Token issuer mismatch");
-  if (payload.aud !== projectId) throw new Error("Token audience mismatch");
-  if (!payload.exp || payload.exp * 1000 < Date.now()) throw new Error("Token expired");
-
-  const jwks = (await (await fetch(GOOGLE_SECURETOKEN_JWKS)).json()) as {
-    keys: Array<JsonWebKey & { kid?: string }>;
-  };
-  const jwk = jwks.keys.find((k) => k.kid === header.kid);
-  if (!jwk) throw new Error("Signing key not found");
-
-  const key = await crypto.subtle.importKey(
-    "jwk",
-    jwk,
-    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-    false,
-    ["verify"],
-  );
-  const valid = await crypto.subtle.verify(
-    "RSASSA-PKCS1-v1_5",
-    key,
-    base64UrlDecode(signaturePart).buffer as ArrayBuffer,
-    new TextEncoder().encode(`${headerPart}.${payloadPart}`),
-  );
-  if (!valid) throw new Error("Invalid token signature");
-  if (payload.email !== adminEmail) throw new Error("Only the site admin can delete accounts");
-}
-
-/* ----------------- mint a service-account access token ---------------- */
-
-let cachedToken: { value: string; expiresAt: number } | null = null;
-
-async function getAccessToken(clientEmail: string, privateKeyPem: string): Promise<string> {
-  if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) return cachedToken.value;
-
-  const key = await importRsaPrivateKey(privateKeyPem);
-  const now = Math.floor(Date.now() / 1000);
-  const header = base64UrlEncode(
-    new TextEncoder().encode(JSON.stringify({ alg: "RS256", typ: "JWT" })),
-  );
-  const claims = base64UrlEncode(
-    new TextEncoder().encode(
-      JSON.stringify({
-        iss: clientEmail,
-        scope: "https://www.googleapis.com/auth/identitytoolkit",
-        aud: "https://oauth2.googleapis.com/token",
-        iat: now,
-        exp: now + 3600,
-      }),
-    ),
-  );
-  const signingInput = `${header}.${claims}`;
-  const signature = await crypto.subtle.sign(
-    "RSASSA-PKCS1-v1_5",
-    key,
-    new TextEncoder().encode(signingInput),
-  );
-  const jwt = `${signingInput}.${base64UrlEncode(new Uint8Array(signature))}`;
-
-  const response = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt,
+/**
+ * Authoritative admin check for the caller's Firebase ID token.
+ *
+ * The browser also keeps an `isAdmin` flag for rendering, but that value is
+ * attacker-controlled. Anything that must actually be restricted calls this
+ * instead: it re-verifies the RS256 signature, issuer, audience and expiry
+ * against Google's live JWKS before answering.
+ */
+export const verifyAdmin = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      idToken: z.string().min(1).max(4096),
     }),
-  });
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Could not authenticate the service account: ${body}`);
-  }
-  const json = (await response.json()) as { access_token: string; expires_in: number };
-  cachedToken = { value: json.access_token, expiresAt: Date.now() + json.expires_in * 1000 };
-  return json.access_token;
-}
+  )
+  .handler(async ({ data }) => {
+    assertSameOrigin();
+    enforceRateLimit("admin-verify", 30, 60_000);
 
-/* --------------------------- the server function --------------------------- */
+    try {
+      await verifyAdminIdToken(data.idToken, serverProjectId(), serverAdminEmail());
+      return { isAdmin: true };
+    } catch (error) {
+      // A non-admin token is an expected answer, not a server fault — report it
+      // as a value so the caller can redirect instead of surfacing a 500.
+      return {
+        isAdmin: false,
+        reason: error instanceof Error ? error.message : "Not an admin",
+      };
+    }
+  });
 
 export const deleteAuthUser = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
@@ -167,61 +71,34 @@ export const deleteAuthUser = createServerFn({ method: "POST" })
     return { uid: data.uid, idToken: data.idToken };
   })
   .handler(async ({ data }) => {
-    // Vite dev loads VITE_-prefixed vars only; production via Nitro/Cloudflare
-    // injects them automatically — but Cloudflare Workers need secrets set in
-    // the dashboard. The dotenv fallback covers local dev; override: true is
-    // needed because Vite may set empty-string values that dotenv won't
-    // replace by default.
-    if (!process.env["FIREBASE_CLIENT_EMAIL"]) {
-      try {
-        const dotenv = await import("dotenv");
-        const { resolve, dirname } = await import("node:path");
-        const { fileURLToPath } = await import("node:url");
-        const cwd = process.cwd();
-        const srcDir = dirname(fileURLToPath(import.meta.url));
-        dotenv.config({ path: resolve(cwd, ".env"), override: true });
-        if (!process.env["FIREBASE_CLIENT_EMAIL"]) {
-          dotenv.config({ path: resolve(srcDir, "../../.env"), override: true });
-        }
-        if (!process.env["FIREBASE_CLIENT_EMAIL"]) {
-          dotenv.config({ path: resolve(srcDir, "../../../.env"), override: true });
-        }
-      } catch {
-        // Production Cloudflare Workers can't read the filesystem;
-        // secrets must be set via the Lovable dashboard.
-      }
-    }
+    assertSameOrigin();
+    enforceRateLimit("admin-delete-user", 20, 60 * 60 * 1000);
 
-    const clientEmail = process.env["FIREBASE_CLIENT_EMAIL"];
-    const privateKey = process.env["FIREBASE_PRIVATE_KEY"];
-    const projectId = process.env["FIREBASE_PROJECT_ID"] || "salom-4f3bd";
-    const adminEmail = process.env["ADMIN_EMAIL"] || "diyorbekmuzaffarovich4@gmail.com";
-
+    const { clientEmail, privateKey } = await loadServiceAccountEnv();
     if (!clientEmail || !privateKey) {
       console.error(
         "[deleteAuthUser] FIREBASE_CLIENT_EMAIL or FIREBASE_PRIVATE_KEY is missing from process.env. " +
-          "In production, set them as secrets in the Lovable dashboard (Project Settings → Environment Variables).",
+          "In production, set them as secrets in the deployment dashboard (Project Settings → Environment Variables).",
       );
       return { deleted: false, reason: "missing_keys" };
     }
 
-    await verifyAdminIdToken(data.idToken, projectId, adminEmail);
+    await verifyAdminIdToken(data.idToken, serverProjectId(), serverAdminEmail());
 
-    const accessToken = await getAccessToken(clientEmail, privateKey);
+    const projectId = serverProjectId();
     const response = await fetch(
       `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:delete`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${await getAuthAdminToken()}`,
         },
         body: JSON.stringify({ localId: data.uid }),
       },
     );
     if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`Firebase Auth deletion failed: ${body}`);
+      throw new Error(`Firebase Auth deletion failed: ${await response.text()}`);
     }
     return { deleted: true };
   });

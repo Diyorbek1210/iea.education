@@ -207,7 +207,7 @@ function MockTestRunPage() {
   const { speak, stop: stopSpeech, isSpeaking, supported: ttsSupported } = useSpeechSynthesis();
 
   const { data: dbMockTests } = useQuery({ queryKey: ["mock-tests"], queryFn: listMockTests });
-  const { data: results = [] } = useQuery({ queryKey: ["mock-results"], queryFn: listMockResults });
+  const { data: results = [] } = useQuery({ queryKey: ["mock-results", user?.uid], queryFn: () => listMockResults(user?.uid) });
   const mockTests = dbMockTests?.length ? dbMockTests : staticMockTests;
 
   const mockSet = mockTests.find((m) => m.id === mockId);

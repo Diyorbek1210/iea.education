@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { geminiFetchWithRetry } from "@/lib/geminiHttp";
+import { assertSameOrigin, enforceRateLimit } from "@/lib/server-security";
 
 const GEMINI_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
@@ -34,12 +35,17 @@ async function callGemini(apiKey: string, prompt: string): Promise<string> {
   }
 }
 
-function getApiKey(): string {
+async function getApiKey(): Promise<string> {
+  // Vite dev loads only VITE_-prefixed .env vars into process.env, and preview/deploy
+  // environments (wrangler, nitro) may not load .env at all. When the key is missing,
+  // try loading it from .env here (a no op where the key is already set or fs is absent).
   if (!process.env["GEMINI_API_KEY"]) {
     try {
-      const dotenv = require("dotenv");
+      const dotenv = await import("dotenv");
       dotenv.config();
-    } catch {}
+    } catch {
+      // No filesystem access (edge runtime) — the key must come from real env vars.
+    }
   }
   const key = process.env["GEMINI_API_KEY"];
   if (!key) throw new Error("GEMINI_API_KEY is not configured on the server.");
@@ -57,7 +63,10 @@ export interface GeneratedListeningQuestion {
   explanation: string;
 }
 
-const LISTENING_PROMPT = (type: string, difficulty: string) => `You are an IELTS exam content creator. Generate 3 IELTS Listening ${type} questions at ${difficulty} difficulty.
+const LISTENING_PROMPT = (
+  type: string,
+  difficulty: string,
+) => `You are an IELTS exam content creator. Generate 3 IELTS Listening ${type} questions at ${difficulty} difficulty.
 
 Return ONLY a JSON object in this exact shape:
 {
@@ -84,7 +93,10 @@ export const generateListeningQuestions = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
-    const apiKey = getApiKey();
+    assertSameOrigin();
+    enforceRateLimit("gemini-task-listen-gen", 15, 60_000);
+
+    const apiKey = await getApiKey();
     const prompt = LISTENING_PROMPT(data.type, data.difficulty);
     const text = await callGemini(apiKey, prompt);
 
@@ -119,7 +131,9 @@ export interface GeneratedSpeakingQuestion {
   tips: string;
 }
 
-const SPEAKING_PROMPT = (part: string) => `You are an IELTS speaking examiner. Generate 3 IELTS Speaking ${part} questions.
+const SPEAKING_PROMPT = (
+  part: string,
+) => `You are an IELTS speaking examiner. Generate 3 IELTS Speaking ${part} questions.
 
 Return ONLY a JSON object in this exact shape:
 {
@@ -144,7 +158,10 @@ export const generateSpeakingQuestions = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
-    const apiKey = getApiKey();
+    assertSameOrigin();
+    enforceRateLimit("gemini-task-speak-gen", 15, 60_000);
+
+    const apiKey = await getApiKey();
     const prompt = SPEAKING_PROMPT(data.part);
     const text = await callGemini(apiKey, prompt);
 
@@ -167,7 +184,10 @@ export const generateSpeakingQuestions = createServerFn({ method: "POST" })
 /* ──────────────────────────────────────────────
    Score Writing Essay
    ────────────────────────────────────────────── */
-const WRITING_SCORE_PROMPT = (prompt: string, essay: string) => `You are a certified IELTS examiner. Evaluate this IELTS Writing Task 2 essay.
+const WRITING_SCORE_PROMPT = (
+  prompt: string,
+  essay: string,
+) => `You are a certified IELTS examiner. Evaluate this IELTS Writing Task 2 essay.
 
 Essay Prompt: ${prompt}
 Candidate's Essay:
@@ -202,7 +222,10 @@ export const scoreWritingEssay = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
-    const apiKey = getApiKey();
+    assertSameOrigin();
+    enforceRateLimit("gemini-task-writing-score", 10, 60_000);
+
+    const apiKey = await getApiKey();
     const prompt = WRITING_SCORE_PROMPT(data.prompt, data.essay);
     const text = await callGemini(apiKey, prompt);
 
@@ -229,7 +252,10 @@ export const scoreWritingEssay = createServerFn({ method: "POST" })
 /* ──────────────────────────────────────────────
    Score Speaking Answer
    ────────────────────────────────────────────── */
-const SPEAKING_SCORE_PROMPT = (question: string, transcript: string) => `You are a certified IELTS speaking examiner. Evaluate this speaking answer.
+const SPEAKING_SCORE_PROMPT = (
+  question: string,
+  transcript: string,
+) => `You are a certified IELTS speaking examiner. Evaluate this speaking answer.
 
 Examiner: ${question}
 Candidate: ${transcript}
@@ -262,7 +288,10 @@ export const scoreSpeakingAnswer = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
-    const apiKey = getApiKey();
+    assertSameOrigin();
+    enforceRateLimit("gemini-task-speaking-score", 15, 60_000);
+
+    const apiKey = await getApiKey();
     const prompt = SPEAKING_SCORE_PROMPT(data.question, data.transcript);
     const text = await callGemini(apiKey, prompt);
 

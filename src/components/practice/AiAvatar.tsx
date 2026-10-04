@@ -1,12 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
-export type AvatarEmotion =
-  | "idle"
-  | "listening"
-  | "thinking"
-  | "speaking"
-  | "happy"
-  | "surprised";
+import { sanitizeSvg } from "@/shared/lib/sanitize-svg";
+
+export type AvatarEmotion = "idle" | "listening" | "thinking" | "speaking" | "happy" | "surprised";
 
 interface AiAvatarProps {
   emotion: AvatarEmotion;
@@ -31,12 +27,15 @@ export function AiAvatar({ emotion, size = 200 }: AiAvatarProps) {
     fetch(getAvatarUrl(SEED))
       .then((r) => r.text())
       .then((svg) => {
+        // Sanitise before touching it: this markup goes straight into the DOM
+        // via dangerouslySetInnerHTML, and the CSP permits inline scripts.
+        const safeSvg = sanitizeSvg(svg);
+        if (!safeSvg) {
+          setSvgContent("");
+          return;
+        }
         // Inject CSS animations into the SVG for eye blink and look-around
-        const animatedSvg = svg
-          .replace(
-            "<svg ",
-            `<svg style="overflow:visible" `,
-          );
+        const animatedSvg = safeSvg.replace("<svg ", `<svg style="overflow:visible" `);
         setSvgContent(animatedSvg);
       })
       .catch(() => {
@@ -74,7 +73,12 @@ export function AiAvatar({ emotion, size = 200 }: AiAvatarProps) {
       const fill = el.getAttribute("fill");
       const cy = parseFloat(el.getAttribute("cy") || "0");
       const r = parseFloat(el.getAttribute("r") || "0");
-      if ((fill === "#1A1A1A" || fill === "#000" || fill === "black") && r < 5 && cy > 60 && cy < 110) {
+      if (
+        (fill === "#1A1A1A" || fill === "#000" || fill === "black") &&
+        r < 5 &&
+        cy > 60 &&
+        cy < 110
+      ) {
         pupils.push(el);
       }
     });
@@ -91,7 +95,10 @@ export function AiAvatar({ emotion, size = 200 }: AiAvatarProps) {
     blinkTimerRef.current = setTimeout(blink, 1500);
 
     // Look around animation
-    let lookX = 0, lookY = 0, targetX = 0, targetY = 0;
+    let lookX = 0,
+      lookY = 0,
+      targetX = 0,
+      targetY = 0;
     const pickTarget = () => {
       targetX = (Math.random() - 0.5) * 4;
       targetY = (Math.random() - 0.5) * 2;
@@ -133,7 +140,10 @@ export function AiAvatar({ emotion, size = 200 }: AiAvatarProps) {
               : "";
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
       {(emotion === "listening" || emotion === "speaking") && (
         <div
           className="absolute inset-0 rounded-full animate-pulse opacity-15"
@@ -160,10 +170,14 @@ export function AiAvatar({ emotion, size = 200 }: AiAvatarProps) {
 
         {/* Emotion particles */}
         {emotion === "happy" && (
-          <span className="absolute -top-1 -right-1 text-sm animate-[float-up_1.5s_ease-in-out_infinite]">✨</span>
+          <span className="absolute -top-1 -right-1 text-sm animate-[float-up_1.5s_ease-in-out_infinite]">
+            ✨
+          </span>
         )}
         {emotion === "thinking" && (
-          <span className="absolute -top-2 right-0 text-xs animate-[float-up_2s_ease-in-out_infinite]">💭</span>
+          <span className="absolute -top-2 right-0 text-xs animate-[float-up_2s_ease-in-out_infinite]">
+            💭
+          </span>
         )}
         {emotion === "speaking" && (
           <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex gap-1">

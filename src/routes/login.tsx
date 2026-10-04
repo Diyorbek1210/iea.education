@@ -2,12 +2,28 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { Logo } from "@/components/Logo";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { useAuth } from "@/lib/auth";
+
+/**
+ * `redirect` carries the page a guard bounced off. Only same-origin paths are
+ * honoured — accepting an absolute URL here would turn the login form into an
+ * open redirect.
+ */
+const loginSearchSchema = z.object({
+  redirect: z
+    .string()
+    .max(2048)
+    .optional()
+    .refine((value) => !value || value.startsWith("/") || !value.includes("//"), {
+      message: "Invalid redirect target",
+    }),
+});
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -24,12 +40,14 @@ export const Route = createFileRoute("/login")({
       },
     ],
   }),
+  validateSearch: loginSearchSchema,
   component: LoginPage,
 });
 
 function LoginPage() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const { redirect: redirectTo } = Route.useSearch();
   const [values, setValues] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -44,6 +62,12 @@ function LoginPage() {
     try {
       const { isAdmin } = await signIn(values.email, values.password);
       toast.success(isAdmin ? "Welcome back, admin!" : "Welcome back!");
+      // A guard's bounce target wins over the default landing page, but never
+      // over the admin panel for an admin.
+      if (redirectTo && !isAdmin) {
+        navigate({ to: redirectTo });
+        return;
+      }
       navigate({ to: isAdmin ? "/admin" : "/dashboard" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not sign in");

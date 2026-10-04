@@ -37,12 +37,12 @@ function CertificatesPage() {
 
   const { data: mockResults = [] } = useQuery({
     queryKey: ["mock-results"],
-    queryFn: listMockResults,
+    queryFn: () => listMockResults(user?.uid),
   });
 
   const { data: plans = [] } = useQuery({
     queryKey: ["study-plans"],
-    queryFn: listStudyPlans,
+    queryFn: () => listStudyPlans(user?.uid),
   });
 
   const { data: profile } = useQuery({

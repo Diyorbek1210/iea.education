@@ -289,6 +289,13 @@ function localPlacementQuestions(): PlacementQuestion[] {
  * ------------------------------------------------------------------ */
 
 import { uploadToR2 } from "./r2Server";
+import {
+  MAX_UPLOAD_BYTES,
+  MAX_UPLOAD_LABEL,
+  allowedMimeList,
+  isAllowedMime,
+  type UploadFolder,
+} from "./uploadPolicy";
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -302,30 +309,41 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-export async function uploadResourceFile(file: File): Promise<string> {
+/**
+ * Client-side mirror of the server policy so an oversized or disallowed file
+ * fails instantly instead of after a full base64 round-trip. The server still
+ * re-validates everything — this only saves the user the wait.
+ */
+function assertUploadableLocally(file: File, folder: UploadFolder): void {
+  if (file.size === 0) throw new Error("That file is empty.");
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error(`Files must be ${MAX_UPLOAD_LABEL} or smaller.`);
+  }
+  if (!isAllowedMime(folder, file.type)) {
+    throw new Error(`That file type is not allowed here. Allowed: ${allowedMimeList(folder)}.`);
+  }
+}
+
+async function uploadFile(file: File, folder: UploadFolder): Promise<string> {
+  assertUploadableLocally(file, folder);
   const fileBase64 = await fileToBase64(file);
   const { objectUrl } = await uploadToR2({
     data: {
       fileBase64,
       fileName: file.name,
       contentType: file.type || "application/octet-stream",
-      folder: "resources",
+      folder,
     },
   });
   return objectUrl;
 }
 
-export async function uploadShadowingFile(file: File): Promise<string> {
-  const fileBase64 = await fileToBase64(file);
-  const { objectUrl } = await uploadToR2({
-    data: {
-      fileBase64,
-      fileName: file.name,
-      contentType: file.type || "application/octet-stream",
-      folder: "shadowing",
-    },
-  });
-  return objectUrl;
+export function uploadResourceFile(file: File): Promise<string> {
+  return uploadFile(file, "resources");
+}
+
+export function uploadShadowingFile(file: File): Promise<string> {
+  return uploadFile(file, "shadowing");
 }
 
 /* ------------------------------------------------------------------ *
@@ -648,9 +666,19 @@ export async function deleteShadowingClip(id: string): Promise<void> {
  * Mock results
  * ------------------------------------------------------------------ */
 
-export async function listMockResults(): Promise<MockResult[]> {
-  if (!isFirebaseConfigured || !db) return read<MockResult[]>(KEYS.mocks, []);
-  const snap = await getDocs(collection(db, "mockResults"));
+/**
+ * Passing `uid` scopes the query to one student's rows, which is what the
+ * Firestore rules allow a non-admin to read. Omitting it requests every row and
+ * is only satisfiable by an admin, so keep the argument at the user-facing call
+ * sites and leave it off inside the admin panel.
+ */
+export async function listMockResults(uid?: string): Promise<MockResult[]> {
+  if (!isFirebaseConfigured || !db) {
+    const rows = read<MockResult[]>(KEYS.mocks, []);
+    return uid ? rows.filter((row) => row.userId === uid) : rows;
+  }
+  const base = collection(db, "mockResults");
+  const snap = await getDocs(uid ? query(base, where("userId", "==", uid)) : base);
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<MockResult, "id">) }));
 }
 
@@ -770,9 +798,13 @@ export async function deletePlacementQuestion(id: string): Promise<void> {
 
 const PRACTICE_KEY = "iea_practice_sessions";
 
-export async function listPracticeSessions(): Promise<PracticeSession[]> {
-  if (!isFirebaseConfigured || !db) return read<PracticeSession[]>(PRACTICE_KEY, []);
-  const snap = await getDocs(collection(db, "practiceSessions"));
+export async function listPracticeSessions(uid?: string): Promise<PracticeSession[]> {
+  if (!isFirebaseConfigured || !db) {
+    const rows = read<PracticeSession[]>(PRACTICE_KEY, []);
+    return uid ? rows.filter((row) => row.userId === uid) : rows;
+  }
+  const base = collection(db, "practiceSessions");
+  const snap = await getDocs(uid ? query(base, where("userId", "==", uid)) : base);
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PracticeSession, "id">) }));
 }
 
@@ -791,9 +823,13 @@ export async function addPracticeSession(session: Omit<PracticeSession, "id">): 
 
 const WRITING_KEY = "iea_writing_submissions";
 
-export async function listWritingSubmissions(): Promise<WritingSubmission[]> {
-  if (!isFirebaseConfigured || !db) return read<WritingSubmission[]>(WRITING_KEY, []);
-  const snap = await getDocs(collection(db, "writingSubmissions"));
+export async function listWritingSubmissions(uid?: string): Promise<WritingSubmission[]> {
+  if (!isFirebaseConfigured || !db) {
+    const rows = read<WritingSubmission[]>(WRITING_KEY, []);
+    return uid ? rows.filter((row) => row.userId === uid) : rows;
+  }
+  const base = collection(db, "writingSubmissions");
+  const snap = await getDocs(uid ? query(base, where("userId", "==", uid)) : base);
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<WritingSubmission, "id">) }));
 }
 
@@ -815,9 +851,13 @@ export async function addWritingSubmission(
 
 const STUDY_PLAN_KEY = "iea_study_plans";
 
-export async function listStudyPlans(): Promise<StudyPlanRecord[]> {
-  if (!isFirebaseConfigured || !db) return read<StudyPlanRecord[]>(STUDY_PLAN_KEY, []);
-  const snap = await getDocs(collection(db, "studyPlans"));
+export async function listStudyPlans(uid?: string): Promise<StudyPlanRecord[]> {
+  if (!isFirebaseConfigured || !db) {
+    const rows = read<StudyPlanRecord[]>(STUDY_PLAN_KEY, []);
+    return uid ? rows.filter((row) => row.userId === uid) : rows;
+  }
+  const base = collection(db, "studyPlans");
+  const snap = await getDocs(uid ? query(base, where("userId", "==", uid)) : base);
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<StudyPlanRecord, "id">) }));
 }
 

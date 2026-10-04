@@ -1,0 +1,208 @@
+rules_version = '2';
+
+/**
+ * Firestore security rules for the IEA app.
+ *
+ * These are the real access-control boundary. Client-side `isAdmin` flags and
+ * route guards are UX; everything here is enforced by Firebase regardless of
+ * what the browser sends.
+ *
+ * Model:
+ *   - Content the app serves before sign-in (placement questions, model
+ *     answers, resources, vocabulary, requirements, learning path) is world
+ *     readable but admin writable.
+ *   - A learner's own rows (profile, mock results, practice sessions, writing
+ *     submissions, study plans) are readable and writable only by that
+ *     learner. Cross-student aggregates (leaderboard) go through a server
+ *     function so raw essays and transcripts never leave the server.
+ *   - Community threads are world readable; only the author or an admin can
+ *     change or remove them.
+ *
+ * Deploy with:  firebase deploy --only firestore:rules
+ */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ----------------------------- helpers ----------------------------- */
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Matches the server's ADMIN_EMAIL. Keeping the address here — rather than a
+    // role document — means revoking admin is a one-line change in two places
+    // and takes effect on the next rules deploy.
+    function adminEmail() {
+      return 'diyorbekmuzaffarovich4@gmail.com';
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.lower() == adminEmail();
+    }
+
+    function ownsExisting() {
+      return isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    function ownsIncoming() {
+      return isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Fields that identify the account. A client may never rewrite them, which
+    // blocks both profile takeover and impersonating another learner's results.
+    function identityKeys() {
+      return ['uid', 'email', 'createdAt'];
+    }
+
+    /* ------------------------------ users ------------------------------ */
+
+    match /users/{uid} {
+      // A learner may read their own profile; admins read any. Listing the
+      // collection is admin-only, which is what the admin panel does.
+      allow get: if isOwner(uid) || isAdmin();
+      allow list: if isAdmin();
+
+      // The document path already binds the write to this uid, so the only
+      // thing left to police is the email: without this a caller could create
+      // their own document carrying somebody else's address. Note that
+      // `createUserProfile` deliberately does not persist `uid` inside the
+      // document, so requiring the field here would lock every new learner out.
+      allow create: if isOwner(uid)
+        && request.resource.data.email == request.auth.token.email;
+
+      // A learner may update their own profile, gamification counters and
+      // progress. Identity fields stay immutable.
+      //
+      // Note: because these counters are still written from the client, a
+      // learner could inflate their own xp. That is a leaderboard cheat, not a
+      // cross-account breach — it touches nothing but their own document.
+      // Moving these writes server-side would close it; the service-account
+      // plumbing for that already exists in src/lib/firebaseAdmin.ts.
+      allow update: if isOwner(uid)
+        && !request.resource.data.diff(resource.data).affectedKeys()
+             .hasAny(identityKeys());
+      allow delete: if isAdmin();
+    }
+
+    /* ---------------------- per-learner result rows --------------------- */
+
+    match /mockResults/{resultId} {
+      allow get, list: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if ownsIncoming();
+      allow update, delete: if isAdmin() || ownsExisting();
+    }
+
+    match /practiceSessions/{sessionId} {
+      allow get, list: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if ownsIncoming();
+      allow update, delete: if isAdmin() || ownsExisting();
+    }
+
+    match /writingSubmissions/{submissionId} {
+      allow get, list: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if ownsIncoming();
+      allow update, delete: if isAdmin() || ownsExisting();
+    }
+
+    match /studyPlans/{planId} {
+      allow get, list: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if ownsIncoming();
+      allow update, delete: if isAdmin() || ownsExisting();
+    }
+
+    /* --------------------- admin-managed site content -------------------- */
+
+    match /resources/{resourceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /placementQuestions/{questionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /vocabulary/{wordId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /modelAnswers/{answerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /countryRequirements/{requirementId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /universityRequirements/{requirementId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /learningSteps/{stepId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /shadowingClips/{clipId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /mockTests/{testId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    /* ----------------------------- community ----------------------------- */
+
+    match /communityThreads/{threadId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.authorEmail == request.auth.token.email;
+
+      // Anyone signed in may bump the like counter, but only the counter:
+      // `hasOnly` means a non-author cannot also rewrite the body, the title or
+      // the author fields in the same request.
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.authorEmail == request.auth.token.email)
+        || (isSignedIn()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']));
+      allow delete: if isAdmin()
+        || (isSignedIn() && resource.data.authorEmail == request.auth.token.email);
+
+      match /replies/{replyId} {
+        allow read: if true;
+        allow create: if isSignedIn()
+          && request.resource.data.authorEmail == request.auth.token.email;
+        allow update: if isAdmin()
+          || (isSignedIn() && resource.data.authorEmail == request.auth.token.email)
+          || (isSignedIn()
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']));
+        allow delete: if isAdmin()
+          || (isSignedIn() && resource.data.authorEmail == request.auth.token.email);
+      }
+    }
+
+    /* ------------------------- default: deny ------------------------- */
+
+    // Anything not matched above is denied. Adding a collection to the app
+    // without adding it here fails closed instead of open.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowDown,
@@ -45,6 +45,8 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Textarea } from "@/shared/ui/textarea";
 import { useAuth } from "@/lib/auth";
+import { useAdminAccess } from "@/lib/useAdminAccess";
+import { getStore } from "@/app/store";
 import { ADMIN_EMAIL } from "@/shared/config/firebase";
 import {
   addPlacementQuestion,
@@ -128,6 +130,15 @@ export const Route = createFileRoute("/admin")({
       { property: "og:description", content: "Internal management area for IEA administrators." },
     ],
   }),
+  // Cheap redirect before the component tree mounts. This is UX, not the
+  // boundary — AdminPage re-verifies the token server-side and the Firestore
+  // rules are what actually refuse a non-admin.
+  beforeLoad: ({ location }) => {
+    const { auth } = getStore().getState();
+    if (auth.ready && !auth.user) {
+      throw redirect({ to: "/login", search: { redirect: location.href } });
+    }
+  },
   component: AdminPage,
 });
 
@@ -166,15 +177,20 @@ const navSections: { label: string; items: { id: Tab; label: string; icon: typeo
   { label: "Overview", items: [tabs[0]!] },
   {
     label: "Learners",
-    items: ["students", "mock-tests", "results", "placement"].map(
-      (id) => tabs.find((t) => t.id === id)!,
+    items: ["students", "mock-tests", "results", "placement"].map((id) =>
+      tabs.find((t) => t.id === id)!,
     ),
   },
   {
     label: "Learning content",
-    items: ["learning-path", "resources", "vocabulary", "model-answers", "requirements", "shadowing"].map(
-      (id) => tabs.find((t) => t.id === id)!,
-    ),
+    items: [
+      "learning-path",
+      "resources",
+      "vocabulary",
+      "model-answers",
+      "requirements",
+      "shadowing",
+    ].map((id) => tabs.find((t) => t.id === id)!),
   },
   { label: "Community", items: ["community"].map((id) => tabs.find((t) => t.id === id)!) },
   { label: "System", items: ["seed"].map((id) => tabs.find((t) => t.id === id)!) },
@@ -355,8 +371,40 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
+/**
+ * Gate for the admin area.
+ *
+ * Splitting the gate from the panel matters: the panel's React Query hooks run
+ * as soon as it mounts, so keeping them behind a server-confirmed check means
+ * a non-admin never issues those reads at all — the Firestore rules would deny
+ * them anyway, but not issuing them avoids leaking the attempt.
+ */
 function AdminPage() {
-  const { isAdmin, loading, signOut } = useAuth();
+  const { loading, user } = useAuth();
+  const navigate = useNavigate();
+  const access = useAdminAccess();
+
+  useEffect(() => {
+    if (!loading && !user) navigate({ to: "/login", replace: true });
+  }, [loading, user, navigate]);
+
+  useEffect(() => {
+    if (access === "denied" && user) navigate({ to: "/", replace: true });
+  }, [access, user, navigate]);
+
+  if (loading || !user || access !== "allowed") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">Checking admin access...</p>
+      </div>
+    );
+  }
+
+  return <AdminPanel />;
+}
+
+function AdminPanel() {
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>("overview");
@@ -365,7 +413,9 @@ function AdminPage() {
   const { data: users = [] } = useQuery({ queryKey: ["users"], queryFn: listUsers });
   const { data: results = [] } = useQuery({
     queryKey: ["mock-results"],
-    queryFn: listMockResults,
+    // Unscoped on purpose: only an admin satisfies this under the Firestore
+    // rules, and the rules refuse it before the data ever leaves Firebase.
+    queryFn: () => listMockResults(),
   });
   const { data: resources = [] } = useQuery({
     queryKey: ["resources"],
@@ -1074,18 +1124,6 @@ function AdminPage() {
     }
   }
 
-  useEffect(() => {
-    if (!loading && !isAdmin) navigate({ to: "/login" });
-  }, [loading, isAdmin, navigate]);
-
-  if (loading || !isAdmin) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">Checking admin access...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex min-h-screen bg-surface">
       {/* Desktop sidebar */}
@@ -1168,2039 +1206,2088 @@ function AdminPage() {
 
         <div className="min-w-0 flex-1">
           <main className="mx-auto w-full max-w-6xl animate-fade-up px-4 py-6 sm:px-6 sm:py-8">
-          {tab === "overview" && (
-            <>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {[
-                  { label: "Students", value: users.length },
-                  { label: "Resources", value: resources.length },
-                  { label: "Mock attempts", value: results.length },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="animate-fade-up rounded-3xl border border-line bg-white p-6 shadow-soft"
-                  >
-                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-ink-faint">
-                      {stat.label}
-                    </p>
-                    <p className="mt-2 text-3xl font-black tracking-tighter text-ink">
-                      {stat.value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 grid gap-6 lg:grid-cols-2">
-                <div className="animate-fade-up rounded-3xl border border-line bg-white p-6 shadow-soft [animation-delay:60ms]">
-                  <h2 className="text-sm font-black uppercase tracking-tight text-ink">
-                    Students by level
-                  </h2>
-                  <p className="mt-1 text-xs font-medium text-ink-soft">
-                    How many registered students fall into each placement level.
-                  </p>
-                  <ChartContainer
-                    config={levelChartConfig}
-                    className="mt-4 aspect-auto h-64 w-full"
-                  >
-                    <BarChart data={studentsByLevel} margin={{ left: -20 }}>
-                      <CartesianGrid vertical={false} />
-                      <XAxis
-                        dataKey="level"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
-                        fontSize={11}
-                      />
-                      <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        allowDecimals={false}
-                        fontSize={11}
-                      />
-                      <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                      <Bar dataKey="value" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
-                    </BarChart>
-                  </ChartContainer>
-                </div>
-
-                <div className="animate-fade-up rounded-3xl border border-line bg-white p-6 shadow-soft [animation-delay:100ms]">
-                  <h2 className="text-sm font-black uppercase tracking-tight text-ink">
-                    Average band by skill
-                  </h2>
-                  <p className="mt-1 text-xs font-medium text-ink-soft">
-                    Average score across every saved mock test attempt.
-                  </p>
-                  <ChartContainer
-                    config={skillChartConfig}
-                    className="mt-4 aspect-auto h-64 w-full"
-                  >
-                    <BarChart data={averageBySkill} margin={{ left: -20 }}>
-                      <CartesianGrid vertical={false} />
-                      <XAxis
-                        dataKey="skill"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
-                        fontSize={11}
-                      />
-                      <YAxis tickLine={false} axisLine={false} domain={[0, 9]} fontSize={11} />
-                      <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                      <Bar dataKey="value" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
-                    </BarChart>
-                  </ChartContainer>
-                </div>
-              </div>
-            </>
-          )}
-
-          {tab === "students" && (
-            <section className="animate-fade-up overflow-hidden rounded-4xl border border-line bg-white shadow-soft">
-              <div className="border-b border-slate-100 px-5 py-4">
-                <h2 className="text-sm font-black uppercase tracking-tight text-ink">Students</h2>
-                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-faint">
-                  {users.length} registered
-                </p>
-              </div>
-              {users.length === 0 && (
-                <p className="p-8 text-center text-sm text-muted-foreground">
-                  No students registered yet.
-                </p>
-              )}
-              <div className="divide-y divide-slate-100">
-                {users.map((student) => (
-                  <div
-                    key={student.uid}
-                    className="flex flex-wrap items-center gap-3 px-5 py-3.5 transition-colors hover:bg-slate-50/60"
-                  >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-[12px] font-black uppercase text-brand-700">
-                      {student.name
-                        .trim()
-                        .split(/\s+/)
-                        .slice(0, 2)
-                        .map((part) => part[0]?.toUpperCase())
-                        .join("") || "?"}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold text-ink">{student.name}</p>
-                      <p className="truncate text-xs font-medium text-ink-soft">{student.email}</p>
-                    </div>
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-slate-500">
-                      {student.level}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-rose-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
-                      onClick={async () => {
-                        const authDeleted = await deleteUserProfile(student.uid);
-                        queryClient.invalidateQueries({ queryKey: ["users"] });
-                        toast.success("Student removed");
-                        if (!authDeleted) {
-                          toast.warning(
-                            "The Firebase Auth account could not be removed (server key not configured).",
-                          );
-                        }
-                      }}
+            {tab === "overview" && (
+              <>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {[
+                    { label: "Students", value: users.length },
+                    { label: "Resources", value: resources.length },
+                    { label: "Mock attempts", value: results.length },
+                  ].map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="animate-fade-up rounded-3xl border border-line bg-white p-6 shadow-soft"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+                      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-ink-faint">
+                        {stat.label}
+                      </p>
+                      <p className="mt-2 text-3xl font-black tracking-tighter text-ink">
+                        {stat.value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
 
-          {tab === "resources" && (
-            <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
-              <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
-                <SectionTitle
-                  icon={Globe}
-                  title={editingResourceId ? "Edit resource" : "Add a resource"}
-                  subtitle="Share links or upload files students can open and study from."
-                />
-                <div className="mt-5 space-y-4">
-                  <div>
-                    <Label htmlFor="r-title">Title</Label>
-                    <Input
-                      id="r-title"
-                      value={resourceForm.title}
-                      maxLength={120}
-                      onChange={(e) => setResourceForm({ ...resourceForm, title: e.target.value })}
-                      className="mt-1.5"
-                    />
+                <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                  <div className="animate-fade-up rounded-3xl border border-line bg-white p-6 shadow-soft [animation-delay:60ms]">
+                    <h2 className="text-sm font-black uppercase tracking-tight text-ink">
+                      Students by level
+                    </h2>
+                    <p className="mt-1 text-xs font-medium text-ink-soft">
+                      How many registered students fall into each placement level.
+                    </p>
+                    <ChartContainer
+                      config={levelChartConfig}
+                      className="mt-4 aspect-auto h-64 w-full"
+                    >
+                      <BarChart data={studentsByLevel} margin={{ left: -20 }}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                          dataKey="level"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          fontSize={11}
+                        />
+                        <YAxis
+                          tickLine={false}
+                          axisLine={false}
+                          allowDecimals={false}
+                          fontSize={11}
+                        />
+                        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                        <Bar dataKey="value" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
+                      </BarChart>
+                    </ChartContainer>
                   </div>
-                  <div>
-                    <Label htmlFor="r-desc">Description</Label>
-                    <Textarea
-                      id="r-desc"
-                      value={resourceForm.description}
-                      maxLength={400}
-                      rows={3}
-                      onChange={(e) =>
-                        setResourceForm({ ...resourceForm, description: e.target.value })
-                      }
-                      className="mt-1.5"
-                    />
+
+                  <div className="animate-fade-up rounded-3xl border border-line bg-white p-6 shadow-soft [animation-delay:100ms]">
+                    <h2 className="text-sm font-black uppercase tracking-tight text-ink">
+                      Average band by skill
+                    </h2>
+                    <p className="mt-1 text-xs font-medium text-ink-soft">
+                      Average score across every saved mock test attempt.
+                    </p>
+                    <ChartContainer
+                      config={skillChartConfig}
+                      className="mt-4 aspect-auto h-64 w-full"
+                    >
+                      <BarChart data={averageBySkill} margin={{ left: -20 }}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                          dataKey="skill"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          fontSize={11}
+                        />
+                        <YAxis tickLine={false} axisLine={false} domain={[0, 9]} fontSize={11} />
+                        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                        <Bar dataKey="value" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
+                      </BarChart>
+                    </ChartContainer>
                   </div>
-                  <div>
-                    <Label>Source</Label>
-                    <div className="mt-1.5 flex gap-2">
+                </div>
+              </>
+            )}
+
+            {tab === "students" && (
+              <section className="animate-fade-up overflow-hidden rounded-4xl border border-line bg-white shadow-soft">
+                <div className="border-b border-slate-100 px-5 py-4">
+                  <h2 className="text-sm font-black uppercase tracking-tight text-ink">Students</h2>
+                  <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-faint">
+                    {users.length} registered
+                  </p>
+                </div>
+                {users.length === 0 && (
+                  <p className="p-8 text-center text-sm text-muted-foreground">
+                    No students registered yet.
+                  </p>
+                )}
+                <div className="divide-y divide-slate-100">
+                  {users.map((student) => (
+                    <div
+                      key={student.uid}
+                      className="flex flex-wrap items-center gap-3 px-5 py-3.5 transition-colors hover:bg-slate-50/60"
+                    >
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-[12px] font-black uppercase text-brand-700">
+                        {student.name
+                          .trim()
+                          .split(/\s+/)
+                          .slice(0, 2)
+                          .map((part) => part[0]?.toUpperCase())
+                          .join("") || "?"}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-ink">{student.name}</p>
+                        <p className="truncate text-xs font-medium text-ink-soft">
+                          {student.email}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-slate-500">
+                        {student.level}
+                      </span>
                       <Button
-                        type="button"
-                        variant={resourceMode === "link" ? "hero" : "soft"}
-                        size="pill"
-                        className="flex-1"
-                        onClick={() => setResourceMode("link")}
+                        variant="ghost"
+                        size="sm"
+                        className="text-rose-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                        onClick={async () => {
+                          const authDeleted = await deleteUserProfile(student.uid);
+                          queryClient.invalidateQueries({ queryKey: ["users"] });
+                          toast.success("Student removed");
+                          if (!authDeleted) {
+                            toast.warning(
+                              "The Firebase Auth account could not be removed (server key not configured).",
+                            );
+                          }
+                        }}
                       >
-                        Link
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={resourceMode === "file" ? "hero" : "soft"}
-                        size="pill"
-                        className="flex-1"
-                        onClick={() => setResourceMode("file")}
-                      >
-                        Upload file
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                  </div>
-                  {resourceMode === "link" ? (
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {tab === "resources" && (
+              <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
+                <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
+                  <SectionTitle
+                    icon={Globe}
+                    title={editingResourceId ? "Edit resource" : "Add a resource"}
+                    subtitle="Share links or upload files students can open and study from."
+                  />
+                  <div className="mt-5 space-y-4">
                     <div>
-                      <Label htmlFor="r-url">URL</Label>
+                      <Label htmlFor="r-title">Title</Label>
                       <Input
-                        id="r-url"
-                        value={resourceForm.url}
+                        id="r-title"
+                        value={resourceForm.title}
+                        maxLength={120}
+                        onChange={(e) =>
+                          setResourceForm({ ...resourceForm, title: e.target.value })
+                        }
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="r-desc">Description</Label>
+                      <Textarea
+                        id="r-desc"
+                        value={resourceForm.description}
+                        maxLength={400}
+                        rows={3}
+                        onChange={(e) =>
+                          setResourceForm({ ...resourceForm, description: e.target.value })
+                        }
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div>
+                      <Label>Source</Label>
+                      <div className="mt-1.5 flex gap-2">
+                        <Button
+                          type="button"
+                          variant={resourceMode === "link" ? "hero" : "soft"}
+                          size="pill"
+                          className="flex-1"
+                          onClick={() => setResourceMode("link")}
+                        >
+                          Link
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={resourceMode === "file" ? "hero" : "soft"}
+                          size="pill"
+                          className="flex-1"
+                          onClick={() => setResourceMode("file")}
+                        >
+                          Upload file
+                        </Button>
+                      </div>
+                    </div>
+                    {resourceMode === "link" ? (
+                      <div>
+                        <Label htmlFor="r-url">URL</Label>
+                        <Input
+                          id="r-url"
+                          value={resourceForm.url}
+                          maxLength={500}
+                          placeholder="https://..."
+                          onChange={(e) =>
+                            setResourceForm({ ...resourceForm, url: e.target.value })
+                          }
+                          className="mt-1.5"
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <Label htmlFor="r-file">File</Label>
+                        <Input
+                          id="r-file"
+                          type="file"
+                          accept="*/*"
+                          onChange={(e) => setResourceFile(e.target.files?.[0] ?? null)}
+                          className="mt-1.5"
+                        />
+                        <p className="mt-1.5 text-xs text-muted-foreground">
+                          Upload any file (PDF, image, document, etc.)
+                        </p>
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="r-type">Type</Label>
+                        <select
+                          id="r-type"
+                          value={resourceForm.type}
+                          onChange={(e) =>
+                            setResourceForm({
+                              ...resourceForm,
+                              type: e.target.value as ResourceDoc["type"],
+                            })
+                          }
+                          className="mt-1.5 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm"
+                        >
+                          {RESOURCE_TYPES.map((t) => (
+                            <option key={t} value={t}>
+                              {t.charAt(0).toUpperCase() + t.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <Label htmlFor="r-skill">Skill</Label>
+                        <select
+                          id="r-skill"
+                          value={resourceForm.skill}
+                          onChange={(e) =>
+                            setResourceForm({
+                              ...resourceForm,
+                              skill: e.target.value as ResourceDoc["skill"],
+                            })
+                          }
+                          className="mt-1.5 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm"
+                        >
+                          {RESOURCE_SKILLS.map((s) => (
+                            <option key={s} value={s}>
+                              {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="r-thumb">Thumbnail URL (optional)</Label>
+                      <Input
+                        id="r-thumb"
+                        value={resourceForm.thumbnail}
                         maxLength={500}
-                        placeholder="https://..."
-                        onChange={(e) => setResourceForm({ ...resourceForm, url: e.target.value })}
+                        onChange={(e) =>
+                          setResourceForm({ ...resourceForm, thumbnail: e.target.value })
+                        }
                         className="mt-1.5"
                       />
                     </div>
-                  ) : (
-                    <div>
-                      <Label htmlFor="r-file">File</Label>
-                      <Input
-                        id="r-file"
-                        type="file"
-                        accept="*/*"
-                        onChange={(e) => setResourceFile(e.target.files?.[0] ?? null)}
-                        className="mt-1.5"
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="r-free"
+                        type="checkbox"
+                        checked={resourceForm.isFree}
+                        onChange={(e) =>
+                          setResourceForm({ ...resourceForm, isFree: e.target.checked })
+                        }
+                        className="h-4 w-4 rounded"
                       />
-                      <p className="mt-1.5 text-xs text-muted-foreground">
-                        Upload any file (PDF, image, document, etc.)
-                      </p>
+                      <Label htmlFor="r-free">Free resource</Label>
                     </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="hero"
+                        size="pill"
+                        className="flex-1"
+                        onClick={submitResource}
+                        disabled={uploadingResource}
+                      >
+                        {uploadingResource
+                          ? "Uploading..."
+                          : editingResourceId
+                            ? "Save changes"
+                            : "Add resource"}
+                      </Button>
+                      {editingResourceId && (
+                        <Button variant="ghost" size="pill" onClick={resetResourceForm}>
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                  {resources.length === 0 && (
+                    <p className="p-8 text-center text-sm text-muted-foreground">
+                      No resources yet.
+                    </p>
                   )}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label htmlFor="r-type">Type</Label>
-                      <select
-                        id="r-type"
-                        value={resourceForm.type}
-                        onChange={(e) =>
-                          setResourceForm({
-                            ...resourceForm,
-                            type: e.target.value as ResourceDoc["type"],
-                          })
-                        }
-                        className="mt-1.5 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm"
-                      >
-                        {RESOURCE_TYPES.map((t) => (
-                          <option key={t} value={t}>
-                            {t.charAt(0).toUpperCase() + t.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <Label htmlFor="r-skill">Skill</Label>
-                      <select
-                        id="r-skill"
-                        value={resourceForm.skill}
-                        onChange={(e) =>
-                          setResourceForm({
-                            ...resourceForm,
-                            skill: e.target.value as ResourceDoc["skill"],
-                          })
-                        }
-                        className="mt-1.5 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm"
-                      >
-                        {RESOURCE_SKILLS.map((s) => (
-                          <option key={s} value={s}>
-                            {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="r-thumb">Thumbnail URL (optional)</Label>
-                    <Input
-                      id="r-thumb"
-                      value={resourceForm.thumbnail}
-                      maxLength={500}
-                      onChange={(e) =>
-                        setResourceForm({ ...resourceForm, thumbnail: e.target.value })
-                      }
-                      className="mt-1.5"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      id="r-free"
-                      type="checkbox"
-                      checked={resourceForm.isFree}
-                      onChange={(e) =>
-                        setResourceForm({ ...resourceForm, isFree: e.target.checked })
-                      }
-                      className="h-4 w-4 rounded"
-                    />
-                    <Label htmlFor="r-free">Free resource</Label>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="hero"
-                      size="pill"
-                      className="flex-1"
-                      onClick={submitResource}
-                      disabled={uploadingResource}
+                  {resources.map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3 border-b border-border p-4 last:border-0"
                     >
-                      {uploadingResource
-                        ? "Uploading..."
-                        : editingResourceId
-                          ? "Save changes"
-                          : "Add resource"}
-                    </Button>
-                    {editingResourceId && (
-                      <Button variant="ghost" size="pill" onClick={resetResourceForm}>
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {resources.length === 0 && (
-                  <p className="p-8 text-center text-sm text-muted-foreground">No resources yet.</p>
-                )}
-                {resources.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-3 border-b border-border p-4 last:border-0"
-                  >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-secondary-foreground">
-                      {index + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
-                      <p className="truncate text-xs text-muted-foreground">{item.description}</p>
-                      <div className="mt-1 flex gap-1.5">
-                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
-                          {item.type}
-                        </span>
-                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
-                          {item.skill}
-                        </span>
-                        {item.isFree && (
-                          <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-semibold text-success">
-                            Free
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-secondary-foreground">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
+                        <p className="truncate text-xs text-muted-foreground">{item.description}</p>
+                        <div className="mt-1 flex gap-1.5">
+                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
+                            {item.type}
                           </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={index === 0}
-                        onClick={async () => {
-                          await moveResource(item.id, "up");
-                          queryClient.invalidateQueries({ queryKey: ["resources"] });
-                        }}
-                      >
-                        <ArrowUp className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={index === resources.length - 1}
-                        onClick={async () => {
-                          await moveResource(item.id, "down");
-                          queryClient.invalidateQueries({ queryKey: ["resources"] });
-                        }}
-                      >
-                        <ArrowDown className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingResourceId(item.id);
-                          setResourceForm({
-                            title: item.title,
-                            description: item.description,
-                            url: item.url,
-                            type: item.type,
-                            skill: item.skill,
-                            isFree: item.isFree,
-                            thumbnail: item.thumbnail,
-                          });
-                          setResourceMode(item.sourceType === "file" ? "file" : "link");
-                          setResourceFile(null);
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                          await deleteResource(item.id);
-                          queryClient.invalidateQueries({ queryKey: ["resources"] });
-                          toast.success("Resource deleted");
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {tab === "learning-path" && (
-            <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
-              <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
-                <SectionTitle
-                  icon={RouteIcon}
-                  title={editingLearningStepId ? "Edit step" : "Add a learning step"}
-                  subtitle="Steps appear as modules on the student Learning Path page."
-                />
-                <div className="mt-5 space-y-4">
-                  <div>
-                    <Label htmlFor="lp-title">Title</Label>
-                    <Input
-                      id="lp-title"
-                      value={learningStepForm.title}
-                      maxLength={120}
-                      onChange={(e) =>
-                        setLearningStepForm({ ...learningStepForm, title: e.target.value })
-                      }
-                      className="mt-1.5"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lp-desc">Description</Label>
-                    <Textarea
-                      id="lp-desc"
-                      value={learningStepForm.description}
-                      maxLength={400}
-                      rows={3}
-                      onChange={(e) =>
-                        setLearningStepForm({ ...learningStepForm, description: e.target.value })
-                      }
-                      className="mt-1.5"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label htmlFor="lp-lessons">Lessons</Label>
-                      <Input
-                        id="lp-lessons"
-                        type="number"
-                        min={1}
-                        value={learningStepForm.lessons}
-                        onChange={(e) =>
-                          setLearningStepForm({
-                            ...learningStepForm,
-                            lessons: Number(e.target.value),
-                          })
-                        }
-                        className="mt-1.5"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lp-minutes">Minutes</Label>
-                      <Input
-                        id="lp-minutes"
-                        type="number"
-                        min={1}
-                        value={learningStepForm.minutes}
-                        onChange={(e) =>
-                          setLearningStepForm({
-                            ...learningStepForm,
-                            minutes: Number(e.target.value),
-                          })
-                        }
-                        className="mt-1.5"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Skills / tags</Label>
-                    <div className="mt-1.5 flex flex-wrap gap-1.5">
-                      {TECH_KEYS.map((key) => {
-                        const tech = TECH[key];
-                        if (!tech) return null;
-                        const active = learningStepForm.tech.includes(key);
-                        const Icon = tech.icon;
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={() => toggleLearningStepTech(key)}
-                            className={cn(
-                              "flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all",
-                              active
-                                ? "bg-brand-700 text-white shadow-brand"
-                                : "bg-secondary text-secondary-foreground hover:bg-brand-50",
-                            )}
-                          >
-                            <Icon
-                              className="h-3.5 w-3.5"
-                              style={{ color: active ? "#fff" : tech.color }}
-                            />
-                            {tech.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      id="lp-finish"
-                      type="checkbox"
-                      checked={learningStepForm.finish}
-                      onChange={(e) =>
-                        setLearningStepForm({ ...learningStepForm, finish: e.target.checked })
-                      }
-                      className="h-4 w-4 rounded"
-                    />
-                    <Label htmlFor="lp-finish">Finish milestone (gold crown)</Label>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="hero"
-                      size="pill"
-                      className="flex-1"
-                      onClick={submitLearningStep}
-                    >
-                      {editingLearningStepId ? "Save changes" : "Add step"}
-                    </Button>
-                    {editingLearningStepId && (
-                      <Button variant="ghost" size="pill" onClick={resetLearningStepForm}>
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {learningSteps.length === 0 && (
-                  <p className="p-8 text-center text-sm text-muted-foreground">
-                    No steps yet. Add the first module.
-                  </p>
-                )}
-                {learningSteps.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-3 border-b border-border p-4 last:border-0"
-                  >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-secondary-foreground">
-                      {index + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
-                      <p className="truncate text-xs text-muted-foreground">{item.description}</p>
-                      <div className="mt-1 flex flex-wrap gap-1.5">
-                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
-                          {item.lessons} lessons
-                        </span>
-                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
-                          {item.minutes} min
-                        </span>
-                        {item.tech.map((t) => (
-                          <span
-                            key={t}
-                            className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold"
-                          >
-                            {t}
+                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
+                            {item.skill}
                           </span>
-                        ))}
-                        {item.finish && (
-                          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
-                            Finish
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={index === 0}
-                        onClick={async () => {
-                          await moveLearningStep(item.id, "up");
-                          queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
-                        }}
-                      >
-                        <ArrowUp className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={index === learningSteps.length - 1}
-                        onClick={async () => {
-                          await moveLearningStep(item.id, "down");
-                          queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
-                        }}
-                      >
-                        <ArrowDown className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => editLearningStep(item)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                          await deleteLearningStep(item.id);
-                          queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
-                          toast.success("Step deleted");
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {tab === "placement" && (
-            <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
-              <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
-                <SectionTitle
-                  icon={ClipboardList}
-                  title={editingQuestionId ? "Edit question" : "Add a placement question"}
-                  subtitle="Write the question, add 4 options and mark the correct answer."
-                />
-                <div className="mt-5 space-y-4">
-                  <div>
-                    <Label htmlFor="q-text">Question</Label>
-                    <Textarea
-                      id="q-text"
-                      value={questionForm.q}
-                      maxLength={300}
-                      rows={2}
-                      onChange={(e) => setQuestionForm({ ...questionForm, q: e.target.value })}
-                      className="mt-1.5"
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Options - click the letter to mark the correct one</Label>
-                    <div className="mt-1.5 space-y-2">
-                      {questionForm.options.map((option, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setQuestionForm({ ...questionForm, answer: i })}
-                            aria-label={`Mark option ${String.fromCharCode(65 + i)} as correct`}
-                            className={cn(
-                              "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-2 text-xs font-bold transition-colors",
-                              questionForm.answer === i
-                                ? "border-primary bg-secondary text-primary"
-                                : "border-border text-muted-foreground hover:border-primary/40",
-                            )}
-                          >
-                            {String.fromCharCode(65 + i)}
-                          </button>
-                          <Input
-                            value={option}
-                            maxLength={200}
-                            placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                            onChange={(e) => {
-                              const next = [...questionForm.options];
-                              next[i] = e.target.value;
-                              setQuestionForm({ ...questionForm, options: next });
-                            }}
-                          />
+                          {item.isFree && (
+                            <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-semibold text-success">
+                              Free
+                            </span>
+                          )}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button variant="hero" size="pill" className="flex-1" onClick={submitQuestion}>
-                      {editingQuestionId ? "Save changes" : "Add question"}
-                    </Button>
-                    {editingQuestionId && (
-                      <Button variant="ghost" size="pill" onClick={resetQuestionForm}>
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {placementQuestions.length === 0 && (
-                  <p className="p-8 text-center text-sm text-muted-foreground">
-                    No placement questions yet.
-                  </p>
-                )}
-                {placementQuestions.map((question, i) => (
-                  <div key={question.id} className="border-b border-border p-4 last:border-0">
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="text-sm font-bold text-foreground">
-                        {i + 1}. {question.q}
-                      </p>
+                      </div>
                       <div className="flex shrink-0 gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => editQuestion(question)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={index === 0}
+                          onClick={async () => {
+                            await moveResource(item.id, "up");
+                            queryClient.invalidateQueries({ queryKey: ["resources"] });
+                          }}
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={index === resources.length - 1}
+                          onClick={async () => {
+                            await moveResource(item.id, "down");
+                            queryClient.invalidateQueries({ queryKey: ["resources"] });
+                          }}
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingResourceId(item.id);
+                            setResourceForm({
+                              title: item.title,
+                              description: item.description,
+                              url: item.url,
+                              type: item.type,
+                              skill: item.skill,
+                              isFree: item.isFree,
+                              thumbnail: item.thumbnail,
+                            });
+                            setResourceMode(item.sourceType === "file" ? "file" : "link");
+                            setResourceFile(null);
+                          }}
+                        >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => removeQuestion(question.id)}
+                          onClick={async () => {
+                            await deleteResource(item.id);
+                            queryClient.invalidateQueries({ queryKey: ["resources"] });
+                            toast.success("Resource deleted");
+                          }}
                         >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {question.options.map((option, oi) => (
-                        <span
-                          key={oi}
-                          className={cn(
-                            "rounded-full px-2.5 py-1 text-[11px] font-medium",
-                            oi === question.answer
-                              ? "bg-success/15 text-success"
-                              : "bg-secondary text-secondary-foreground",
-                          )}
-                        >
-                          {option}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {tab === "results" && (
-            <section className="mt-6 overflow-hidden rounded-3xl bg-card shadow-card">
-              {results.length === 0 && (
-                <p className="p-8 text-center text-sm text-muted-foreground">
-                  No mock results yet.
-                </p>
-              )}
-              {results.map((result) => (
-                <div
-                  key={result.id}
-                  className="flex flex-wrap items-center gap-4 border-b border-border px-5 py-4 last:border-0"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-foreground">{result.userName}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(result.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    L {result.listening} / R {result.reading} / W {result.writing} / S{" "}
-                    {result.speaking}
-                  </p>
-                  <span className="text-lg font-extrabold text-foreground">
-                    {result.overall.toFixed(1)}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      queryClient.setQueryData(["mock-results"], (old: typeof results) =>
-                        old.filter((r) => r.id !== result.id),
-                      );
-                      toast.success("Mock result deleted");
-                      deleteMockResult(result.id, result.userId)
-                        .then(() => {
-                          queryClient.invalidateQueries({ queryKey: ["user-profile"] });
-                        })
-                        .catch(() => {
-                          queryClient.invalidateQueries({ queryKey: ["mock-results"] });
-                          toast.error("Failed to delete mock result");
-                        });
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              ))}
-            </section>
-          )}
-
-          {tab === "vocabulary" && (
-            <section className="mt-6 space-y-6">
-              <div className="rounded-3xl bg-card p-6 shadow-card">
-                <h2 className="text-base font-bold text-foreground">
-                  {editingVocabId ? "Edit Vocabulary Word" : "Add Vocabulary Word"}
-                </h2>
-                <div className="mt-4 space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label>Word</Label>
-                      <Input
-                        className="mt-1.5"
-                        value={vocabForm.word}
-                        onChange={(e) => setVocabForm({ ...vocabForm, word: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label>Synonym</Label>
-                      <Input
-                        className="mt-1.5"
-                        value={vocabForm.synonym}
-                        onChange={(e) => setVocabForm({ ...vocabForm, synonym: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Definition</Label>
-                    <Textarea
-                      className="mt-1.5"
-                      rows={2}
-                      value={vocabForm.definition}
-                      onChange={(e) => setVocabForm({ ...vocabForm, definition: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label>Example sentence</Label>
-                    <Textarea
-                      className="mt-1.5"
-                      rows={2}
-                      value={vocabForm.example}
-                      onChange={(e) => setVocabForm({ ...vocabForm, example: e.target.value })}
-                    />
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <Label>Antonym</Label>
-                      <Input
-                        className="mt-1.5"
-                        value={vocabForm.antonym}
-                        onChange={(e) => setVocabForm({ ...vocabForm, antonym: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label>Topic</Label>
-                      <Select
-                        value={vocabForm.topic}
-                        onValueChange={(v) =>
-                          setVocabForm({ ...vocabForm, topic: v as VocabWordDoc["topic"] })
-                        }
-                      >
-                        <SelectTrigger className="mt-1.5">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {[
-                            "education",
-                            "environment",
-                            "technology",
-                            "health",
-                            "society",
-                            "economy",
-                            "crime",
-                            "transport",
-                            "media",
-                            "government",
-                            "work",
-                            "family",
-                          ].map((t) => (
-                            <SelectItem key={t} value={t}>
-                              {t}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Difficulty</Label>
-                      <Select
-                        value={vocabForm.difficulty}
-                        onValueChange={(v) =>
-                          setVocabForm({
-                            ...vocabForm,
-                            difficulty: v as VocabWordDoc["difficulty"],
-                          })
-                        }
-                      >
-                        <SelectTrigger className="mt-1.5">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="beginner">Beginner</SelectItem>
-                          <SelectItem value="intermediate">Intermediate</SelectItem>
-                          <SelectItem value="advanced">Advanced</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div>
-                    <Label>IELTS Frequency</Label>
-                    <Select
-                      value={vocabForm.ieltsFrequency}
-                      onValueChange={(v) =>
-                        setVocabForm({
-                          ...vocabForm,
-                          ieltsFrequency: v as VocabWordDoc["ieltsFrequency"],
-                        })
-                      }
-                    >
-                      <SelectTrigger className="mt-1.5 w-48">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="hero" size="pill" className="flex-1" onClick={submitVocabWord}>
-                      {editingVocabId ? "Save changes" : "Add word"}
-                    </Button>
-                    {editingVocabId && (
-                      <Button variant="ghost" size="pill" onClick={resetVocabForm}>
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {vocabWords.length === 0 && (
-                  <p className="p-8 text-center text-sm text-muted-foreground">
-                    No vocabulary words yet.
-                  </p>
-                )}
-                {vocabWords.map((w) => (
-                  <div key={w.id} className="border-b border-border p-4 last:border-0">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-foreground">{w.word}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">{w.definition}</p>
-                        <div className="mt-1.5 flex flex-wrap gap-1.5">
-                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
-                            {w.topic}
-                          </span>
-                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
-                            {w.difficulty}
-                          </span>
-                          <span
-                            className={cn(
-                              "rounded-full px-2 py-0.5 text-[11px] font-medium",
-                              w.ieltsFrequency === "high"
-                                ? "bg-success/15 text-success"
-                                : w.ieltsFrequency === "medium"
-                                  ? "bg-warning/15 text-warning"
-                                  : "bg-muted text-muted-foreground",
-                            )}
-                          >
-                            {w.ieltsFrequency} freq
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex shrink-0 gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => editVocabWord(w)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => removeVocabWord(w.id)}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+                  ))}
+                </div>
+              </section>
+            )}
 
-          {tab === "model-answers" && (
-            <section className="mt-6 space-y-6">
-              <div className="rounded-3xl bg-card p-6 shadow-card">
-                <h2 className="text-base font-bold text-foreground">
-                  {editingModelAnswerId ? "Edit Model Answer" : "Add Model Answer"}
-                </h2>
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <Label>Title</Label>
-                    <Input
-                      className="mt-1.5"
-                      value={modelAnswerForm.title}
-                      onChange={(e) =>
-                        setModelAnswerForm({ ...modelAnswerForm, title: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
+            {tab === "learning-path" && (
+              <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
+                <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
+                  <SectionTitle
+                    icon={RouteIcon}
+                    title={editingLearningStepId ? "Edit step" : "Add a learning step"}
+                    subtitle="Steps appear as modules on the student Learning Path page."
+                  />
+                  <div className="mt-5 space-y-4">
                     <div>
-                      <Label>Skill</Label>
-                      <Select
-                        value={modelAnswerForm.skill}
-                        onValueChange={(v) =>
-                          setModelAnswerForm({
-                            ...modelAnswerForm,
-                            skill: v as ModelAnswerDoc["skill"],
-                          })
-                        }
-                      >
-                        <SelectTrigger className="mt-1.5">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="writing">Writing</SelectItem>
-                          <SelectItem value="speaking">Speaking</SelectItem>
-                          <SelectItem value="reading">Reading</SelectItem>
-                          <SelectItem value="listening">Listening</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Band</Label>
-                      <Select
-                        value={String(modelAnswerForm.band)}
-                        onValueChange={(v) =>
-                          setModelAnswerForm({ ...modelAnswerForm, band: Number(v) })
-                        }
-                      >
-                        <SelectTrigger className="mt-1.5">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {[5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9].map((b) => (
-                            <SelectItem key={b} value={String(b)}>
-                              {b}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Category</Label>
+                      <Label htmlFor="lp-title">Title</Label>
                       <Input
-                        className="mt-1.5"
-                        placeholder="e.g. education"
-                        value={modelAnswerForm.category}
+                        id="lp-title"
+                        value={learningStepForm.title}
+                        maxLength={120}
                         onChange={(e) =>
-                          setModelAnswerForm({ ...modelAnswerForm, category: e.target.value })
+                          setLearningStepForm({ ...learningStepForm, title: e.target.value })
                         }
+                        className="mt-1.5"
                       />
                     </div>
-                  </div>
-                  <div>
-                    <Label>Prompt</Label>
-                    <Textarea
-                      className="mt-1.5"
-                      rows={3}
-                      value={modelAnswerForm.prompt}
-                      onChange={(e) =>
-                        setModelAnswerForm({ ...modelAnswerForm, prompt: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label>Model Answer</Label>
-                    <Textarea
-                      className="mt-1.5"
-                      rows={6}
-                      value={modelAnswerForm.answer}
-                      onChange={(e) =>
-                        setModelAnswerForm({ ...modelAnswerForm, answer: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label>Tips (one per line)</Label>
-                    <Textarea
-                      className="mt-1.5"
-                      rows={3}
-                      value={modelAnswerForm.tips.join("\n")}
-                      onChange={(e) =>
-                        setModelAnswerForm({ ...modelAnswerForm, tips: e.target.value.split("\n") })
-                      }
-                    />
-                  </div>
-
-                  {/* Criteria */}
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <Label>Scoring Criteria</Label>
-                      <Button
-                        variant="soft"
-                        size="sm"
-                        onClick={() =>
-                          setModelAnswerForm({
-                            ...modelAnswerForm,
-                            criteria: [
-                              ...modelAnswerForm.criteria,
-                              { label: "", band: 7, comment: "" },
-                            ],
-                          })
+                    <div>
+                      <Label htmlFor="lp-desc">Description</Label>
+                      <Textarea
+                        id="lp-desc"
+                        value={learningStepForm.description}
+                        maxLength={400}
+                        rows={3}
+                        onChange={(e) =>
+                          setLearningStepForm({ ...learningStepForm, description: e.target.value })
                         }
-                      >
-                        + Criterion
-                      </Button>
+                        className="mt-1.5"
+                      />
                     </div>
-                    <div className="mt-2 space-y-2">
-                      {modelAnswerForm.criteria.map((c, i) => {
-                        const next = [...modelAnswerForm.criteria];
-                        return (
-                          <div
-                            key={i}
-                            className="flex items-start gap-2 rounded-xl border border-border p-3"
-                          >
-                            <div className="flex-1 space-y-1.5">
-                              <Input
-                                placeholder="Label (e.g. Task Response)"
-                                value={c.label}
-                                onChange={(e) => {
-                                  next[i] = { ...next[i]!, label: e.target.value };
-                                  setModelAnswerForm({ ...modelAnswerForm, criteria: next });
-                                }}
-                              />
-                              <div className="flex gap-2">
-                                <Input
-                                  className="w-20"
-                                  type="number"
-                                  step="0.5"
-                                  min="0"
-                                  max="9"
-                                  value={c.band}
-                                  onChange={(e) => {
-                                    next[i] = { ...next[i]!, band: Number(e.target.value) };
-                                    setModelAnswerForm({ ...modelAnswerForm, criteria: next });
-                                  }}
-                                />
-                                <Input
-                                  className="flex-1"
-                                  placeholder="Comment"
-                                  value={c.comment}
-                                  onChange={(e) => {
-                                    next[i] = { ...next[i]!, comment: e.target.value };
-                                    setModelAnswerForm({ ...modelAnswerForm, criteria: next });
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                setModelAnswerForm({
-                                  ...modelAnswerForm,
-                                  criteria: modelAnswerForm.criteria.filter((_, idx) => idx !== i),
-                                })
-                              }
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="lp-lessons">Lessons</Label>
+                        <Input
+                          id="lp-lessons"
+                          type="number"
+                          min={1}
+                          value={learningStepForm.lessons}
+                          onChange={(e) =>
+                            setLearningStepForm({
+                              ...learningStepForm,
+                              lessons: Number(e.target.value),
+                            })
+                          }
+                          className="mt-1.5"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="lp-minutes">Minutes</Label>
+                        <Input
+                          id="lp-minutes"
+                          type="number"
+                          min={1}
+                          value={learningStepForm.minutes}
+                          onChange={(e) =>
+                            setLearningStepForm({
+                              ...learningStepForm,
+                              minutes: Number(e.target.value),
+                            })
+                          }
+                          className="mt-1.5"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Skills / tags</Label>
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {TECH_KEYS.map((key) => {
+                          const tech = TECH[key];
+                          if (!tech) return null;
+                          const active = learningStepForm.tech.includes(key);
+                          const Icon = tech.icon;
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={() => toggleLearningStepTech(key)}
+                              className={cn(
+                                "flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all",
+                                active
+                                  ? "bg-brand-700 text-white shadow-brand"
+                                  : "bg-secondary text-secondary-foreground hover:bg-brand-50",
+                              )}
                             >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                        );
-                      })}
+                              <Icon
+                                className="h-3.5 w-3.5"
+                                style={{ color: active ? "#fff" : tech.color }}
+                              />
+                              {tech.label}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant="hero"
-                      size="pill"
-                      className="flex-1"
-                      onClick={submitModelAnswer}
-                    >
-                      {editingModelAnswerId ? "Save changes" : "Add answer"}
-                    </Button>
-                    {editingModelAnswerId && (
-                      <Button variant="ghost" size="pill" onClick={resetModelAnswerForm}>
-                        Cancel
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="lp-finish"
+                        type="checkbox"
+                        checked={learningStepForm.finish}
+                        onChange={(e) =>
+                          setLearningStepForm({ ...learningStepForm, finish: e.target.checked })
+                        }
+                        className="h-4 w-4 rounded"
+                      />
+                      <Label htmlFor="lp-finish">Finish milestone (gold crown)</Label>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="hero"
+                        size="pill"
+                        className="flex-1"
+                        onClick={submitLearningStep}
+                      >
+                        {editingLearningStepId ? "Save changes" : "Add step"}
                       </Button>
-                    )}
+                      {editingLearningStepId && (
+                        <Button variant="ghost" size="pill" onClick={resetLearningStepForm}>
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {modelAnswers.length === 0 && (
-                  <p className="p-8 text-center text-sm text-muted-foreground">
-                    No model answers yet.
-                  </p>
-                )}
-                {modelAnswers.map((a) => (
-                  <div key={a.id} className="border-b border-border p-4 last:border-0">
-                    <div className="flex items-start justify-between gap-3">
+                <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                  {learningSteps.length === 0 && (
+                    <p className="p-8 text-center text-sm text-muted-foreground">
+                      No steps yet. Add the first module.
+                    </p>
+                  )}
+                  {learningSteps.map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3 border-b border-border p-4 last:border-0"
+                    >
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-secondary-foreground">
+                        {index + 1}
+                      </span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-foreground">{a.title}</p>
+                        <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
+                        <p className="truncate text-xs text-muted-foreground">{item.description}</p>
                         <div className="mt-1 flex flex-wrap gap-1.5">
-                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
-                            {a.skill}
+                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
+                            {item.lessons} lessons
                           </span>
-                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
-                            Band {a.band}
+                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold">
+                            {item.minutes} min
                           </span>
-                          {a.category && (
-                            <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
-                              {a.category}
+                          {item.tech.map((t) => (
+                            <span
+                              key={t}
+                              className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                          {item.finish && (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                              Finish
                             </span>
                           )}
                         </div>
                       </div>
                       <div className="flex shrink-0 gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => editModelAnswer(a)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={index === 0}
+                          onClick={async () => {
+                            await moveLearningStep(item.id, "up");
+                            queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+                          }}
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={index === learningSteps.length - 1}
+                          onClick={async () => {
+                            await moveLearningStep(item.id, "down");
+                            queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+                          }}
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => editLearningStep(item)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => removeModelAnswer(a.id)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async () => {
+                            await deleteLearningStep(item.id);
+                            queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+                            toast.success("Step deleted");
+                          }}
+                        >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+                  ))}
+                </div>
+              </section>
+            )}
 
-          {tab === "requirements" && (
-            <section className="mt-6 space-y-6">
-              {/* Country Requirements */}
-              <div className="rounded-3xl bg-card p-6 shadow-card">
-                <h2 className="text-base font-bold text-foreground">
-                  {editingCountryReqId ? "Edit Country Requirement" : "Add Country Requirement"}
-                </h2>
-                <div className="mt-4 space-y-4">
-                  <div className="grid grid-cols-3 gap-3">
+            {tab === "placement" && (
+              <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
+                <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
+                  <SectionTitle
+                    icon={ClipboardList}
+                    title={editingQuestionId ? "Edit question" : "Add a placement question"}
+                    subtitle="Write the question, add 4 options and mark the correct answer."
+                  />
+                  <div className="mt-5 space-y-4">
                     <div>
-                      <Label>Country</Label>
-                      <Input
+                      <Label htmlFor="q-text">Question</Label>
+                      <Textarea
+                        id="q-text"
+                        value={questionForm.q}
+                        maxLength={300}
+                        rows={2}
+                        onChange={(e) => setQuestionForm({ ...questionForm, q: e.target.value })}
                         className="mt-1.5"
-                        value={countryReqForm.country}
-                        onChange={(e) =>
-                          setCountryReqForm({ ...countryReqForm, country: e.target.value })
-                        }
                       />
                     </div>
+
                     <div>
-                      <Label>Flag emoji</Label>
-                      <Input
-                        className="mt-1.5"
-                        value={countryReqForm.flag}
-                        onChange={(e) =>
-                          setCountryReqForm({ ...countryReqForm, flag: e.target.value })
-                        }
-                      />
+                      <Label>Options - click the letter to mark the correct one</Label>
+                      <div className="mt-1.5 space-y-2">
+                        {questionForm.options.map((option, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setQuestionForm({ ...questionForm, answer: i })}
+                              aria-label={`Mark option ${String.fromCharCode(65 + i)} as correct`}
+                              className={cn(
+                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-2 text-xs font-bold transition-colors",
+                                questionForm.answer === i
+                                  ? "border-primary bg-secondary text-primary"
+                                  : "border-border text-muted-foreground hover:border-primary/40",
+                              )}
+                            >
+                              {String.fromCharCode(65 + i)}
+                            </button>
+                            <Input
+                              value={option}
+                              maxLength={200}
+                              placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                              onChange={(e) => {
+                                const next = [...questionForm.options];
+                                next[i] = e.target.value;
+                                setQuestionForm({ ...questionForm, options: next });
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <div>
-                      <Label>Purpose</Label>
-                      <Input
-                        className="mt-1.5"
-                        value={countryReqForm.purpose}
-                        onChange={(e) =>
-                          setCountryReqForm({ ...countryReqForm, purpose: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label>Overall Band</Label>
-                      <Input
-                        className="mt-1.5"
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        max="9"
-                        value={countryReqForm.overallBand}
-                        onChange={(e) =>
-                          setCountryReqForm({
-                            ...countryReqForm,
-                            overallBand: Number(e.target.value),
-                          })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <Label>Min per skill</Label>
-                      <Input
-                        className="mt-1.5"
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        max="9"
-                        value={countryReqForm.minPerSkill}
-                        onChange={(e) =>
-                          setCountryReqForm({
-                            ...countryReqForm,
-                            minPerSkill: Number(e.target.value),
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Notes</Label>
-                    <Textarea
-                      className="mt-1.5"
-                      rows={2}
-                      value={countryReqForm.notes}
-                      onChange={(e) =>
-                        setCountryReqForm({ ...countryReqForm, notes: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="hero"
-                      size="pill"
-                      className="flex-1"
-                      onClick={submitCountryReq}
-                    >
-                      {editingCountryReqId ? "Save changes" : "Add requirement"}
-                    </Button>
-                    {editingCountryReqId && (
-                      <Button variant="ghost" size="pill" onClick={resetCountryReqForm}>
-                        Cancel
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="hero"
+                        size="pill"
+                        className="flex-1"
+                        onClick={submitQuestion}
+                      >
+                        {editingQuestionId ? "Save changes" : "Add question"}
                       </Button>
-                    )}
+                      {editingQuestionId && (
+                        <Button variant="ghost" size="pill" onClick={resetQuestionForm}>
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {countryReqs.length === 0 && (
-                  <p className="p-8 text-center text-sm text-muted-foreground">
-                    No country requirements yet.
-                  </p>
-                )}
-                {countryReqs.map((r) => (
-                  <div key={r.id} className="border-b border-border p-4 last:border-0">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
+                <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                  {placementQuestions.length === 0 && (
+                    <p className="p-8 text-center text-sm text-muted-foreground">
+                      No placement questions yet.
+                    </p>
+                  )}
+                  {placementQuestions.map((question, i) => (
+                    <div key={question.id} className="border-b border-border p-4 last:border-0">
+                      <div className="flex items-start justify-between gap-3">
                         <p className="text-sm font-bold text-foreground">
-                          {r.flag} {r.country} — {r.purpose}
+                          {i + 1}. {question.q}
                         </p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          Overall: {r.overallBand} / Min skill: {r.minPerSkill}
-                        </p>
-                        {r.notes && <p className="mt-1 text-xs text-muted-foreground">{r.notes}</p>}
+                        <div className="flex shrink-0 gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => editQuestion(question)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeQuestion(question.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex shrink-0 gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => editCountryReq(r)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => removeCountryReq(r.id)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {question.options.map((option, oi) => (
+                          <span
+                            key={oi}
+                            className={cn(
+                              "rounded-full px-2.5 py-1 text-[11px] font-medium",
+                              oi === question.answer
+                                ? "bg-success/15 text-success"
+                                : "bg-secondary text-secondary-foreground",
+                            )}
+                          >
+                            {option}
+                          </span>
+                        ))}
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* University Requirements */}
-              <div className="rounded-3xl bg-card p-6 shadow-card">
-                <h2 className="text-base font-bold text-foreground">
-                  {editingUniReqId ? "Edit University Requirement" : "Add University Requirement"}
-                </h2>
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <Label>University</Label>
-                    <Input
-                      className="mt-1.5"
-                      value={uniReqForm.university}
-                      onChange={(e) => setUniReqForm({ ...uniReqForm, university: e.target.value })}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label>Country</Label>
-                      <Input
-                        className="mt-1.5"
-                        value={uniReqForm.country}
-                        onChange={(e) => setUniReqForm({ ...uniReqForm, country: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label>Program</Label>
-                      <Input
-                        className="mt-1.5"
-                        value={uniReqForm.program}
-                        onChange={(e) => setUniReqForm({ ...uniReqForm, program: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <Label>Overall Band</Label>
-                      <Input
-                        className="mt-1.5"
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        max="9"
-                        value={uniReqForm.overallBand}
-                        onChange={(e) =>
-                          setUniReqForm({ ...uniReqForm, overallBand: Number(e.target.value) })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <Label>Min Writing</Label>
-                      <Input
-                        className="mt-1.5"
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        max="9"
-                        value={uniReqForm.minWriting}
-                        onChange={(e) =>
-                          setUniReqForm({ ...uniReqForm, minWriting: Number(e.target.value) })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <Label>Min Speaking</Label>
-                      <Input
-                        className="mt-1.5"
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        max="9"
-                        value={uniReqForm.minSpeaking}
-                        onChange={(e) =>
-                          setUniReqForm({ ...uniReqForm, minSpeaking: Number(e.target.value) })
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label>URL</Label>
-                    <Input
-                      className="mt-1.5"
-                      value={uniReqForm.url}
-                      onChange={(e) => setUniReqForm({ ...uniReqForm, url: e.target.value })}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="hero" size="pill" className="flex-1" onClick={submitUniReq}>
-                      {editingUniReqId ? "Save changes" : "Add requirement"}
-                    </Button>
-                    {editingUniReqId && (
-                      <Button variant="ghost" size="pill" onClick={resetUniReqForm}>
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
+                  ))}
                 </div>
-              </div>
+              </section>
+            )}
 
-              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {uniReqs.length === 0 && (
+            {tab === "results" && (
+              <section className="mt-6 overflow-hidden rounded-3xl bg-card shadow-card">
+                {results.length === 0 && (
                   <p className="p-8 text-center text-sm text-muted-foreground">
-                    No university requirements yet.
+                    No mock results yet.
                   </p>
                 )}
-                {uniReqs.map((r) => (
-                  <div key={r.id} className="border-b border-border p-4 last:border-0">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-foreground">{r.university}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          {r.country} — {r.program} — Overall: {r.overallBand}, Writing:{" "}
-                          {r.minWriting}, Speaking: {r.minSpeaking}
-                        </p>
-                      </div>
-                      <div className="flex shrink-0 gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => editUniReq(r)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => removeUniReq(r.id)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
+                {results.map((result) => (
+                  <div
+                    key={result.id}
+                    className="flex flex-wrap items-center gap-4 border-b border-border px-5 py-4 last:border-0"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-foreground">
+                        {result.userName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(result.date).toLocaleDateString()}
+                      </p>
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      L {result.listening} / R {result.reading} / W {result.writing} / S{" "}
+                      {result.speaking}
+                    </p>
+                    <span className="text-lg font-extrabold text-foreground">
+                      {result.overall.toFixed(1)}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        queryClient.setQueryData(["mock-results"], (old: typeof results) =>
+                          old.filter((r) => r.id !== result.id),
+                        );
+                        toast.success("Mock result deleted");
+                        deleteMockResult(result.id, result.userId)
+                          .then(() => {
+                            queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+                          })
+                          .catch(() => {
+                            queryClient.invalidateQueries({ queryKey: ["mock-results"] });
+                            toast.error("Failed to delete mock result");
+                          });
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                   </div>
                 ))}
-              </div>
-            </section>
-          )}
+              </section>
+            )}
 
-          {tab === "mock-tests" && (
-            <section className="mt-6 space-y-6">
-              <div className="rounded-3xl bg-card p-6 shadow-card">
-                <h2 className="text-base font-bold text-foreground">
-                  {editingMockId ? "Edit Mock Test" : "Add Mock Test"}
-                </h2>
-                <div className="mt-4 space-y-4">
-                  {/* Basic info */}
-                  <div className="grid grid-cols-3 gap-3">
+            {tab === "vocabulary" && (
+              <section className="mt-6 space-y-6">
+                <div className="rounded-3xl bg-card p-6 shadow-card">
+                  <h2 className="text-base font-bold text-foreground">
+                    {editingVocabId ? "Edit Vocabulary Word" : "Add Vocabulary Word"}
+                  </h2>
+                  <div className="mt-4 space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Word</Label>
+                        <Input
+                          className="mt-1.5"
+                          value={vocabForm.word}
+                          onChange={(e) => setVocabForm({ ...vocabForm, word: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label>Synonym</Label>
+                        <Input
+                          className="mt-1.5"
+                          value={vocabForm.synonym}
+                          onChange={(e) => setVocabForm({ ...vocabForm, synonym: e.target.value })}
+                        />
+                      </div>
+                    </div>
                     <div>
-                      <Label>Mock ID</Label>
-                      <Input
+                      <Label>Definition</Label>
+                      <Textarea
                         className="mt-1.5"
-                        placeholder="mock-11"
-                        value={mockForm.id}
-                        onChange={(e) => setMockForm({ ...mockForm, id: e.target.value })}
-                        disabled={!!editingMockId}
+                        rows={2}
+                        value={vocabForm.definition}
+                        onChange={(e) => setVocabForm({ ...vocabForm, definition: e.target.value })}
                       />
                     </div>
                     <div>
-                      <Label>Order</Label>
-                      <Input
+                      <Label>Example sentence</Label>
+                      <Textarea
                         className="mt-1.5"
-                        type="number"
-                        min="1"
-                        value={mockForm.order}
-                        onChange={(e) =>
-                          setMockForm({ ...mockForm, order: Number(e.target.value) })
+                        rows={2}
+                        value={vocabForm.example}
+                        onChange={(e) => setVocabForm({ ...vocabForm, example: e.target.value })}
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <Label>Antonym</Label>
+                        <Input
+                          className="mt-1.5"
+                          value={vocabForm.antonym}
+                          onChange={(e) => setVocabForm({ ...vocabForm, antonym: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label>Topic</Label>
+                        <Select
+                          value={vocabForm.topic}
+                          onValueChange={(v) =>
+                            setVocabForm({ ...vocabForm, topic: v as VocabWordDoc["topic"] })
+                          }
+                        >
+                          <SelectTrigger className="mt-1.5">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[
+                              "education",
+                              "environment",
+                              "technology",
+                              "health",
+                              "society",
+                              "economy",
+                              "crime",
+                              "transport",
+                              "media",
+                              "government",
+                              "work",
+                              "family",
+                            ].map((t) => (
+                              <SelectItem key={t} value={t}>
+                                {t}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Difficulty</Label>
+                        <Select
+                          value={vocabForm.difficulty}
+                          onValueChange={(v) =>
+                            setVocabForm({
+                              ...vocabForm,
+                              difficulty: v as VocabWordDoc["difficulty"],
+                            })
+                          }
+                        >
+                          <SelectTrigger className="mt-1.5">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="beginner">Beginner</SelectItem>
+                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="advanced">Advanced</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div>
+                      <Label>IELTS Frequency</Label>
+                      <Select
+                        value={vocabForm.ieltsFrequency}
+                        onValueChange={(v) =>
+                          setVocabForm({
+                            ...vocabForm,
+                            ieltsFrequency: v as VocabWordDoc["ieltsFrequency"],
+                          })
                         }
-                      />
+                      >
+                        <SelectTrigger className="mt-1.5 w-48">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="hero"
+                        size="pill"
+                        className="flex-1"
+                        onClick={submitVocabWord}
+                      >
+                        {editingVocabId ? "Save changes" : "Add word"}
+                      </Button>
+                      {editingVocabId && (
+                        <Button variant="ghost" size="pill" onClick={resetVocabForm}>
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                  {vocabWords.length === 0 && (
+                    <p className="p-8 text-center text-sm text-muted-foreground">
+                      No vocabulary words yet.
+                    </p>
+                  )}
+                  {vocabWords.map((w) => (
+                    <div key={w.id} className="border-b border-border p-4 last:border-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-foreground">{w.word}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">{w.definition}</p>
+                          <div className="mt-1.5 flex flex-wrap gap-1.5">
+                            <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
+                              {w.topic}
+                            </span>
+                            <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
+                              {w.difficulty}
+                            </span>
+                            <span
+                              className={cn(
+                                "rounded-full px-2 py-0.5 text-[11px] font-medium",
+                                w.ieltsFrequency === "high"
+                                  ? "bg-success/15 text-success"
+                                  : w.ieltsFrequency === "medium"
+                                    ? "bg-warning/15 text-warning"
+                                    : "bg-muted text-muted-foreground",
+                              )}
+                            >
+                              {w.ieltsFrequency} freq
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => editVocabWord(w)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => removeVocabWord(w.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {tab === "model-answers" && (
+              <section className="mt-6 space-y-6">
+                <div className="rounded-3xl bg-card p-6 shadow-card">
+                  <h2 className="text-base font-bold text-foreground">
+                    {editingModelAnswerId ? "Edit Model Answer" : "Add Model Answer"}
+                  </h2>
+                  <div className="mt-4 space-y-4">
                     <div>
                       <Label>Title</Label>
                       <Input
                         className="mt-1.5"
-                        placeholder="Mock Test 11"
-                        value={mockForm.title}
-                        onChange={(e) => setMockForm({ ...mockForm, title: e.target.value })}
+                        value={modelAnswerForm.title}
+                        onChange={(e) =>
+                          setModelAnswerForm({ ...modelAnswerForm, title: e.target.value })
+                        }
                       />
                     </div>
-                  </div>
-
-                  {/* Writing */}
-                  <div>
-                    <h3 className="text-sm font-bold text-foreground">Writing</h3>
-                    <div className="mt-2 space-y-2">
+                    <div className="grid grid-cols-3 gap-3">
                       <div>
-                        <Label>Task 1 (Graph/Table description)</Label>
-                        <Textarea
-                          className="mt-1.5"
-                          rows={2}
-                          value={mockForm.writing.task1}
-                          onChange={(e) =>
-                            setMockForm({
-                              ...mockForm,
-                              writing: { ...mockForm.writing, task1: e.target.value },
+                        <Label>Skill</Label>
+                        <Select
+                          value={modelAnswerForm.skill}
+                          onValueChange={(v) =>
+                            setModelAnswerForm({
+                              ...modelAnswerForm,
+                              skill: v as ModelAnswerDoc["skill"],
                             })
                           }
-                        />
-                      </div>
-                      <div>
-                        <Label>Task 2 (Essay)</Label>
-                        <Textarea
-                          className="mt-1.5"
-                          rows={2}
-                          value={mockForm.writing.task2}
-                          onChange={(e) =>
-                            setMockForm({
-                              ...mockForm,
-                              writing: { ...mockForm.writing, task2: e.target.value },
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Speaking */}
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-foreground">
-                        Speaking ({mockForm.speaking.length} questions)
-                      </h3>
-                      <div className="flex gap-1">
-                        <Button variant="soft" size="sm" onClick={() => addSpeakingQuestion(1)}>
-                          + Part 1
-                        </Button>
-                        <Button variant="soft" size="sm" onClick={() => addSpeakingQuestion(2)}>
-                          + Part 2
-                        </Button>
-                        <Button variant="soft" size="sm" onClick={() => addSpeakingQuestion(3)}>
-                          + Part 3
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="mt-2 space-y-2">
-                      {mockForm.speaking.map((sq, i) => (
-                        <div
-                          key={i}
-                          className="flex items-start gap-2 rounded-xl border border-border p-3"
                         >
-                          <span className="mt-1 shrink-0 rounded-full bg-secondary px-2 py-0.5 text-[11px] font-bold">
-                            P{sq.part}
-                          </span>
-                          <div className="flex-1 space-y-1.5">
-                            <Input
-                              placeholder="Prompt"
-                              value={sq.prompt}
-                              onChange={(e) =>
-                                updateSpeakingQuestion(i, { prompt: e.target.value })
-                              }
-                            />
-                            <div className="flex gap-2">
-                              <div className="flex-1">
-                                <Label className="text-[11px]">Prep (s)</Label>
-                                <Input
-                                  type="number"
-                                  value={sq.prepSeconds}
-                                  onChange={(e) =>
-                                    updateSpeakingQuestion(i, {
-                                      prepSeconds: Number(e.target.value),
-                                    })
-                                  }
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <Label className="text-[11px]">Answer (s)</Label>
-                                <Input
-                                  type="number"
-                                  value={sq.answerSeconds}
-                                  onChange={(e) =>
-                                    updateSpeakingQuestion(i, {
-                                      answerSeconds: Number(e.target.value),
-                                    })
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeSpeakingQuestion(i)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      ))}
+                          <SelectTrigger className="mt-1.5">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="writing">Writing</SelectItem>
+                            <SelectItem value="speaking">Speaking</SelectItem>
+                            <SelectItem value="reading">Reading</SelectItem>
+                            <SelectItem value="listening">Listening</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Band</Label>
+                        <Select
+                          value={String(modelAnswerForm.band)}
+                          onValueChange={(v) =>
+                            setModelAnswerForm({ ...modelAnswerForm, band: Number(v) })
+                          }
+                        >
+                          <SelectTrigger className="mt-1.5">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9].map((b) => (
+                              <SelectItem key={b} value={String(b)}>
+                                {b}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Category</Label>
+                        <Input
+                          className="mt-1.5"
+                          placeholder="e.g. education"
+                          value={modelAnswerForm.category}
+                          onChange={(e) =>
+                            setModelAnswerForm({ ...modelAnswerForm, category: e.target.value })
+                          }
+                        />
+                      </div>
                     </div>
-                  </div>
+                    <div>
+                      <Label>Prompt</Label>
+                      <Textarea
+                        className="mt-1.5"
+                        rows={3}
+                        value={modelAnswerForm.prompt}
+                        onChange={(e) =>
+                          setModelAnswerForm({ ...modelAnswerForm, prompt: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label>Model Answer</Label>
+                      <Textarea
+                        className="mt-1.5"
+                        rows={6}
+                        value={modelAnswerForm.answer}
+                        onChange={(e) =>
+                          setModelAnswerForm({ ...modelAnswerForm, answer: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label>Tips (one per line)</Label>
+                      <Textarea
+                        className="mt-1.5"
+                        rows={3}
+                        value={modelAnswerForm.tips.join("\n")}
+                        onChange={(e) =>
+                          setModelAnswerForm({
+                            ...modelAnswerForm,
+                            tips: e.target.value.split("\n"),
+                          })
+                        }
+                      />
+                    </div>
 
-                  {/* Reading */}
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-foreground">
-                        Reading ({mockForm.readingPassages.length} passages)
-                      </h3>
-                      <Button variant="soft" size="sm" onClick={addReadingPassage}>
-                        + Passage
-                      </Button>
-                    </div>
-                    <div className="mt-2 space-y-3">
-                      {mockForm.readingPassages.map((passage, pi) => (
-                        <div key={pi} className="rounded-xl border border-border p-3 space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Input
-                              placeholder="Passage title"
-                              value={passage.title}
-                              onChange={(e) => updateReadingPassage(pi, { title: e.target.value })}
-                            />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeReadingPassage(pi)}
+                    {/* Criteria */}
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <Label>Scoring Criteria</Label>
+                        <Button
+                          variant="soft"
+                          size="sm"
+                          onClick={() =>
+                            setModelAnswerForm({
+                              ...modelAnswerForm,
+                              criteria: [
+                                ...modelAnswerForm.criteria,
+                                { label: "", band: 7, comment: "" },
+                              ],
+                            })
+                          }
+                        >
+                          + Criterion
+                        </Button>
+                      </div>
+                      <div className="mt-2 space-y-2">
+                        {modelAnswerForm.criteria.map((c, i) => {
+                          const next = [...modelAnswerForm.criteria];
+                          return (
+                            <div
+                              key={i}
+                              className="flex items-start gap-2 rounded-xl border border-border p-3"
                             >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                          <Textarea
-                            placeholder="Passage text..."
-                            rows={3}
-                            value={passage.passage}
-                            onChange={(e) => updateReadingPassage(pi, { passage: e.target.value })}
-                          />
-                          <div className="flex items-center justify-between">
-                            <span className="text-[11px] text-muted-foreground">
-                              MC Questions ({passage.questions.length})
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => addReadingQuestion(pi)}
-                            >
-                              + Question
-                            </Button>
-                          </div>
-                          {passage.questions.map((q, qi) => (
-                            <div key={qi} className="ml-3 space-y-1 rounded-lg bg-secondary/50 p-2">
-                              <div className="flex items-center gap-1">
+                              <div className="flex-1 space-y-1.5">
                                 <Input
-                                  placeholder={`Question ${qi + 1}`}
-                                  value={q.q}
-                                  onChange={(e) =>
-                                    updateReadingQuestion(pi, qi, { q: e.target.value })
-                                  }
+                                  placeholder="Label (e.g. Task Response)"
+                                  value={c.label}
+                                  onChange={(e) => {
+                                    next[i] = { ...next[i]!, label: e.target.value };
+                                    setModelAnswerForm({ ...modelAnswerForm, criteria: next });
+                                  }}
                                 />
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeReadingQuestion(pi, qi)}
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
-                              {q.options.map((opt, oi) => (
-                                <div key={oi} className="flex items-center gap-1">
-                                  <button
-                                    type="button"
-                                    onClick={() => updateReadingQuestion(pi, qi, { answer: oi })}
-                                    className={cn(
-                                      "flex h-6 w-6 shrink-0 items-center justify-center rounded border text-[10px] font-bold",
-                                      q.answer === oi
-                                        ? "border-primary bg-primary text-primary-foreground"
-                                        : "border-border text-muted-foreground",
-                                    )}
-                                  >
-                                    {String.fromCharCode(65 + oi)}
-                                  </button>
+                                <div className="flex gap-2">
                                   <Input
-                                    className="text-xs"
-                                    placeholder={`Option ${String.fromCharCode(65 + oi)}`}
-                                    value={opt}
+                                    className="w-20"
+                                    type="number"
+                                    step="0.5"
+                                    min="0"
+                                    max="9"
+                                    value={c.band}
                                     onChange={(e) => {
-                                      const next = [...q.options];
-                                      next[oi] = e.target.value;
-                                      updateReadingQuestion(pi, qi, { options: next });
+                                      next[i] = { ...next[i]!, band: Number(e.target.value) };
+                                      setModelAnswerForm({ ...modelAnswerForm, criteria: next });
+                                    }}
+                                  />
+                                  <Input
+                                    className="flex-1"
+                                    placeholder="Comment"
+                                    value={c.comment}
+                                    onChange={(e) => {
+                                      next[i] = { ...next[i]!, comment: e.target.value };
+                                      setModelAnswerForm({ ...modelAnswerForm, criteria: next });
                                     }}
                                   />
                                 </div>
-                              ))}
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  setModelAnswerForm({
+                                    ...modelAnswerForm,
+                                    criteria: modelAnswerForm.criteria.filter(
+                                      (_, idx) => idx !== i,
+                                    ),
+                                  })
+                                }
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
                             </div>
-                          ))}
-                        </div>
-                      ))}
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="hero"
+                        size="pill"
+                        className="flex-1"
+                        onClick={submitModelAnswer}
+                      >
+                        {editingModelAnswerId ? "Save changes" : "Add answer"}
+                      </Button>
+                      {editingModelAnswerId && (
+                        <Button variant="ghost" size="pill" onClick={resetModelAnswerForm}>
+                          Cancel
+                        </Button>
+                      )}
                     </div>
                   </div>
+                </div>
 
-                  {/* Listening */}
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-foreground">
-                        Listening ({mockForm.listeningSections.length} sections)
-                      </h3>
-                      <Button variant="soft" size="sm" onClick={addListeningSection}>
-                        + Section
-                      </Button>
+                <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                  {modelAnswers.length === 0 && (
+                    <p className="p-8 text-center text-sm text-muted-foreground">
+                      No model answers yet.
+                    </p>
+                  )}
+                  {modelAnswers.map((a) => (
+                    <div key={a.id} className="border-b border-border p-4 last:border-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-foreground">{a.title}</p>
+                          <div className="mt-1 flex flex-wrap gap-1.5">
+                            <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
+                              {a.skill}
+                            </span>
+                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
+                              Band {a.band}
+                            </span>
+                            {a.category && (
+                              <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                                {a.category}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => editModelAnswer(a)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => removeModelAnswer(a.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="mt-2 space-y-3">
-                      {mockForm.listeningSections.map((section, si) => (
-                        <div key={si} className="rounded-xl border border-border p-3 space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Input
-                              placeholder="Section title"
-                              value={section.title}
-                              onChange={(e) =>
-                                updateListeningSection(si, { title: e.target.value })
-                              }
-                            />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {tab === "requirements" && (
+              <section className="mt-6 space-y-6">
+                {/* Country Requirements */}
+                <div className="rounded-3xl bg-card p-6 shadow-card">
+                  <h2 className="text-base font-bold text-foreground">
+                    {editingCountryReqId ? "Edit Country Requirement" : "Add Country Requirement"}
+                  </h2>
+                  <div className="mt-4 space-y-4">
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <Label>Country</Label>
+                        <Input
+                          className="mt-1.5"
+                          value={countryReqForm.country}
+                          onChange={(e) =>
+                            setCountryReqForm({ ...countryReqForm, country: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Flag emoji</Label>
+                        <Input
+                          className="mt-1.5"
+                          value={countryReqForm.flag}
+                          onChange={(e) =>
+                            setCountryReqForm({ ...countryReqForm, flag: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Purpose</Label>
+                        <Input
+                          className="mt-1.5"
+                          value={countryReqForm.purpose}
+                          onChange={(e) =>
+                            setCountryReqForm({ ...countryReqForm, purpose: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Overall Band</Label>
+                        <Input
+                          className="mt-1.5"
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          max="9"
+                          value={countryReqForm.overallBand}
+                          onChange={(e) =>
+                            setCountryReqForm({
+                              ...countryReqForm,
+                              overallBand: Number(e.target.value),
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Min per skill</Label>
+                        <Input
+                          className="mt-1.5"
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          max="9"
+                          value={countryReqForm.minPerSkill}
+                          onChange={(e) =>
+                            setCountryReqForm({
+                              ...countryReqForm,
+                              minPerSkill: Number(e.target.value),
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Notes</Label>
+                      <Textarea
+                        className="mt-1.5"
+                        rows={2}
+                        value={countryReqForm.notes}
+                        onChange={(e) =>
+                          setCountryReqForm({ ...countryReqForm, notes: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="hero"
+                        size="pill"
+                        className="flex-1"
+                        onClick={submitCountryReq}
+                      >
+                        {editingCountryReqId ? "Save changes" : "Add requirement"}
+                      </Button>
+                      {editingCountryReqId && (
+                        <Button variant="ghost" size="pill" onClick={resetCountryReqForm}>
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                  {countryReqs.length === 0 && (
+                    <p className="p-8 text-center text-sm text-muted-foreground">
+                      No country requirements yet.
+                    </p>
+                  )}
+                  {countryReqs.map((r) => (
+                    <div key={r.id} className="border-b border-border p-4 last:border-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-foreground">
+                            {r.flag} {r.country} — {r.purpose}
+                          </p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            Overall: {r.overallBand} / Min skill: {r.minPerSkill}
+                          </p>
+                          {r.notes && (
+                            <p className="mt-1 text-xs text-muted-foreground">{r.notes}</p>
+                          )}
+                        </div>
+                        <div className="flex shrink-0 gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => editCountryReq(r)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => removeCountryReq(r.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* University Requirements */}
+                <div className="rounded-3xl bg-card p-6 shadow-card">
+                  <h2 className="text-base font-bold text-foreground">
+                    {editingUniReqId ? "Edit University Requirement" : "Add University Requirement"}
+                  </h2>
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <Label>University</Label>
+                      <Input
+                        className="mt-1.5"
+                        value={uniReqForm.university}
+                        onChange={(e) =>
+                          setUniReqForm({ ...uniReqForm, university: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Country</Label>
+                        <Input
+                          className="mt-1.5"
+                          value={uniReqForm.country}
+                          onChange={(e) =>
+                            setUniReqForm({ ...uniReqForm, country: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Program</Label>
+                        <Input
+                          className="mt-1.5"
+                          value={uniReqForm.program}
+                          onChange={(e) =>
+                            setUniReqForm({ ...uniReqForm, program: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <Label>Overall Band</Label>
+                        <Input
+                          className="mt-1.5"
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          max="9"
+                          value={uniReqForm.overallBand}
+                          onChange={(e) =>
+                            setUniReqForm({ ...uniReqForm, overallBand: Number(e.target.value) })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Min Writing</Label>
+                        <Input
+                          className="mt-1.5"
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          max="9"
+                          value={uniReqForm.minWriting}
+                          onChange={(e) =>
+                            setUniReqForm({ ...uniReqForm, minWriting: Number(e.target.value) })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Min Speaking</Label>
+                        <Input
+                          className="mt-1.5"
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          max="9"
+                          value={uniReqForm.minSpeaking}
+                          onChange={(e) =>
+                            setUniReqForm({ ...uniReqForm, minSpeaking: Number(e.target.value) })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>URL</Label>
+                      <Input
+                        className="mt-1.5"
+                        value={uniReqForm.url}
+                        onChange={(e) => setUniReqForm({ ...uniReqForm, url: e.target.value })}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="hero" size="pill" className="flex-1" onClick={submitUniReq}>
+                        {editingUniReqId ? "Save changes" : "Add requirement"}
+                      </Button>
+                      {editingUniReqId && (
+                        <Button variant="ghost" size="pill" onClick={resetUniReqForm}>
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                  {uniReqs.length === 0 && (
+                    <p className="p-8 text-center text-sm text-muted-foreground">
+                      No university requirements yet.
+                    </p>
+                  )}
+                  {uniReqs.map((r) => (
+                    <div key={r.id} className="border-b border-border p-4 last:border-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-foreground">{r.university}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            {r.country} — {r.program} — Overall: {r.overallBand}, Writing:{" "}
+                            {r.minWriting}, Speaking: {r.minSpeaking}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => editUniReq(r)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => removeUniReq(r.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {tab === "mock-tests" && (
+              <section className="mt-6 space-y-6">
+                <div className="rounded-3xl bg-card p-6 shadow-card">
+                  <h2 className="text-base font-bold text-foreground">
+                    {editingMockId ? "Edit Mock Test" : "Add Mock Test"}
+                  </h2>
+                  <div className="mt-4 space-y-4">
+                    {/* Basic info */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <Label>Mock ID</Label>
+                        <Input
+                          className="mt-1.5"
+                          placeholder="mock-11"
+                          value={mockForm.id}
+                          onChange={(e) => setMockForm({ ...mockForm, id: e.target.value })}
+                          disabled={!!editingMockId}
+                        />
+                      </div>
+                      <div>
+                        <Label>Order</Label>
+                        <Input
+                          className="mt-1.5"
+                          type="number"
+                          min="1"
+                          value={mockForm.order}
+                          onChange={(e) =>
+                            setMockForm({ ...mockForm, order: Number(e.target.value) })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Title</Label>
+                        <Input
+                          className="mt-1.5"
+                          placeholder="Mock Test 11"
+                          value={mockForm.title}
+                          onChange={(e) => setMockForm({ ...mockForm, title: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Writing */}
+                    <div>
+                      <h3 className="text-sm font-bold text-foreground">Writing</h3>
+                      <div className="mt-2 space-y-2">
+                        <div>
+                          <Label>Task 1 (Graph/Table description)</Label>
+                          <Textarea
+                            className="mt-1.5"
+                            rows={2}
+                            value={mockForm.writing.task1}
+                            onChange={(e) =>
+                              setMockForm({
+                                ...mockForm,
+                                writing: { ...mockForm.writing, task1: e.target.value },
+                              })
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label>Task 2 (Essay)</Label>
+                          <Textarea
+                            className="mt-1.5"
+                            rows={2}
+                            value={mockForm.writing.task2}
+                            onChange={(e) =>
+                              setMockForm({
+                                ...mockForm,
+                                writing: { ...mockForm.writing, task2: e.target.value },
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Speaking */}
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-bold text-foreground">
+                          Speaking ({mockForm.speaking.length} questions)
+                        </h3>
+                        <div className="flex gap-1">
+                          <Button variant="soft" size="sm" onClick={() => addSpeakingQuestion(1)}>
+                            + Part 1
+                          </Button>
+                          <Button variant="soft" size="sm" onClick={() => addSpeakingQuestion(2)}>
+                            + Part 2
+                          </Button>
+                          <Button variant="soft" size="sm" onClick={() => addSpeakingQuestion(3)}>
+                            + Part 3
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-2 space-y-2">
+                        {mockForm.speaking.map((sq, i) => (
+                          <div
+                            key={i}
+                            className="flex items-start gap-2 rounded-xl border border-border p-3"
+                          >
+                            <span className="mt-1 shrink-0 rounded-full bg-secondary px-2 py-0.5 text-[11px] font-bold">
+                              P{sq.part}
+                            </span>
+                            <div className="flex-1 space-y-1.5">
+                              <Input
+                                placeholder="Prompt"
+                                value={sq.prompt}
+                                onChange={(e) =>
+                                  updateSpeakingQuestion(i, { prompt: e.target.value })
+                                }
+                              />
+                              <div className="flex gap-2">
+                                <div className="flex-1">
+                                  <Label className="text-[11px]">Prep (s)</Label>
+                                  <Input
+                                    type="number"
+                                    value={sq.prepSeconds}
+                                    onChange={(e) =>
+                                      updateSpeakingQuestion(i, {
+                                        prepSeconds: Number(e.target.value),
+                                      })
+                                    }
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <Label className="text-[11px]">Answer (s)</Label>
+                                  <Input
+                                    type="number"
+                                    value={sq.answerSeconds}
+                                    onChange={(e) =>
+                                      updateSpeakingQuestion(i, {
+                                        answerSeconds: Number(e.target.value),
+                                      })
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            </div>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => removeListeningSection(si)}
+                              onClick={() => removeSpeakingQuestion(i)}
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </div>
-                          <Textarea
-                            placeholder="Transcript..."
-                            rows={3}
-                            value={section.transcript}
-                            onChange={(e) =>
-                              updateListeningSection(si, { transcript: e.target.value })
-                            }
-                          />
-                          <div className="flex items-center justify-between">
-                            <span className="text-[11px] text-muted-foreground">
-                              Fill Questions ({section.questions.length})
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => addListeningQuestion(si)}
-                            >
-                              + Question
-                            </Button>
-                          </div>
-                          {section.questions.map((q, qi) => (
-                            <div
-                              key={qi}
-                              className="ml-3 flex items-center gap-1 rounded-lg bg-secondary/50 p-2"
-                            >
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Reading */}
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-bold text-foreground">
+                          Reading ({mockForm.readingPassages.length} passages)
+                        </h3>
+                        <Button variant="soft" size="sm" onClick={addReadingPassage}>
+                          + Passage
+                        </Button>
+                      </div>
+                      <div className="mt-2 space-y-3">
+                        {mockForm.readingPassages.map((passage, pi) => (
+                          <div key={pi} className="rounded-xl border border-border p-3 space-y-2">
+                            <div className="flex items-center gap-2">
                               <Input
-                                className="flex-1 text-xs"
-                                placeholder="Question (use ___ for blank)"
-                                value={q.q}
+                                placeholder="Passage title"
+                                value={passage.title}
                                 onChange={(e) =>
-                                  updateListeningQuestion(si, qi, { q: e.target.value })
-                                }
-                              />
-                              <Input
-                                className="w-32 text-xs"
-                                placeholder="Accepted (,)"
-                                value={q.accepted.join(",")}
-                                onChange={(e) =>
-                                  updateListeningQuestion(si, qi, {
-                                    accepted: e.target.value.split(",").map((s) => s.trim()),
-                                  })
+                                  updateReadingPassage(pi, { title: e.target.value })
                                 }
                               />
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => removeListeningQuestion(si, qi)}
+                                onClick={() => removeReadingPassage(pi)}
                               >
-                                <Trash2 className="h-3 w-3" />
+                                <Trash2 className="h-4 w-4 text-destructive" />
                               </Button>
                             </div>
-                          ))}
-                        </div>
-                      ))}
+                            <Textarea
+                              placeholder="Passage text..."
+                              rows={3}
+                              value={passage.passage}
+                              onChange={(e) =>
+                                updateReadingPassage(pi, { passage: e.target.value })
+                              }
+                            />
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] text-muted-foreground">
+                                MC Questions ({passage.questions.length})
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => addReadingQuestion(pi)}
+                              >
+                                + Question
+                              </Button>
+                            </div>
+                            {passage.questions.map((q, qi) => (
+                              <div
+                                key={qi}
+                                className="ml-3 space-y-1 rounded-lg bg-secondary/50 p-2"
+                              >
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    placeholder={`Question ${qi + 1}`}
+                                    value={q.q}
+                                    onChange={(e) =>
+                                      updateReadingQuestion(pi, qi, { q: e.target.value })
+                                    }
+                                  />
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeReadingQuestion(pi, qi)}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                                {q.options.map((opt, oi) => (
+                                  <div key={oi} className="flex items-center gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => updateReadingQuestion(pi, qi, { answer: oi })}
+                                      className={cn(
+                                        "flex h-6 w-6 shrink-0 items-center justify-center rounded border text-[10px] font-bold",
+                                        q.answer === oi
+                                          ? "border-primary bg-primary text-primary-foreground"
+                                          : "border-border text-muted-foreground",
+                                      )}
+                                    >
+                                      {String.fromCharCode(65 + oi)}
+                                    </button>
+                                    <Input
+                                      className="text-xs"
+                                      placeholder={`Option ${String.fromCharCode(65 + oi)}`}
+                                      value={opt}
+                                      onChange={(e) => {
+                                        const next = [...q.options];
+                                        next[oi] = e.target.value;
+                                        updateReadingQuestion(pi, qi, { options: next });
+                                      }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex gap-2">
-                    <Button variant="hero" size="pill" className="flex-1" onClick={submitMockTest}>
-                      {editingMockId ? "Save changes" : "Add Mock Test"}
-                    </Button>
-                    {editingMockId && (
-                      <Button variant="ghost" size="pill" onClick={resetMockForm}>
-                        Cancel
+                    {/* Listening */}
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-bold text-foreground">
+                          Listening ({mockForm.listeningSections.length} sections)
+                        </h3>
+                        <Button variant="soft" size="sm" onClick={addListeningSection}>
+                          + Section
+                        </Button>
+                      </div>
+                      <div className="mt-2 space-y-3">
+                        {mockForm.listeningSections.map((section, si) => (
+                          <div key={si} className="rounded-xl border border-border p-3 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Input
+                                placeholder="Section title"
+                                value={section.title}
+                                onChange={(e) =>
+                                  updateListeningSection(si, { title: e.target.value })
+                                }
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeListeningSection(si)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                            <Textarea
+                              placeholder="Transcript..."
+                              rows={3}
+                              value={section.transcript}
+                              onChange={(e) =>
+                                updateListeningSection(si, { transcript: e.target.value })
+                              }
+                            />
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] text-muted-foreground">
+                                Fill Questions ({section.questions.length})
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => addListeningQuestion(si)}
+                              >
+                                + Question
+                              </Button>
+                            </div>
+                            {section.questions.map((q, qi) => (
+                              <div
+                                key={qi}
+                                className="ml-3 flex items-center gap-1 rounded-lg bg-secondary/50 p-2"
+                              >
+                                <Input
+                                  className="flex-1 text-xs"
+                                  placeholder="Question (use ___ for blank)"
+                                  value={q.q}
+                                  onChange={(e) =>
+                                    updateListeningQuestion(si, qi, { q: e.target.value })
+                                  }
+                                />
+                                <Input
+                                  className="w-32 text-xs"
+                                  placeholder="Accepted (,)"
+                                  value={q.accepted.join(",")}
+                                  onChange={(e) =>
+                                    updateListeningQuestion(si, qi, {
+                                      accepted: e.target.value.split(",").map((s) => s.trim()),
+                                    })
+                                  }
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeListeningQuestion(si, qi)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="hero"
+                        size="pill"
+                        className="flex-1"
+                        onClick={submitMockTest}
+                      >
+                        {editingMockId ? "Save changes" : "Add Mock Test"}
                       </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* List */}
-              <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                {mockTests.length === 0 && (
-                  <p className="p-8 text-center text-sm text-muted-foreground">
-                    No mock tests yet.
-                  </p>
-                )}
-                {mockTests.map((m) => (
-                  <div key={m.id} className="border-b border-border p-4 last:border-0">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-foreground">
-                          #{m.order} — {m.title}
-                        </p>
-                        <div className="mt-1 flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
-                          <span>{m.reading.passages.length} passages</span>
-                          <span>•</span>
-                          <span>{m.listening.sections.length} sections</span>
-                          <span>•</span>
-                          <span>{m.speaking.length} speaking Qs</span>
-                        </div>
-                      </div>
-                      <div className="flex shrink-0 gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => editMockTest(m)}>
-                          <Pencil className="h-4 w-4" />
+                      {editingMockId && (
+                        <Button variant="ghost" size="pill" onClick={resetMockForm}>
+                          Cancel
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => removeMockTest(m.id)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {tab === "community" && (
-            <section className="mt-6 space-y-4">
-              {selectedCommunityThread ? (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="pill"
-                    onClick={() => setSelectedCommunityThread(null)}
-                  >
-                    ← Back to threads
-                  </Button>
-                  <div className="rounded-3xl bg-card p-6 shadow-card">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="capitalize">
-                        {selectedCommunityThread.category}
-                      </Badge>
-                      <span className="text-sm font-bold text-foreground">
-                        {selectedCommunityThread.author}
-                      </span>
-                      {selectedCommunityThread.authorEmail === ADMIN_EMAIL && (
-                        <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
-                          <Shield className="h-2.5 w-2.5" /> Admin
-                        </span>
                       )}
                     </div>
-                    <h2 className="mt-2 text-lg font-extrabold text-foreground">
-                      {selectedCommunityThread.title}
-                    </h2>
-                    <p className="mt-3 whitespace-pre-wrap text-sm text-foreground leading-relaxed">
-                      {selectedCommunityThread.content}
-                    </p>
-                    <div className="mt-4 flex items-center gap-4">
-                      <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <ThumbsUp className="h-4 w-4" /> {selectedCommunityThread.likes}
-                      </span>
-                      <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <MessageSquare className="h-4 w-4" />{" "}
-                        {selectedCommunityThread.replies.length} replies
-                      </span>
-                      <button
-                        onClick={() => deleteCommunityThread(selectedCommunityThread.id)}
-                        className="flex items-center gap-1 text-sm text-destructive hover:text-destructive/80"
-                      >
-                        <Trash2 className="h-4 w-4" /> Delete thread
-                      </button>
-                    </div>
                   </div>
+                </div>
 
-                  <h3 className="text-sm font-bold text-foreground">
-                    Replies ({selectedCommunityThread.replies.length})
-                  </h3>
-                  {selectedCommunityThread.replies.map((reply) => (
-                    <div key={reply.id} className="rounded-2xl bg-card p-4 shadow-card">
+                {/* List */}
+                <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                  {mockTests.length === 0 && (
+                    <p className="p-8 text-center text-sm text-muted-foreground">
+                      No mock tests yet.
+                    </p>
+                  )}
+                  {mockTests.map((m) => (
+                    <div key={m.id} className="border-b border-border p-4 last:border-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-foreground">
+                            #{m.order} — {m.title}
+                          </p>
+                          <div className="mt-1 flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
+                            <span>{m.reading.passages.length} passages</span>
+                            <span>•</span>
+                            <span>{m.listening.sections.length} sections</span>
+                            <span>•</span>
+                            <span>{m.speaking.length} speaking Qs</span>
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => editMockTest(m)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => removeMockTest(m.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {tab === "community" && (
+              <section className="mt-6 space-y-4">
+                {selectedCommunityThread ? (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="pill"
+                      onClick={() => setSelectedCommunityThread(null)}
+                    >
+                      ← Back to threads
+                    </Button>
+                    <div className="rounded-3xl bg-card p-6 shadow-card">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-foreground">{reply.author}</span>
-                        {reply.authorEmail === ADMIN_EMAIL && (
+                        <Badge variant="secondary" className="capitalize">
+                          {selectedCommunityThread.category}
+                        </Badge>
+                        <span className="text-sm font-bold text-foreground">
+                          {selectedCommunityThread.author}
+                        </span>
+                        {selectedCommunityThread.authorEmail === ADMIN_EMAIL && (
                           <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
                             <Shield className="h-2.5 w-2.5" /> Admin
                           </span>
                         )}
+                      </div>
+                      <h2 className="mt-2 text-lg font-extrabold text-foreground">
+                        {selectedCommunityThread.title}
+                      </h2>
+                      <p className="mt-3 whitespace-pre-wrap text-sm text-foreground leading-relaxed">
+                        {selectedCommunityThread.content}
+                      </p>
+                      <div className="mt-4 flex items-center gap-4">
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <ThumbsUp className="h-4 w-4" /> {selectedCommunityThread.likes}
+                        </span>
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <MessageSquare className="h-4 w-4" />{" "}
+                          {selectedCommunityThread.replies.length} replies
+                        </span>
                         <button
-                          onClick={() => deleteCommunityReply(selectedCommunityThread.id, reply.id)}
-                          className="ml-auto text-destructive hover:text-destructive/80"
+                          onClick={() => deleteCommunityThread(selectedCommunityThread.id)}
+                          className="flex items-center gap-1 text-sm text-destructive hover:text-destructive/80"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="h-4 w-4" /> Delete thread
                         </button>
                       </div>
-                      <p className="mt-2 text-sm text-foreground">{reply.content}</p>
                     </div>
-                  ))}
 
-                  <div className="rounded-2xl bg-card p-4 shadow-card">
-                    <textarea
-                      value={communityReplyText}
-                      onChange={(e) => setCommunityReplyText(e.target.value)}
-                      placeholder="Write a reply as Admin..."
-                      rows={3}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm resize-none"
-                    />
-                    <div className="mt-2 flex justify-end">
-                      <Button
-                        onClick={handleCommunityReply}
-                        disabled={!communityReplyText.trim()}
-                        variant="hero"
-                        size="pill"
-                      >
-                        <Send className="mr-2 h-4 w-4" /> Reply as Admin
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex flex-wrap gap-2">
-                    {(["all", "tips", "question", "experience", "resource"] as const).map((tab) => (
-                      <Button
-                        key={tab}
-                        variant={communityTab === tab ? "hero" : "soft"}
-                        size="pill"
-                        onClick={() => setCommunityTab(tab)}
-                      >
-                        {tab === "all" ? "All" : tab.charAt(0).toUpperCase() + tab.slice(1)}
-                      </Button>
-                    ))}
-                  </div>
-
-                  <div className="overflow-hidden rounded-3xl bg-card shadow-card">
-                    {communityLoading && (
-                      <p className="flex items-center justify-center gap-2 p-8 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" /> Loading threads...
-                      </p>
-                    )}
-                    {!communityLoading && filteredCommunityThreads.length === 0 && (
-                      <p className="p-8 text-center text-sm text-muted-foreground">
-                        No threads yet.
-                      </p>
-                    )}
-                    {filteredCommunityThreads.map((thread) => (
-                      <div key={thread.id} className="border-b border-border p-4 last:border-0">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="secondary" className="capitalize text-[10px]">
-                                {thread.category}
-                              </Badge>
-                              <span className="text-sm font-bold text-foreground">
-                                {thread.author}
-                              </span>
-                              {thread.authorEmail === ADMIN_EMAIL && (
-                                <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
-                                  <Shield className="h-2.5 w-2.5" /> Admin
-                                </span>
-                              )}
-                            </div>
-                            <p className="mt-1 text-sm font-semibold text-foreground">
-                              {thread.title}
-                            </p>
-                            <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
-                              {thread.content}
-                            </p>
-                            <div className="mt-1.5 flex gap-3 text-[11px] text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <ThumbsUp className="h-3 w-3" /> {thread.likes}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <MessageSquare className="h-3 w-3" /> {thread.replies.length}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex shrink-0 gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setSelectedCommunityThread(thread)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deleteCommunityThread(thread.id)}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
+                    <h3 className="text-sm font-bold text-foreground">
+                      Replies ({selectedCommunityThread.replies.length})
+                    </h3>
+                    {selectedCommunityThread.replies.map((reply) => (
+                      <div key={reply.id} className="rounded-2xl bg-card p-4 shadow-card">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-foreground">{reply.author}</span>
+                          {reply.authorEmail === ADMIN_EMAIL && (
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                              <Shield className="h-2.5 w-2.5" /> Admin
+                            </span>
+                          )}
+                          <button
+                            onClick={() =>
+                              deleteCommunityReply(selectedCommunityThread.id, reply.id)
+                            }
+                            className="ml-auto text-destructive hover:text-destructive/80"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
                         </div>
+                        <p className="mt-2 text-sm text-foreground">{reply.content}</p>
                       </div>
                     ))}
-                  </div>
-                </>
-              )}
-            </section>
-          )}
 
-          {tab === "seed" && <SeedSection queryClient={queryClient} />}
-          {tab === "shadowing" && <ShadowingAdminSection queryClient={queryClient} />}
-        </main>
+                    <div className="rounded-2xl bg-card p-4 shadow-card">
+                      <textarea
+                        value={communityReplyText}
+                        onChange={(e) => setCommunityReplyText(e.target.value)}
+                        placeholder="Write a reply as Admin..."
+                        rows={3}
+                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm resize-none"
+                      />
+                      <div className="mt-2 flex justify-end">
+                        <Button
+                          onClick={handleCommunityReply}
+                          disabled={!communityReplyText.trim()}
+                          variant="hero"
+                          size="pill"
+                        >
+                          <Send className="mr-2 h-4 w-4" /> Reply as Admin
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex flex-wrap gap-2">
+                      {(["all", "tips", "question", "experience", "resource"] as const).map(
+                        (tab) => (
+                          <Button
+                            key={tab}
+                            variant={communityTab === tab ? "hero" : "soft"}
+                            size="pill"
+                            onClick={() => setCommunityTab(tab)}
+                          >
+                            {tab === "all" ? "All" : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                          </Button>
+                        ),
+                      )}
+                    </div>
+
+                    <div className="overflow-hidden rounded-3xl bg-card shadow-card">
+                      {communityLoading && (
+                        <p className="flex items-center justify-center gap-2 p-8 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" /> Loading threads...
+                        </p>
+                      )}
+                      {!communityLoading && filteredCommunityThreads.length === 0 && (
+                        <p className="p-8 text-center text-sm text-muted-foreground">
+                          No threads yet.
+                        </p>
+                      )}
+                      {filteredCommunityThreads.map((thread) => (
+                        <div key={thread.id} className="border-b border-border p-4 last:border-0">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="capitalize text-[10px]">
+                                  {thread.category}
+                                </Badge>
+                                <span className="text-sm font-bold text-foreground">
+                                  {thread.author}
+                                </span>
+                                {thread.authorEmail === ADMIN_EMAIL && (
+                                  <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                                    <Shield className="h-2.5 w-2.5" /> Admin
+                                  </span>
+                                )}
+                              </div>
+                              <p className="mt-1 text-sm font-semibold text-foreground">
+                                {thread.title}
+                              </p>
+                              <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
+                                {thread.content}
+                              </p>
+                              <div className="mt-1.5 flex gap-3 text-[11px] text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <ThumbsUp className="h-3 w-3" /> {thread.likes}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <MessageSquare className="h-3 w-3" /> {thread.replies.length}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex shrink-0 gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSelectedCommunityThread(thread)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteCommunityThread(thread.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </section>
+            )}
+
+            {tab === "seed" && <SeedSection queryClient={queryClient} />}
+            {tab === "shadowing" && <ShadowingAdminSection queryClient={queryClient} />}
+          </main>
         </div>
       </div>
     </div>

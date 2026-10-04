@@ -237,7 +237,7 @@ function DashboardPage() {
   const { user } = useAuth();
   const { data: plans = [] } = useQuery({
     queryKey: ["study-plans"],
-    queryFn: listStudyPlans,
+    queryFn: () => listStudyPlans(user?.uid),
   });
 
   if (!user) return null;

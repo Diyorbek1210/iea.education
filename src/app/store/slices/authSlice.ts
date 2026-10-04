@@ -5,28 +5,31 @@ import {
   signInWithEmailAndPassword,
   signOut as fbSignOut,
 } from "firebase/auth";
-import { ADMIN_EMAIL, ADMIN_PASSWORD, auth, isFirebaseConfigured } from "@/shared/config/firebase";
+import { auth, isAdminEmail, isFirebaseConfigured } from "@/shared/config/firebase";
+import {
+  authenticateDemoUser,
+  purgeLegacyPlaintextCredentials,
+  registerDemoUser,
+} from "@/lib/demoAuth";
 import { createUserProfile, getUserProfile, recordActivity } from "@/lib/db";
 import { DEFAULT_DAILY_GOAL, weekStartKey } from "@/lib/gamification";
 import type { UserProfile } from "@/shared/types/types";
 
 const SESSION_KEY = "iea_session_uid";
-const ADMIN_KEY = "iea_session_admin";
-const CRED_KEY = "iea_credentials";
 
-type Credentials = Record<string, { uid: string; password: string }>;
-
-function readCreds(): Credentials {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(window.localStorage.getItem(CRED_KEY) ?? "{}") as Credentials;
-  } catch {
-    return {};
-  }
+/**
+ * The signed-in uid is the only thing persisted. Neither a password nor an
+ * `isAdmin` flag is written to storage: admin status is re-derived from the
+ * Firebase-authenticated identity on every page load, so editing localStorage
+ * cannot escalate privileges.
+ */
+function readSessionUid(): string | null {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(SESSION_KEY);
 }
 
-function writeCreds(creds: Credentials) {
-  window.localStorage.setItem(CRED_KEY, JSON.stringify(creds));
+function writeSessionUid(uid: string) {
+  window.localStorage.setItem(SESSION_KEY, uid);
 }
 
 interface AuthState {
@@ -55,9 +58,32 @@ async function restoreProfile(uid: string): Promise<UserProfile | null> {
   }
 }
 
+function emptyProfile(uid: string, name: string, email: string): UserProfile {
+  return {
+    uid,
+    name,
+    email,
+    level: "Advanced",
+    createdAt: new Date().toISOString(),
+    mockResults: [],
+    xp: 0,
+    streak: 0,
+    longestStreak: 0,
+    todayXp: 0,
+    weeklyXp: 0,
+    weekStartDate: weekStartKey(),
+    dailyGoal: DEFAULT_DAILY_GOAL,
+    badges: [],
+    gamesPlayed: 0,
+    placementCompleted: false,
+  };
+}
+
 export const initAuth = createAsyncThunk(
   "auth/init",
   async (_, { dispatch }) => {
+    purgeLegacyPlaintextCredentials();
+
     if (isFirebaseConfigured && auth) {
       const fbAuth = auth;
       await new Promise<void>((resolve) => {
@@ -68,7 +94,9 @@ export const initAuth = createAsyncThunk(
             resolve();
             return;
           }
-          const isAdmin = fbUser.email === ADMIN_EMAIL;
+          // `fbUser.email` comes from a verified Firebase session, not from
+          // anything the browser can rewrite.
+          const isAdmin = isAdminEmail(fbUser.email);
           const profile = await restoreProfile(fbUser.uid);
           dispatch(setAuth({ user: profile, isAdmin }));
           resolve();
@@ -77,14 +105,13 @@ export const initAuth = createAsyncThunk(
       return;
     }
 
-    const uid = window.localStorage.getItem(SESSION_KEY);
-    const isAdmin = window.localStorage.getItem(ADMIN_KEY) === "true";
-    if (uid) {
-      const profile = await restoreProfile(uid);
-      dispatch(setAuth({ user: profile, isAdmin }));
-    } else {
-      dispatch(setAuth({ user: null, isAdmin }));
+    const uid = readSessionUid();
+    if (!uid) {
+      dispatch(setAuth({ user: null, isAdmin: false }));
+      return;
     }
+    const profile = await restoreProfile(uid);
+    dispatch(setAuth({ user: profile, isAdmin: isAdminEmail(profile?.email) }));
   },
   { condition: (_, { getState }) => !(getState() as { auth: AuthState }).auth.ready },
 );
@@ -107,33 +134,14 @@ export const signUp = createAsyncThunk(
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       uid = cred.user.uid;
     } else {
-      const creds = readCreds();
-      if (creds[email.toLowerCase()]) throw new Error("This email is already registered.");
-      uid = crypto.randomUUID();
-      creds[email.toLowerCase()] = { uid, password };
-      writeCreds(creds);
-      window.localStorage.setItem(SESSION_KEY, uid);
-      window.localStorage.setItem(ADMIN_KEY, "false");
+      uid = await registerDemoUser(email, password);
+      writeSessionUid(uid);
     }
 
     const placementCompleted = Boolean(level);
     const profile: UserProfile = {
-      uid,
-      name,
-      email,
+      ...emptyProfile(uid, name, email),
       level: level || "Beginner",
-      createdAt: new Date().toISOString(),
-      mockResults: [],
-      xp: 0,
-      streak: 0,
-      longestStreak: 0,
-      todayXp: 0,
-      weeklyXp: 0,
-      weekStartDate: weekStartKey(),
-      dailyGoal: DEFAULT_DAILY_GOAL,
-      badges: [],
-      gamesPlayed: 0,
-      placementCompleted: false,
     };
     await createUserProfile(profile);
 
@@ -142,76 +150,33 @@ export const signUp = createAsyncThunk(
       await recordActivity(profile, "placementTest");
       finalProfile = (await getUserProfile(uid)) ?? profile;
     }
-    return { user: finalProfile, isAdmin: email === ADMIN_EMAIL };
+    // A freshly created account is never admin: admin status is an outcome of
+    // signing in as a pre-provisioned admin, never of registering.
+    return { user: finalProfile, isAdmin: false };
   },
 );
 
 export const signIn = createAsyncThunk(
   "auth/signIn",
   async ({ email, password }: { email: string; password: string }) => {
-    const admin = email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD;
-
     if (isFirebaseConfigured && auth) {
-      if (admin) {
-        let fbUser = null as { uid: string } | null;
-        try {
-          const cred = await signInWithEmailAndPassword(auth, email, password);
-          fbUser = cred.user;
-        } catch {
-          try {
-            const cred = await createUserWithEmailAndPassword(auth, email, password);
-            fbUser = cred.user;
-            const existing = await getUserProfile(cred.user.uid);
-            if (!existing) {
-              await createUserProfile({
-                uid: cred.user.uid,
-                name: "Admin",
-                email,
-                level: "Advanced",
-                createdAt: new Date().toISOString(),
-                mockResults: [],
-                xp: 0,
-                streak: 0,
-                longestStreak: 0,
-                todayXp: 0,
-                weeklyXp: 0,
-                weekStartDate: weekStartKey(),
-                dailyGoal: DEFAULT_DAILY_GOAL,
-                badges: [],
-                gamesPlayed: 0,
-                placementCompleted: false,
-              });
-            }
-          } catch {
-            /* Creation also failed — still grant admin access for this session. */
-          }
-        }
-        window.localStorage.setItem(ADMIN_KEY, "true");
-        if (fbUser) {
-          const profile = await loadProfileThunk(fbUser.uid);
-          return { user: profile, isAdmin: true };
-        }
-        return { user: null, isAdmin: true };
-      }
+      // Single path for everyone. The admin account is provisioned in the
+      // Firebase console; there is no code path that can mint one, and no
+      // credential to compare against in the bundle.
       const cred = await signInWithEmailAndPassword(auth, email, password);
+      const isAdmin = isAdminEmail(cred.user.email);
       const profile = await loadProfileThunk(cred.user.uid);
-      return { user: profile, isAdmin: false };
+      if (!profile && isAdmin) {
+        await createUserProfile(emptyProfile(cred.user.uid, "Admin", cred.user.email ?? email));
+      }
+      const resolved = profile ?? (await loadProfileThunk(cred.user.uid));
+      return { user: resolved, isAdmin };
     }
 
-    if (admin) {
-      window.localStorage.setItem(ADMIN_KEY, "true");
-      return { user: null, isAdmin: true };
-    }
-
-    const creds = readCreds();
-    const entry = creds[email.trim().toLowerCase()];
-    if (!entry || entry.password !== password) {
-      throw new Error("Incorrect email or password.");
-    }
-    window.localStorage.setItem(SESSION_KEY, entry.uid);
-    window.localStorage.setItem(ADMIN_KEY, "false");
+    const entry = await authenticateDemoUser(email, password);
+    writeSessionUid(entry.uid);
     const profile = await loadProfileThunk(entry.uid);
-    return { user: profile, isAdmin: false };
+    return { user: profile, isAdmin: isAdminEmail(entry.email) };
   },
 );
 
@@ -219,8 +184,7 @@ export const signOut = createAsyncThunk("auth/signOut", async () => {
   if (isFirebaseConfigured && auth) {
     await fbSignOut(auth);
   }
-  window.localStorage.removeItem(SESSION_KEY);
-  window.localStorage.removeItem(ADMIN_KEY);
+  if (typeof window !== "undefined") window.localStorage.removeItem(SESSION_KEY);
 });
 
 export const refreshUser = createAsyncThunk("auth/refresh", async (_, { getState }) => {

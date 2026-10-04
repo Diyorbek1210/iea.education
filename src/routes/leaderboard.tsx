@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Crown, Medal } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { listMockResults } from "@/lib/db";
+import { fetchLeaderboard } from "@/lib/leaderboardServer";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/shared/lib/utils";
 
@@ -31,28 +31,21 @@ interface RankRow {
 
 function LeaderboardPage() {
   const { user } = useAuth();
-  const { data: results = [] } = useQuery({
-    queryKey: ["mock-results"],
-    queryFn: listMockResults,
+  // Rankings span every student, but mock results also hold each learner's
+  // essays and transcripts — so the aggregate is computed server-side and only
+  // the display fields are returned.
+  const { data } = useQuery({
+    queryKey: ["leaderboard"],
+    queryFn: () => fetchLeaderboard(),
+    staleTime: 60_000,
   });
 
-  const best = new Map<string, { name: string; band: number; attempts: number }>();
-  for (const result of results) {
-    const current = best.get(result.userId);
-    best.set(result.userId, {
-      name: result.userName,
-      band: Math.max(current?.band ?? 0, result.overall),
-      attempts: (current?.attempts ?? 0) + 1,
-    });
-  }
-  const bandRanked: RankRow[] = [...best.entries()]
-    .map(([userId, value]) => ({
-      userId,
-      name: value.name,
-      value: value.band,
-      sub: `${value.attempts} ${value.attempts === 1 ? "attempt" : "attempts"}`,
-    }))
-    .sort((a, b) => b.value - a.value);
+  const bandRanked: RankRow[] = (data?.entries ?? []).map((entry) => ({
+    userId: entry.userId,
+    name: entry.name,
+    value: entry.band,
+    sub: `${entry.attempts} ${entry.attempts === 1 ? "attempt" : "attempts"}`,
+  }));
 
   return (
     <DashboardShell title="Leaderboard" subtitle="Ranked by best mock band score">

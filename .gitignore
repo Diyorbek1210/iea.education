@@ -23,6 +23,8 @@ dist-ssr
 # Secrets
 .env
 .env*
+# …but the documented template is safe to commit and must stay visible.
+!.env.example
 
 # Editor directories and files
 .vscode/*

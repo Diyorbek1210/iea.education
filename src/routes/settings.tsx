@@ -48,7 +48,7 @@ function SettingsPage() {
 
   const { data: plans = [] } = useQuery({
     queryKey: ["study-plans"],
-    queryFn: listStudyPlans,
+    queryFn: () => listStudyPlans(user?.uid),
   });
 
   const existingPlan = plans.find((p) => p.userId === user?.uid);

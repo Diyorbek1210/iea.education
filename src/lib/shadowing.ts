@@ -12,6 +12,7 @@ import {
 import type { TranscriptResponse } from "youtube-transcript";
 
 import { geminiFetchWithRetry } from "@/lib/geminiHttp";
+import { assertSameOrigin, enforceRateLimit } from "@/lib/server-security";
 
 import type { ShadowingSegment } from "@/shared/types/types";
 
@@ -137,7 +138,10 @@ export const extractYouTubeTranscript = createServerFn({ method: "POST" })
       url: z.string().max(1000),
     }),
   )
-  .handler(async ({ data }): Promise<ExtractedTranscript> => {
+  .handler(async ({ data }) => {
+    assertSameOrigin();
+    enforceRateLimit("youtube-transcript", 20, 60_000);
+
     const videoId = extractYouTubeVideoId(data.url);
     if (!videoId) {
       throw new Error("Could not find a valid YouTube video ID in that URL.");
@@ -298,6 +302,8 @@ export const analyzeShadowing = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }): Promise<ShadowingAnalysis> => {
+    assertSameOrigin();
+    enforceRateLimit("gemini-shadowing", 10, 60_000);
     const apiKey = await ensureApiKey();
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not configured on the server.");

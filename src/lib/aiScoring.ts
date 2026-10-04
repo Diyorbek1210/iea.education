@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { geminiFetchWithRetry } from "@/lib/geminiHttp";
+import { assertSameOrigin, enforceRateLimit } from "@/lib/server-security";
 
 import {
   SPEAKING_CRITERIA_LABELS,
@@ -70,6 +71,8 @@ export const scoreMockPerformance = createServerFn({ method: "POST" })
     } satisfies ScoreInput;
   })
   .handler(async ({ data }) => {
+    assertSameOrigin();
+    enforceRateLimit("gemini-score", 8, 60_000);
     // Vite dev loads only VITE_-prefixed .env vars into process.env, and preview/deploy
     // environments (wrangler, nitro) may not load .env at all. When the key is missing,
     // try loading it from .env here (a no op where the key is already set or fs is absent).

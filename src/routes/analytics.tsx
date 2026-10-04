@@ -63,7 +63,7 @@ function AnalyticsPage() {
   const { user } = useAuth();
   const { data: mockResults = [] } = useQuery({
     queryKey: ["mock-results"],
-    queryFn: listMockResults,
+    queryFn: () => listMockResults(user?.uid),
   });
 
   const myResults = useMemo(
