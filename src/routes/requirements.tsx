@@ -25,7 +25,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/requirements")({
   head: () => ({
     meta: [
-      { title: "Requirements — IEA" },
+      { title: "Requirements — Tafakkur Avlodi" },
       { name: "description", content: "IELTS score requirements by country and university." },
     ],
   }),

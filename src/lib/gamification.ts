@@ -26,7 +26,7 @@ export const XP_LEVELS: XpLevelDef[] = [
   { level: 5, minXp: 900, title: "Fluent Fighter" },
   { level: 6, minXp: 1400, title: "Word Warrior" },
   { level: 7, minXp: 2000, title: "Language Master" },
-  { level: 8, minXp: 3000, title: "IEA Legend" },
+  { level: 8, minXp: 3000, title: "Tafakkur Avlodi Legend" },
 ];
 
 export function computeXpLevel(xp = 0): XpLevelDef {

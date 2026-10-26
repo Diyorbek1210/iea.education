@@ -1,4 +1,4 @@
-# Scope: IEA (IELTS & English Access)
+# Scope: Tafakkur Avlodi (Tafakkur avlodi)
 
 A web app that gives learners free, structured IELTS preparation: courses, games, a placement test, and 10 full mock tests with band scoring.
 

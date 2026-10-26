@@ -9,7 +9,7 @@ export function Footer() {
         <div className="sm:col-span-2">
           <Logo />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-            IEA gives free, structured access to IELTS preparation and general English for learners
+            Tafakkur Avlodi gives free, structured access to IELTS preparation and general English for learners
             at every level.
           </p>
         </div>
@@ -58,7 +58,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-border py-5 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} IEA — IELTS &amp; English Access. Learning Today, Leading
+        © {new Date().getFullYear()} Tafakkur Avlodi — Tafakkur avlodi. Learning Today, Leading
         Tomorrow.
       </div>
     </footer>

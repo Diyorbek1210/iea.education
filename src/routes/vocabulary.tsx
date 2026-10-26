@@ -32,7 +32,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/vocabulary")({
   head: () => ({
     meta: [
-      { title: "Vocabulary — IEA" },
+      { title: "Vocabulary — Tafakkur Avlodi" },
       { name: "description", content: "Build your IELTS vocabulary with spaced repetition flashcards." },
     ],
   }),

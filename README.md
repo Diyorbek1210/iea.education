@@ -1,10 +1,10 @@
-# English Access Hub
+# Tafakkur avlodi
 
-# IEA — IELTS & English Access | Lovable uchun to'liq loyiha prompti
+# Tafakkur Avlodi — Tafakkur avlodi | Lovable uchun to'liq loyiha prompti
 
 ## Umumiy g'oya
 
-"IEA (IELTS & English Access)" nomli veb-platforma yasa. Bu platforma foydalanuvchilarga ingliz tilini noldan o'rganish yoki mavjud darajasini oshirishga yordam beradi. Loyiha **Vite + React + TypeScript** asosida, **faqat frontend** (backend kerak emas), ma'lumotlar bazasi sifatida **Firebase (Firestore + Authentication)** ishlatiladi, alohida `firebaseConfig.ts` fayl orqali sozlansin.
+"Tafakkur Avlodi (Tafakkur avlodi)" nomli veb-platforma yasa. Bu platforma foydalanuvchilarga ingliz tilini noldan o'rganish yoki mavjud darajasini oshirishga yordam beradi. Loyiha **Vite + React + TypeScript** asosida, **faqat frontend** (backend kerak emas), ma'lumotlar bazasi sifatida **Firebase (Firestore + Authentication)** ishlatiladi, alohida `firebaseConfig.ts` fayl orqali sozlansin.
 
 ## Dizayn yo'nalishi (stil manbai)
 
@@ -13,7 +13,7 @@ Men tashlagan landing page skrinshotidagi stilni asos qilib ol:
 - Fon: oq / juda ochiq ko'k-kulrang (#F8FAFC)
 - Asosiy rang: to'q ko'k-siyoh (#1E3A8A) va yorqin ko'k (#2563EB) gradient
 - Tugmalar: to'liq yumaloq (pill-shape), gradient fon, oq matn
-- Logo: qalpoqcha (graduation cap) ikonasi + "IEA" qalin qora harflarda, pastida "IELTS & ENGLISH ACCESS" va kichik kursiv slogan "Learning Today, Leading Tomorrow"
+- Logo: qalpoqcha (graduation cap) ikonasi + "Tafakkur Avlodi" qalin qora harflarda, pastida "Tafakkur avlodi" va kichik kursiv slogan "Learning Today, Leading Tomorrow"
 - Shrift: zamonaviy sans-serif (Inter yoki shunga o'xshash), sarlavhalar bold/extra-bold
 - Kartalar: yumshoq soya (shadow), yumaloq burchaklar (rounded-2xl)
 - Umumiy uslub: toza, minimal, professional ta'lim platformasi ko'rinishi (soft SaaS look)
@@ -24,7 +24,7 @@ Men tashlagan landing page skrinshotidagi stilni asos qilib ol:
 
 Quyidagi bo'limlardan iborat (navbar: Home, About, Courses, Teachers, Testimonials, Contact + "Join Now" tugmasi):
 
-- **Hero section**: "Free IELTS & English Access" sarlavhasi, qisqa tavsif, "Join Now" va "Explore Courses" tugmalari, o'ng tomonda IEA logo kartasi + "Trusted by 3000+ learners" badge
+- **Hero section**: "Free Tafakkur avlodi" sarlavhasi, qisqa tavsif, "Join Now" va "Explore Courses" tugmalari, o'ng tomonda Tafakkur Avlodi logo kartasi + "Trusted by 3000+ learners" badge
 - **About**: platforma haqida qisqa ma'lumot
 - **Courses**: taklif qilinadigan yo'nalishlar (IELTS Speaking, Listening, Reading, Writing va umumiy English)
 - **Teachers**: o'qituvchilar bo'limi (kartochkalar)

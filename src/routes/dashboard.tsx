@@ -22,12 +22,12 @@ import type { StudyPlanRecord } from "@/shared/types/types";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — IEA" },
+      { title: "Dashboard — Tafakkur Avlodi" },
       {
         name: "description",
         content: "Your study dashboard: daily tasks, progress and mock test results.",
       },
-      { property: "og:title", content: "Dashboard — IEA" },
+      { property: "og:title", content: "Dashboard — Tafakkur Avlodi" },
       { property: "og:description", content: "Your progress in learning English." },
     ],
   }),
@@ -76,7 +76,7 @@ function getDayOfWeek(): DayOfWeek {
 
 function getCompletedTasks(): Record<string, boolean> {
   try {
-    const raw = localStorage.getItem(`iea_daily_tasks_${getTodayKey()}`);
+    const raw = localStorage.getItem(`ta_daily_tasks_${getTodayKey()}`);
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
@@ -84,7 +84,7 @@ function getCompletedTasks(): Record<string, boolean> {
 }
 
 function saveCompletedTasks(tasks: Record<string, boolean>) {
-  localStorage.setItem(`iea_daily_tasks_${getTodayKey()}`, JSON.stringify(tasks));
+  localStorage.setItem(`ta_daily_tasks_${getTodayKey()}`, JSON.stringify(tasks));
 }
 
 function DailyStudyTasks({ plans }: { plans: StudyPlanRecord[] }) {
@@ -248,18 +248,6 @@ function DashboardPage() {
   return (
     <DashboardShell title="Dashboard" subtitle="Your learning center">
       <div className="space-y-6">
-        <AppHeader
-          eyebrow="Hello, student"
-          title="My Dashboard"
-          subtitle={`Have a great day, ${user.name.split(" ")[0]}! Keep up the momentum.`}
-          className="animate-fade-up"
-          actions={
-            <>
-              <HeaderAction label="Notifications" icon={<Bell className="h-4 w-4" />} badge={2} />
-              <HeaderAction label="Achievements" icon={<Sparkles className="h-4 w-4" />} />
-            </>
-          }
-        />
 
         {/* User Profile */}
         <section className="flex animate-fade-up flex-wrap items-center gap-5 rounded-4xl border border-line bg-white p-6 shadow-soft [animation-delay:40ms]">

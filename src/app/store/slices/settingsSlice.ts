@@ -3,8 +3,8 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 export type Theme = "light" | "dark" | "system";
 export type FontSize = "small" | "medium" | "large";
 
-const THEME_KEY = "iea_theme";
-const FONT_SIZE_KEY = "iea_font_size";
+const THEME_KEY = "ta_theme";
+const FONT_SIZE_KEY = "ta_font_size";
 
 export const SIZE_MAP: Record<FontSize, string> = {
   small: "14px",

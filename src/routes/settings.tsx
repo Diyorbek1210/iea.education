@@ -28,7 +28,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Settings - IEA" },
+      { title: "Settings - Tafakkur Avlodi" },
       { name: "description", content: "Manage your account settings, theme, and study plan." },
     ],
   }),

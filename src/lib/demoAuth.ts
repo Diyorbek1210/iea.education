@@ -7,7 +7,7 @@
  * Hashing uses PBKDF2-SHA256 via WebCrypto with a per-user random salt.
  */
 
-const STORAGE_KEY = "iea_credentials";
+const STORAGE_KEY = "ta_credentials";
 
 export interface DemoCredential {
   uid: string;

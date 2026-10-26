@@ -9,7 +9,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications — IEA" },
+      { title: "Notifications — Tafakkur Avlodi" },
       { name: "description", content: "View your notifications and reminders." },
       {}
     ]

@@ -34,7 +34,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/community")({
   head: () => ({
     meta: [
-      { title: "Community — IEA" },
+      { title: "Community — Tafakkur Avlodi" },
       {
         name: "description",
         content: "Discuss IELTS tips, share experiences, and help other learners.",

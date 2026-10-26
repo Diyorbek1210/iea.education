@@ -80,14 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "IEA — Free IELTS & English Access" },
+      { title: "Tafakkur Avlodi — Free Tafakkur avlodi" },
       { name: "description", content: "Free IELTS and English learning platform." },
-      { name: "author", content: "IEA" },
-      { property: "og:title", content: "IEA — Free IELTS & English Access" },
+      { name: "author", content: "Tafakkur Avlodi" },
+      { property: "og:title", content: "Tafakkur Avlodi — Free Tafakkur avlodi" },
       { property: "og:description", content: "Free IELTS and English learning platform." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@IEA" },
+      { name: "twitter:site", content: "@Tafakkur Avlodi" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -115,12 +115,12 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{localStorage.setItem("iea_theme","light")}catch(e){}`,
+            __html: `try{localStorage.setItem("ta_theme","light")}catch(e){}`,
           }}
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var s=localStorage.getItem("iea_font_size"),m={"small":"14px","medium":"16px","large":"18px"};if(s&&m[s])document.documentElement.style.fontSize=m[s]}catch(e){}`,
+            __html: `try{var s=localStorage.getItem("ta_font_size"),m={"small":"14px","medium":"16px","large":"18px"};if(s&&m[s])document.documentElement.style.fontSize=m[s]}catch(e){}`,
           }}
         />
         <HeadContent />

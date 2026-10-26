@@ -23,13 +23,13 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/test")({
   head: () => ({
     meta: [
-      { title: "Placement Test — IEA" },
+      { title: "Placement Test — Tafakkur Avlodi" },
       {
         name: "description",
         content:
           "Answer 20 questions and get your English level instantly, from Beginner to Advanced.",
       },
-      { property: "og:title", content: "Placement Test — IEA" },
+      { property: "og:title", content: "Placement Test — Tafakkur Avlodi" },
       {
         property: "og:description",
         content: "A quick 20-question test that defines your English level before you register.",

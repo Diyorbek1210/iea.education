@@ -35,7 +35,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/practice")({
   head: () => ({
     meta: [
-      { title: "Practice with AI — IEA" },
+      { title: "Practice with AI — Tafakkur Avlodi" },
       { name: "description", content: "Practice IELTS speaking with an AI partner." },
     ],
   }),

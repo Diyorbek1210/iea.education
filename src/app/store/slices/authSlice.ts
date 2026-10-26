@@ -15,7 +15,7 @@ import { createUserProfile, getUserProfile, recordActivity } from "@/lib/db";
 import { DEFAULT_DAILY_GOAL, weekStartKey } from "@/lib/gamification";
 import type { UserProfile } from "@/shared/types/types";
 
-const SESSION_KEY = "iea_session_uid";
+const SESSION_KEY = "ta_session_uid";
 
 /**
  * The signed-in uid is the only thing persisted. Neither a password nor an

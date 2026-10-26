@@ -23,7 +23,7 @@ import type { ResourceDoc } from "@/shared/types/types";
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Resources - IEA" },
+      { title: "Resources - Tafakkur Avlodi" },
       { name: "description", content: "Curated IELTS preparation resources, links, and materials." },
     ],
   }),

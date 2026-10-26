@@ -18,7 +18,6 @@ import { auth, db, isFirebaseConfigured } from "@/shared/config/firebase";
 import { deleteAuthUser } from "./authAdmin";
 import { placementQuestions as staticPlacementQuestions } from "@/shared/data/placement";
 import { IELTS_RESOURCES } from "@/shared/data/resources";
-import { SEED_LEARNING_STEPS } from "@/shared/data/learningPath";
 import { BADGES, type BadgeDef } from "@/shared/data/badges";
 import { VOCABULARY, type VocabWord, type VocabTopic } from "@/shared/data/vocabulary";
 import { MODEL_ANSWERS, type ModelAnswer } from "@/shared/data/modelAnswers";
@@ -46,7 +45,6 @@ import type {
   PlacementQuestion,
   PracticeSession,
   ResourceDoc,
-  LearningPathStepDoc,
   ShadowingClip,
   StudyPlanRecord,
   UserProfile,
@@ -71,16 +69,15 @@ export function levelForBand(overall: number): Level {
  * ------------------------------------------------------------------ */
 
 const KEYS = {
-  users: "iea_users",
-  mocks: "iea_mock_results",
-  resources: "iea_resources",
-  learningPath: "iea_learning_path",
-  placement: "iea_placement_questions",
-  vocabulary: "iea_vocabulary",
-  modelAnswers: "iea_model_answers",
-  countryRequirements: "iea_country_requirements",
-  universityRequirements: "iea_university_requirements",
-  shadowing: "iea_shadowing_clips",
+  users: "ta_users",
+  mocks: "ta_mock_results",
+  resources: "ta_resources",
+    placement: "ta_placement_questions",
+  vocabulary: "ta_vocabulary",
+  modelAnswers: "ta_model_answers",
+  countryRequirements: "ta_country_requirements",
+  universityRequirements: "ta_university_requirements",
+  shadowing: "ta_shadowing_clips",
 };
 
 function read<T>(key: string, fallback: T): T {
@@ -796,7 +793,7 @@ export async function deletePlacementQuestion(id: string): Promise<void> {
  * Practice Sessions
  * ------------------------------------------------------------------ */
 
-const PRACTICE_KEY = "iea_practice_sessions";
+const PRACTICE_KEY = "ta_practice_sessions";
 
 export async function listPracticeSessions(uid?: string): Promise<PracticeSession[]> {
   if (!isFirebaseConfigured || !db) {
@@ -821,7 +818,7 @@ export async function addPracticeSession(session: Omit<PracticeSession, "id">): 
  * Writing Submissions
  * ------------------------------------------------------------------ */
 
-const WRITING_KEY = "iea_writing_submissions";
+const WRITING_KEY = "ta_writing_submissions";
 
 export async function listWritingSubmissions(uid?: string): Promise<WritingSubmission[]> {
   if (!isFirebaseConfigured || !db) {
@@ -849,7 +846,7 @@ export async function addWritingSubmission(
  * Study Plans
  * ------------------------------------------------------------------ */
 
-const STUDY_PLAN_KEY = "iea_study_plans";
+const STUDY_PLAN_KEY = "ta_study_plans";
 
 export async function listStudyPlans(uid?: string): Promise<StudyPlanRecord[]> {
   if (!isFirebaseConfigured || !db) {
@@ -890,7 +887,7 @@ export interface VocabWordDoc extends VocabWord {
   id: string;
 }
 
-const VOCAB_KEY = "iea_vocabulary";
+const VOCAB_KEY = "ta_vocabulary";
 
 function seedLocalVocabulary(): VocabWordDoc[] {
   const existing = read<VocabWordDoc[] | null>(VOCAB_KEY, null);
@@ -954,7 +951,7 @@ export interface ModelAnswerDoc extends ModelAnswer {
   id: string;
 }
 
-const MODEL_ANSWER_KEY = "iea_model_answers";
+const MODEL_ANSWER_KEY = "ta_model_answers";
 
 function seedLocalModelAnswers(): ModelAnswerDoc[] {
   const existing = read<ModelAnswerDoc[] | null>(MODEL_ANSWER_KEY, null);
@@ -1020,8 +1017,8 @@ export interface UniversityRequirementDoc extends UniversityRequirement {
   id: string;
 }
 
-const COUNTRY_REQ_KEY = "iea_country_requirements";
-const UNI_REQ_KEY = "iea_university_requirements";
+const COUNTRY_REQ_KEY = "ta_country_requirements";
+const UNI_REQ_KEY = "ta_university_requirements";
 
 function seedLocalCountryRequirements(): CountryRequirementDoc[] {
   const existing = read<CountryRequirementDoc[] | null>(COUNTRY_REQ_KEY, null);
@@ -1148,7 +1145,7 @@ export async function deleteUniversityRequirement(id: string): Promise<void> {
  * Mock Tests (admin-managed)
  * ------------------------------------------------------------------ */
 
-const MOCK_TEST_KEY = "iea_mock_tests";
+const MOCK_TEST_KEY = "ta_mock_tests";
 
 function seedLocalMockTests(): MockTestSet[] {
   const existing = read<MockTestSet[] | null>(MOCK_TEST_KEY, null);
@@ -1209,7 +1206,7 @@ export async function deleteMockTest(id: string): Promise<void> {
  * Community Threads & Replies
  * ------------------------------------------------------------------ */
 
-const COMMUNITY_KEY = "iea_community_threads";
+const COMMUNITY_KEY = "ta_community_threads";
 
 const SEED_THREADS: CommunityThread[] = [
   {
@@ -1433,103 +1430,3 @@ export async function deleteCommunityReply(threadId: string, replyId: string): P
   await deleteDoc(doc(db, "communityThreads", threadId, "replies", replyId));
 }
 
-/* ------------------------------------------------------------------ *
- * Learning path steps (admin-managed)
- * ------------------------------------------------------------------ */
-
-export async function listLearningSteps(): Promise<LearningPathStepDoc[]> {
-  if (!isFirebaseConfigured || !db) {
-    return read<LearningPathStepDoc[]>(KEYS.learningPath, SEED_LEARNING_STEPS).sort(
-      (a, b) => a.order - b.order,
-    );
-  }
-  const snap = await getDocs(query(collection(db, "learningSteps"), orderBy("order", "asc")));
-  if (snap.empty) {
-    const seeded = SEED_LEARNING_STEPS.map((s, i) => ({ ...s, order: i }));
-    for (const step of seeded) {
-      const { id, ...data } = step;
-      await setDoc(doc(db, "learningSteps", id), data);
-    }
-    return seeded;
-  }
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<LearningPathStepDoc, "id">) }));
-}
-
-export async function addLearningStep(
-  step: Omit<LearningPathStepDoc, "id" | "createdAt" | "order">,
-): Promise<void> {
-  const now = new Date().toISOString();
-  if (!isFirebaseConfigured || !db) {
-    const existing = read<LearningPathStepDoc[]>(KEYS.learningPath, []);
-    const maxOrder = existing.reduce((max, s) => Math.max(max, s.order), -1);
-    write(KEYS.learningPath, [
-      ...existing,
-      { ...step, id: crypto.randomUUID(), order: maxOrder + 1, createdAt: now },
-    ]);
-    return;
-  }
-  const snap = await getDocs(collection(db, "learningSteps"));
-  const maxOrder = snap.docs.reduce((max, d) => {
-    const data = d.data() as Omit<LearningPathStepDoc, "id">;
-    return Math.max(max, data.order ?? 0);
-  }, -1);
-  await addDoc(collection(db, "learningSteps"), { ...step, order: maxOrder + 1, createdAt: now });
-}
-
-export async function updateLearningStep(
-  id: string,
-  data: Partial<Omit<LearningPathStepDoc, "id" | "createdAt">>,
-): Promise<void> {
-  if (!isFirebaseConfigured || !db) {
-    const existing = read<LearningPathStepDoc[]>(KEYS.learningPath, []);
-    write(
-      KEYS.learningPath,
-      existing.map((s) => (s.id === id ? { ...s, ...data } : s)),
-    );
-    return;
-  }
-  await updateDoc(doc(db, "learningSteps", id), data);
-}
-
-export async function deleteLearningStep(id: string): Promise<void> {
-  if (!isFirebaseConfigured || !db) {
-    const existing = read<LearningPathStepDoc[]>(KEYS.learningPath, []);
-    const filtered = existing.filter((s) => s.id !== id);
-    filtered.forEach((s, i) => {
-      s.order = i;
-    });
-    write(KEYS.learningPath, filtered);
-    return;
-  }
-  await deleteDoc(doc(db, "learningSteps", id));
-}
-
-export async function moveLearningStep(id: string, direction: "up" | "down"): Promise<void> {
-  if (!isFirebaseConfigured || !db) {
-    const existing = read<LearningPathStepDoc[]>(KEYS.learningPath, []).sort(
-      (a, b) => a.order - b.order,
-    );
-    const idx = existing.findIndex((s) => s.id === id);
-    if (idx < 0) return;
-    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= existing.length) return;
-    const temp = existing[idx]!.order;
-    existing[idx]!.order = existing[swapIdx]!.order;
-    existing[swapIdx]!.order = temp;
-    write(KEYS.learningPath, existing);
-    return;
-  }
-  const snap = await getDocs(query(collection(db, "learningSteps"), orderBy("order", "asc")));
-  const docs = snap.docs.map((d) => ({
-    ref: d.ref,
-    data: d.data() as Omit<LearningPathStepDoc, "id">,
-  }));
-  const idx = docs.findIndex((d) => d.ref.id === id);
-  if (idx < 0) return;
-  const swapIdx = direction === "up" ? idx - 1 : idx + 1;
-  if (swapIdx < 0 || swapIdx >= docs.length) return;
-  const a = docs[idx]!;
-  const b = docs[swapIdx]!;
-  await updateDoc(a.ref, { order: b.data.order });
-  await updateDoc(b.ref, { order: a.data.order });
-}

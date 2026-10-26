@@ -27,12 +27,12 @@ export function About() {
   return (
     <section id="about" className="mx-auto max-w-7xl px-5 py-20">
       <div className="mx-auto max-w-2xl text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">About IEA</p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">About Tafakkur Avlodi</p>
         <h2 className="mt-3 text-3xl font-extrabold text-foreground sm:text-4xl">
           An English academy that fits into your day
         </h2>
         <p className="mt-4 text-muted-foreground">
-          IEA — IELTS &amp; English Access — is a free learning platform built for students who want
+          Tafakkur Avlodi — Tafakkur avlodi — is a free learning platform built for students who want
           measurable progress. Learn at your pace, test yourself often, and see exactly how far
           you&apos;ve come.
         </p>

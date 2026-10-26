@@ -11,7 +11,7 @@ export interface SrsCard {
   incorrectCount: number;
 }
 
-const SRS_KEY = "iea_srs_cards";
+const SRS_KEY = "ta_srs_cards";
 
 function loadSrsCards(): Map<string, SrsCard> {
   if (typeof window === "undefined") return new Map();

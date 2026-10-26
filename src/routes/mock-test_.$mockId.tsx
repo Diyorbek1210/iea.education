@@ -34,7 +34,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/mock-test_/$mockId")({
   head: () => ({
     meta: [
-      { title: "IELTS Mock Test — IEA" },
+      { title: "IELTS Mock Test — Tafakkur Avlodi" },
       {
         name: "description",
         content:

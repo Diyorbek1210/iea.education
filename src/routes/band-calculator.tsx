@@ -11,7 +11,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/band-calculator")({
   head: () => ({
     meta: [
-      { title: "Band Calculator — IEA" },
+      { title: "Band Calculator — Tafakkur Avlodi" },
       { name: "description", content: "Calculate your overall IELTS band score from individual skill scores." },
     ],
   }),

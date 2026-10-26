@@ -10,13 +10,13 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
     meta: [
-      { title: "Leaderboard - IEA" },
+      { title: "Leaderboard - Tafakkur Avlodi" },
       {
         name: "description",
-        content: "See the top IEA learners ranked by their best IELTS mock band score.",
+        content: "See the top Tafakkur Avlodi learners ranked by their best IELTS mock band score.",
       },
-      { property: "og:title", content: "Leaderboard - IEA" },
-      { property: "og:description", content: "Compete with other IEA students for the top spot." },
+      { property: "og:title", content: "Leaderboard - Tafakkur Avlodi" },
+      { property: "og:description", content: "Compete with other Tafakkur Avlodi students for the top spot." },
     ],
   }),
   component: LeaderboardPage,

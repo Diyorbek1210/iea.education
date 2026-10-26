@@ -22,7 +22,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-md">
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3">
-        <Link to="/" aria-label="IEA home">
+        <Link to="/" aria-label="Tafakkur Avlodi home">
           <Logo />
         </Link>
 

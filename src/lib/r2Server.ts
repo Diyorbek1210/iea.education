@@ -103,7 +103,7 @@ export const uploadToR2 = createServerFn({ method: "POST" })
               ? "inline"
               : `attachment; filename="${key.slice(key.lastIndexOf("/") + 1)}"`,
           CacheControl: "private, max-age=86400",
-          Metadata: { source: "iea-upload" },
+          Metadata: { source: "ta-upload" },
         }),
       );
     } catch (err) {

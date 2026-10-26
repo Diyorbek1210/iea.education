@@ -16,7 +16,7 @@ const schema = z.object({
 });
 
 const details = [
-  { icon: Mail, label: "Email", value: "hello@iea-academy.uz" },
+  { icon: Mail, label: "Email", value: "hello@ta-academy.uz" },
   { icon: Phone, label: "Phone", value: "+998 90 000 00 00" },
   { icon: MapPin, label: "Location", value: "Tashkent, Uzbekistan (online worldwide)" },
 ];
@@ -44,7 +44,7 @@ export function Contact() {
             Questions before you start?
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Write to us and the IEA team will answer within one working day. Or skip ahead — take
+            Write to us and the Tafakkur Avlodi team will answer within one working day. Or skip ahead — take
             the placement test and start learning right now.
           </p>
 

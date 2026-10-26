@@ -28,12 +28,12 @@ const loginSearchSchema = z.object({
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — IEA" },
+      { title: "Sign in — Tafakkur Avlodi" },
       {
         name: "description",
-        content: "Sign in to your IEA account to continue your English and IELTS lessons.",
+        content: "Sign in to your Tafakkur Avlodi account to continue your English and IELTS lessons.",
       },
-      { property: "og:title", content: "Sign in — IEA" },
+      { property: "og:title", content: "Sign in — Tafakkur Avlodi" },
       {
         property: "og:description",
         content: "Access your dashboard, mock tests and the leaderboard.",
@@ -94,7 +94,7 @@ function LoginPage() {
 
       <div className="relative w-full max-w-lg">
         <div className="mb-7 flex flex-col items-center gap-4">
-          <Logo wordmark="IEA" showLabel label="STUDENT PORTAL" />
+          <Logo wordmark="Tafakkur Avlodi" showLabel label="STUDENT PORTAL" />
         </div>
 
         <div className="rounded-5xl border border-slate-200/70 bg-white p-8 shadow-lift sm:p-9">

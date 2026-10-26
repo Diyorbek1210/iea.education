@@ -10,7 +10,7 @@ export interface AppNotification {
   actionUrl?: string;
 }
 
-const NOTIF_KEY = "iea_notifications";
+const NOTIF_KEY = "ta_notifications";
 
 export type NewNotification = Omit<AppNotification, "id" | "date" | "read">;
 

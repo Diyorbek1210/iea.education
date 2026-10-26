@@ -83,28 +83,12 @@ import {
   updateResource,
   uploadResourceFile,
   seedAllDataToFirestore,
-  listLearningSteps,
-  addLearningStep,
-  updateLearningStep,
-  deleteLearningStep,
-  moveLearningStep,
-  listShadowingClips,
-  addShadowingClip,
-  updateShadowingClip,
-  deleteShadowingClip,
-  uploadShadowingFile,
-  listCommunityThreads,
-  addCommunityReply,
-  deleteCommunityThread as deleteCommunityThreadFromDb,
-  deleteCommunityReply as deleteCommunityReplyFromDb,
-  type SeedProgress,
 } from "@/lib/db";
 import type {
   CommunityReply,
   CommunityThread,
   Level,
   ResourceDoc,
-  LearningPathStepDoc,
   ShadowingClip,
   ShadowingSegment,
   ThreadCategory,
@@ -117,17 +101,16 @@ import type {
   UniversityRequirementDoc,
 } from "@/lib/db";
 import type { MockTestSet } from "@/shared/data/mockTest";
-import { TECH, TECH_KEYS } from "@/shared/data/learningPath";
 import { cn } from "@/shared/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Panel - IEA" },
-      { name: "description", content: "Manage IEA students, resources and placement tests." },
+      { title: "Admin Panel" },
+      { name: "description", content: "Manage students, resources and placement tests." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Admin Panel - IEA" },
-      { property: "og:description", content: "Internal management area for IEA administrators." },
+      { property: "og:title", content: "Admin Panel" },
+      { property: "og:description", content: "Internal management area for administrators." },
     ],
   }),
   // Cheap redirect before the component tree mounts. This is UX, not the
@@ -146,7 +129,7 @@ type Tab =
   | "overview"
   | "students"
   | "resources"
-  | "learning-path"
+  | ""
   | "placement"
   | "results"
   | "vocabulary"
@@ -164,7 +147,7 @@ const tabs: { id: Tab; label: string; icon: typeof Users }[] = [
   { id: "results", label: "Mock results", icon: GraduationCap },
   { id: "placement", label: "Placement test", icon: ClipboardList },
   { id: "resources", label: "Resources", icon: Globe },
-  { id: "learning-path", label: "Learning Path", icon: RouteIcon },
+  { id: "", label: "", icon: RouteIcon },
   { id: "vocabulary", label: "Vocabulary", icon: BookOpen },
   { id: "model-answers", label: "Model Answers", icon: FileText },
   { id: "requirements", label: "Requirements", icon: Target },
@@ -184,7 +167,7 @@ const navSections: { label: string; items: { id: Tab; label: string; icon: typeo
   {
     label: "Learning content",
     items: [
-      "learning-path",
+      "",
       "resources",
       "vocabulary",
       "model-answers",
@@ -209,14 +192,6 @@ function AdminSidebar({
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 px-4 pt-5">
         <Logo compact />
-        <div className="min-w-0">
-          <p className="truncate text-[12px] font-black uppercase tracking-widest text-ink">
-            IEA Admin
-          </p>
-          <p className="text-[9px] font-black uppercase tracking-[0.25em] text-ink-faint">
-            Control panel
-          </p>
-        </div>
       </div>
 
       <nav className="mt-6 flex-1 space-y-6 overflow-y-auto px-3" aria-label="Admin sections">
@@ -421,10 +396,6 @@ function AdminPanel() {
     queryKey: ["resources"],
     queryFn: listResources,
   });
-  const { data: learningSteps = [] } = useQuery({
-    queryKey: ["learning-steps"],
-    queryFn: listLearningSteps,
-  });
   const { data: placementQuestions = [] } = useQuery({
     queryKey: ["placement-questions"],
     queryFn: listPlacementQuestions,
@@ -583,73 +554,6 @@ function AdminPanel() {
     } finally {
       setUploadingResource(false);
     }
-  }
-
-  // Learning path form state
-  const emptyLearningStep = {
-    title: "",
-    description: "",
-    lessons: 3,
-    minutes: 60,
-    tech: [] as string[],
-    finish: false,
-  };
-  const [learningStepForm, setLearningStepForm] = useState(emptyLearningStep);
-  const [editingLearningStepId, setEditingLearningStepId] = useState<string | null>(null);
-
-  function editLearningStep(s: LearningPathStepDoc) {
-    setEditingLearningStepId(s.id);
-    setLearningStepForm({
-      title: s.title,
-      description: s.description,
-      lessons: s.lessons,
-      minutes: s.minutes,
-      tech: [...s.tech],
-      finish: !!s.finish,
-    });
-  }
-
-  function resetLearningStepForm() {
-    setLearningStepForm(emptyLearningStep);
-    setEditingLearningStepId(null);
-  }
-
-  async function submitLearningStep() {
-    if (!learningStepForm.title.trim() || !learningStepForm.description.trim()) {
-      toast.error("Title and description are required");
-      return;
-    }
-    const payload = {
-      title: learningStepForm.title.trim(),
-      description: learningStepForm.description.trim(),
-      lessons: Math.max(1, learningStepForm.lessons),
-      minutes: Math.max(1, learningStepForm.minutes),
-      tech: learningStepForm.tech,
-      finish: learningStepForm.finish,
-    };
-    if (editingLearningStepId) {
-      await updateLearningStep(editingLearningStepId, payload);
-      toast.success("Step updated");
-    } else {
-      await addLearningStep(payload);
-      toast.success("Step added");
-    }
-    resetLearningStepForm();
-    queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
-  }
-
-  async function removeLearningStep(id: string) {
-    await deleteLearningStep(id);
-    if (editingLearningStepId === id) resetLearningStepForm();
-    queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
-    toast.success("Step deleted");
-  }
-
-  function toggleLearningStepTech(key: string) {
-    setLearningStepForm((prev) => ({
-      ...prev,
-      tech: prev.tech.includes(key) ? prev.tech.filter((t) => t !== key) : [...prev.tech, key],
-    }));
   }
 
   // Vocabulary form state
@@ -1617,13 +1521,13 @@ function AdminPanel() {
               </section>
             )}
 
-            {tab === "learning-path" && (
+            {tab === "" && (
               <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
                 <div className="rounded-4xl border border-line bg-white p-6 shadow-soft">
                   <SectionTitle
                     icon={RouteIcon}
                     title={editingLearningStepId ? "Edit step" : "Add a learning step"}
-                    subtitle="Steps appear as modules on the student Learning Path page."
+                    subtitle="Steps appear as modules on the student  page."
                   />
                   <div className="mt-5 space-y-4">
                     <div>
@@ -1790,8 +1694,7 @@ function AdminPanel() {
                           size="sm"
                           disabled={index === 0}
                           onClick={async () => {
-                            await moveLearningStep(item.id, "up");
-                            queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+                            await                             queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
                           }}
                         >
                           <ArrowUp className="h-4 w-4" />
@@ -1801,8 +1704,7 @@ function AdminPanel() {
                           size="sm"
                           disabled={index === learningSteps.length - 1}
                           onClick={async () => {
-                            await moveLearningStep(item.id, "down");
-                            queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+                            await                             queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
                           }}
                         >
                           <ArrowDown className="h-4 w-4" />
@@ -1814,8 +1716,7 @@ function AdminPanel() {
                           variant="ghost"
                           size="sm"
                           onClick={async () => {
-                            await deleteLearningStep(item.id);
-                            queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
+                            await                             queryClient.invalidateQueries({ queryKey: ["learning-steps"] });
                             toast.success("Step deleted");
                           }}
                         >

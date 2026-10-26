@@ -12,13 +12,13 @@ import { Testimonials } from "@/components/landing/Testimonials";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "IEA — Free IELTS & English Access" },
+      { title: "Tafakkur Avlodi — Free Tafakkur avlodi" },
       {
         name: "description",
         content:
           "Free IELTS and English learning platform: placement test, video lessons, games, full mock exams and a live leaderboard.",
       },
-      { property: "og:title", content: "IEA — Free IELTS & English Access" },
+      { property: "og:title", content: "Tafakkur Avlodi — Free Tafakkur avlodi" },
       {
         property: "og:description",
         content:

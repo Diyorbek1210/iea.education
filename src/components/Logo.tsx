@@ -4,7 +4,7 @@ import { cn } from "@/shared/lib/utils";
 
 export function Logo({
   className,
-  wordmark = "IEA",
+  wordmark = "Tafakkur Avlodi",
   showLabel = false,
   label = "STUDENT PORTAL",
   compact = false,

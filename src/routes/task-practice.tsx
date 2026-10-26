@@ -50,7 +50,7 @@ import {
 export const Route = createFileRoute("/task-practice")({
   head: () => ({
     meta: [
-      { title: "Task Practice — IEA" },
+      { title: "Task Practice — Tafakkur Avlodi" },
       { name: "description", content: "Practice individual IELTS sections and question types." },
     ],
   }),

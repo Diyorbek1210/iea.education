@@ -1,7 +1,7 @@
 rules_version = '2';
 
 /**
- * Firestore security rules for the IEA app.
+ * Firestore security rules for the Tafakkur Avlodi app.
  *
  * These are the real access-control boundary. Client-side `isAdmin` flags and
  * route guards are UX; everything here is enforced by Firebase regardless of

@@ -38,7 +38,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/analytics")({
   head: () => ({
     meta: [
-      { title: "Analytics — IEA" },
+      { title: "Analytics — Tafakkur Avlodi" },
       { name: "description", content: "Detailed performance analytics and progress tracking." },
     ],
   }),

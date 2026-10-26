@@ -57,7 +57,7 @@ export function Hero() {
             <Logo />
             <img
               src={heroStudent}
-              alt="Student learning English with IEA"
+              alt="Student learning English with Tafakkur Avlodi"
               width={1024}
               height={1024}
               className="mt-6 aspect-[4/3] w-full rounded-3xl object-cover"

@@ -13,7 +13,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/model-answers")({
   head: () => ({
     meta: [
-      { title: "Model Answers — IEA" },
+      { title: "Model Answers — Tafakkur Avlodi" },
       { name: "description", content: "Band-scored essays, speaking samples, and reading/listening guides with explanations." },
     ],
   }),

@@ -29,7 +29,6 @@ import { cn } from "@/shared/lib/utils";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/learn", label: "Learning Path", icon: Route },
   { to: "/mock-test", label: "Mock Test", icon: ClipboardCheck },
   { to: "/task-practice", label: "Task Practice", icon: Target },
   { to: "/practice", label: "Practice with AI", icon: Bot },

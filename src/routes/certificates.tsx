@@ -25,7 +25,7 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/certificates")({
   head: () => ({
     meta: [
-      { title: "Certificates & Reports — IEA" },
+      { title: "Certificates & Reports — Tafakkur Avlodi" },
       { name: "description", content: "View your progress reports and download certificates." },
     ],
   }),
@@ -278,7 +278,7 @@ function CertificatesPage() {
                 </div>
 
                 <p className="mt-4 text-[11px] font-bold tracking-[0.4em] text-muted-foreground uppercase">
-                  IEA · IELTS Exam Academy
+                  Tafakkur Avlodi · Tafakkur avlodi
                 </p>
                 <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
                   Certificate of Achievement
@@ -301,7 +301,7 @@ function CertificatesPage() {
                 <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
                   has successfully completed the{" "}
                   <span className="font-bold text-foreground">IELTS Preparation</span> programme at
-                  the International English Academy, demonstrating outstanding performance across
+                  the Tafakkur avlodi, demonstrating outstanding performance across
                   all four skills — Listening, Reading, Writing and Speaking — and was conferred an
                   overall band score of
                 </p>
@@ -338,7 +338,7 @@ function CertificatesPage() {
                   <span className="h-3 w-px bg-border" />
                   <span>
                     Certificate No.{" "}
-                    {`IEA-${new Date().getFullYear()}-${(user?.uid ?? "STUDENT").slice(0, 6).toUpperCase()}`}
+                    {`Tafakkur Avlodi-${new Date().getFullYear()}-${(user?.uid ?? "STUDENT").slice(0, 6).toUpperCase()}`}
                   </span>
                 </div>
 
@@ -363,7 +363,7 @@ function CertificatesPage() {
                           <p className="mt-1 text-[9px] font-black uppercase leading-none tracking-widest text-amber-600">
                             Verified
                           </p>
-                          <p className="mt-0.5 text-[8px] font-bold text-amber-600/80">IEA · 2026</p>
+                          <p className="mt-0.5 text-[8px] font-bold text-amber-600/80">Tafakkur Avlodi · 2026</p>
                         </div>
                       </div>
                     </div>
@@ -381,7 +381,7 @@ function CertificatesPage() {
                 </div>
 
                 <p className="mx-auto mt-10 max-w-md text-[10px] font-medium uppercase tracking-widest text-amber-600/70">
-                  Certified by the founders of IEA — IELTS Exam Academy
+                  Certified by the founders of Tafakkur Avlodi — Tafakkur avlodi
                 </p>
               </div>
             </div>

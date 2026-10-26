@@ -12,12 +12,12 @@ import { cn } from "@/shared/lib/utils";
 export const Route = createFileRoute("/mock-test")({
   head: () => ({
     meta: [
-      { title: "IELTS Mock Tests — IEA" },
+      { title: "IELTS Mock Tests — Tafakkur Avlodi" },
       {
         name: "description",
         content: "Ten full IELTS mock tests — complete them in order to track your progress.",
       },
-      { property: "og:title", content: "IELTS Mock Tests — IEA" },
+      { property: "og:title", content: "IELTS Mock Tests — Tafakkur Avlodi" },
       {
         property: "og:description",
         content: "Complete mock tests in order and track your band scores.",

@@ -35,13 +35,13 @@ export const Route = createFileRoute("/register")({
   }),
   head: () => ({
     meta: [
-      { title: "Create your IEA account" },
+      { title: "Create your Tafakkur Avlodi account" },
       {
         name: "description",
         content:
-          "Register for free and unlock IEA video lessons, practice tests and IELTS mock exams.",
+          "Register for free and unlock Tafakkur Avlodi video lessons, practice tests and IELTS mock exams.",
       },
-      { property: "og:title", content: "Create your IEA account" },
+      { property: "og:title", content: "Create your Tafakkur Avlodi account" },
       {
         property: "og:description",
         content: "Your placement level is saved to your profile automatically.",

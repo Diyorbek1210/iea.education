@@ -1,4 +1,4 @@
-const CACHE_NAME = "iea-v1";
+const CACHE_NAME = "ta-v1";
 const STATIC_ASSETS = [
   "/",
   "/dashboard",
